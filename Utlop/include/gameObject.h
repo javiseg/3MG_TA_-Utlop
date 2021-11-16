@@ -6,6 +6,7 @@
 
 #include "material.h"
 #include "transform.h"
+#include <vector>
 
 namespace Utlop
 {
@@ -30,6 +31,7 @@ namespace Utlop
     private:
       GLuint _vao;
       GLuint _vbo;
+			std::vector<float> _array;
 
       Material _material;
       Transform _transform;
