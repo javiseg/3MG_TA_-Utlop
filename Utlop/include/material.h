@@ -16,6 +16,7 @@ namespace Utlop
       void draw();
 
       void loadShader(char* vertexFilename, char* fragmentFilename);
+			GLuint ProgramNumber();
 
     protected:
 

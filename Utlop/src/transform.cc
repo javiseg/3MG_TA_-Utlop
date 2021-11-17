@@ -50,4 +50,8 @@ namespace Utlop
   {
     _rotation += rotation;
   }
+	glm::vec3 Transform::Position()
+	{
+		return _position;
+	}
 }

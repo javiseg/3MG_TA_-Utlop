@@ -33,6 +33,11 @@ namespace Utlop
     glLinkProgram(_shader);
   }
 
+	GLuint Material::ProgramNumber()
+	{
+		return _shader;
+	}
+
   void Material::loadVertexShader(char* filename)
   {
     std::ifstream inputVertexShader(filename);

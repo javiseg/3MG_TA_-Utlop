@@ -24,6 +24,8 @@ namespace Utlop
       void scale(glm::vec3 scale);
       void rotate(glm::vec4 rotation);
 
+			glm::vec3 Position();
+
     protected:
 
     private:
