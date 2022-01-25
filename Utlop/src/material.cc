@@ -1,5 +1,7 @@
 #include "material.h"
 #include <fstream>
+#include <math.h>
+#include <vector>
 
 namespace Utlop
 {
@@ -26,9 +28,36 @@ namespace Utlop
     setParameters();
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
+		int bufflen = 0;
+		glGetShaderiv(_vertex_shader, GL_COMPILE_STATUS, &bufflen);
+		if (bufflen > 1)
+		{
+			GLchar* log_string = new char[bufflen + 1];
+			glGetShaderInfoLog(_vertex_shader, bufflen, 0, log_string);
+			printf("Log found for vert:\n%s", log_string);
+
+			delete[] log_string;
+		}
+
+		glGetShaderiv(_fragment_shader, GL_COMPILE_STATUS, &bufflen);
+		if (bufflen != GL_TRUE)
+		{
+			printf("Failed to compile fragment shader.");
+
+		}
+		
+		
   }
 
-  void Material::setParameters() { }
+  void Material::setParameters() {
+	
+		float color[3] = { 1.0f, 1.0f, 1.0f };
+
+		GLuint matrix = glGetUniformLocation(_shader, "new_color");
+		printf("%d\n", matrix);
+		glUniform3fv(matrix, 1, color);
+	
+	}
 
   void Material::loadShader(char* vertexFilename, char* fragmentFilename)
   {
