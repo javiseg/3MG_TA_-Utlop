@@ -10,7 +10,8 @@ namespace Utlop
 
   Material::~Material()
   {
-
+    glDeleteShader(_vertex_shader);
+    glDeleteShader(_fragment_shader);
   }
 
   void Material::init()
@@ -22,8 +23,12 @@ namespace Utlop
   {
     glUseProgram(_shader);
 
+    setParameters();
+
     glDrawArrays(GL_TRIANGLES, 0, 3);
   }
+
+  void Material::setParameters() { }
 
   void Material::loadShader(char* vertexFilename, char* fragmentFilename)
   {
@@ -33,10 +38,20 @@ namespace Utlop
     glLinkProgram(_shader);
   }
 
-	GLuint Material::ProgramNumber()
-	{
-		return _shader;
-	}
+  void Material::setBool(const char* name, bool value)
+  {
+    glUniform1i(glGetUniformLocation(_shader, name), (int)value);
+  }
+
+  void Material::setInt(const char* name, int value)
+  {
+    glUniform1i(glGetUniformLocation(_shader, name), value);
+  }
+
+  void Material::setFloat(const char* name, float value)
+  {
+    glUniform1f(glGetUniformLocation(_shader, name), value);
+  }
 
   void Material::loadVertexShader(char* filename)
   {

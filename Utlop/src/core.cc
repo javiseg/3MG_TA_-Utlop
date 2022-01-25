@@ -9,10 +9,13 @@
 
 namespace Utlop
 {
+  Core* Core::_instance = nullptr;
+
   Core::Core()
   {
     _fps = 0.0f;
     _frame_time_millis = 0;
+    _instance = this;
   }
 
   Core::~Core()
@@ -24,6 +27,8 @@ namespace Utlop
   {
     _fps = fps;
     _frame_time_millis = 1000 / (long)_fps;
+
+    _scheduler.Initialize();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -43,12 +48,9 @@ namespace Utlop
         printf("Failed to initialize GLAD");
       }
 
-      Utlop::GameScene scene;
-      scene.init();
-      //_scenes.push_front(scene);
-      _scenes.push_back(scene);
+      Utlop::GameScene::_current_scene->_start();
 
-      glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+      glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
 
       while (!glfwWindowShouldClose(_window._window))
       {
@@ -59,11 +61,11 @@ namespace Utlop
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        _scenes[0].draw();
+        Utlop::GameScene::_current_scene->draw();
 
         glfwSwapBuffers(_window._window);
 
-        _scenes[0].update();
+        Utlop::GameScene::_current_scene->_update();
 
         glfwPollEvents();
 
@@ -71,7 +73,10 @@ namespace Utlop
         std::this_thread::sleep_until(start_time + std::chrono::milliseconds(_frame_time_millis));
 
         long current_time = (long)(end_time.time_since_epoch().count() - start_time.time_since_epoch().count());
+
+#ifdef DEBUG
         printf("Desired FPS: %f - Current FPS: %f\n", _fps, current_time / 1000.0f);
+#endif // DEBUG
       }
     }
   }
@@ -84,5 +89,15 @@ namespace Utlop
   Utlop::Window* Core::getWindow()
   {
     return &_window;
+  }
+
+  enki::TaskScheduler* Core::getScheduler()
+  {
+    return &_scheduler;
+  }
+
+  Core* Core::Instance()
+  {
+    return _instance;
   }
 }

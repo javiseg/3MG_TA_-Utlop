@@ -1,5 +1,5 @@
-#ifndef Utlop_GAMESCENE
-#define Utlop_GAMESCENE 1
+#ifndef UTLOP_GAMESCENE
+#define UTLOP_GAMESCENE 1
 
 #include "gameObject.h"
 
@@ -16,16 +16,22 @@ namespace Utlop
 
       void init();
       void draw();
-      void update();
+      virtual void start();
+      virtual void update();
 
     protected:
       std::vector<GameObject> _gameObjects;
 
     private:
+      static GameScene* _current_scene;
+      static std::vector<GameScene*> _scenes;
+      friend class Core;
 
+      void _start();
+      void _update();
   };
 
 
 }
 
-#endif // !Utlop_GAMESCENE
+#endif // !UTLOP_GAMESCENE

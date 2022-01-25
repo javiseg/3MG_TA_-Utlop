@@ -1,10 +1,11 @@
-#ifndef Utlop_CORE
-#define Utlop_CORE 1
+#ifndef UTLOP_CORE
+#define UTLOP_CORE 1
 
 #include "window.h"
 
 #include <list>
 #include <vector>
+#include "TaskScheduler.h"
 
 #include "gameScene.h"
 
@@ -22,18 +23,21 @@ namespace Utlop
       void stop();
 
       Utlop::Window* getWindow();
+      enki::TaskScheduler* getScheduler();
+
+      static Core* Instance();
 
     protected:
 
     private:
-
+      static Core* _instance;
       Utlop::Window _window;
       float _fps;
       long _frame_time_millis;
-      std::vector<GameScene> _scenes;
+      enki::TaskScheduler _scheduler;
   };
 
 
 }
 
-#endif // !Utlop_WINDOW
+#endif // !UTLOP_WINDOW

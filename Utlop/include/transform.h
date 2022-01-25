@@ -1,5 +1,5 @@
-#ifndef Utlop_TRANSFORM
-#define Utlop_TRANSFORM 1
+#ifndef UTLOP_TRANSFORM
+#define UTLOP_TRANSFORM 1
 
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
@@ -24,8 +24,6 @@ namespace Utlop
       void scale(glm::vec3 scale);
       void rotate(glm::vec4 rotation);
 
-			glm::vec3 Position();
-
     protected:
 
     private:
@@ -37,4 +35,4 @@ namespace Utlop
 
 }
 
-#endif // !Utlop_TRANSFORM
+#endif // !UTLOP_TRANSFORM

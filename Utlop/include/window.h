@@ -1,5 +1,5 @@
-#ifndef Utlop_WINDOW
-#define Utlop_WINDOW 1
+#ifndef UTLOP_WINDOW
+#define UTLOP_WINDOW 1
 
 struct GLFWwindow;
 
@@ -28,4 +28,4 @@ namespace Utlop
 
 }
 
-#endif // !Utlop_WINDOW
+#endif // !UTLOP_WINDOW

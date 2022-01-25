@@ -1,5 +1,5 @@
-#ifndef Utlop_MATERIAL
-#define Utlop_MATERIAL 1
+#ifndef UTLOP_MATERIAL
+#define UTLOP_MATERIAL 1
 
 #include "glad/glad.h"
 
@@ -14,9 +14,12 @@ namespace Utlop
 
       void init();
       void draw();
+      virtual void setParameters();
 
       void loadShader(char* vertexFilename, char* fragmentFilename);
-			GLuint ProgramNumber();
+      void setBool(const char* name, bool value);
+      void setInt(const char* name, int value);
+      void setFloat(const char* name, float value);
 
     protected:
 
@@ -33,4 +36,4 @@ namespace Utlop
 
 }
 
-#endif // !Utlop_MATERIAL
+#endif // !UTLOP_MATERIAL

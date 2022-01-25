@@ -1,21 +1,19 @@
-#ifndef UTLOP_GAMEOBJECT
-#define UTLOP_GAMEOBJECT 1
+#ifndef UTLOP_MESH
+#define UTLOP_MESH 1
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
 #include "material.h"
-#include "transform.h"
-#include "mesh.h"
 
 namespace Utlop
 {
 
-  class GameObject
+  class Mesh
   {
     public:
-      GameObject();
-      ~GameObject();
+      Mesh();
+      ~Mesh();
 
       void init();
       void draw();
@@ -23,7 +21,7 @@ namespace Utlop
       void update();
       void destroy();
 
-      void setTransform(Transform transform);
+      void setMaterial(Material material);
 
     protected:
 
@@ -31,12 +29,11 @@ namespace Utlop
       GLuint _vao;
       GLuint _vbo;
 
-      Transform _transform;
-      Mesh _mesh;
+      Material _material;
       float *_vertices;
   };
 
 
 }
 
-#endif // !UTLOP_GAMEOBJECT
+#endif // !UTLOP_MESH

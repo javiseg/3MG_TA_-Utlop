@@ -27,6 +27,7 @@ solution("Utlop")
 	path.join(UTLOP_DIR, "./deps/glfw/include/"),
     path.join(UTLOP_DIR, "./deps/glad/include/"),
     path.join(UTLOP_DIR, "./deps/glm/include/"),
+    path.join(UTLOP_DIR, "./deps/enkiTS/src/"),
   }
 
   --Here only the files that we want compile.
@@ -49,6 +50,7 @@ solution("Utlop")
     path.join(UTLOP_DIR, "./deps/glfw/src/egl_context.c"),
     path.join(UTLOP_DIR, "./deps/glfw/src/osmesa_context.c"),
     path.join(UTLOP_DIR, "./deps/glad/src/glad.c"),
+    path.join(UTLOP_DIR, "./deps/enkiTS/src/TaskScheduler.cpp"),
 
   }
 
@@ -73,15 +75,16 @@ solution("Utlop")
 	
   project "UtlopTests"
   kind "ConsoleApp"
-  UTLOP_TEST_DIR = path.join(PROJ_DIR, "UtlopTests")
+  UTLOP_TEST_DIR = path.join(PROJ_DIR, "./UtlopTests")
 
   --Here is where we need to include the include directories (.h)
   includedirs{
 	path.join(UTLOP_TEST_DIR, "./include/"),
 	path.join(UTLOP_DIR, "./include/"),
 	path.join(UTLOP_DIR, "./deps/glfw/include/"),
-    	path.join(UTLOP_DIR, "./deps/glad/include/"),
-    	path.join(UTLOP_DIR, "./deps/glm/include/"),
+    path.join(UTLOP_DIR, "./deps/glad/include/"),
+    path.join(UTLOP_DIR, "./deps/glm/include/"),
+    path.join(UTLOP_DIR, "./deps/enkiTS/src/"),
   }
 
   --Here only the files that we want compile.
