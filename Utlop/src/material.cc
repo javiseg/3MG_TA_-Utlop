@@ -5,9 +5,18 @@
 
 namespace Utlop
 {
+
+	enum UniformType {
+		U_COLOR = 2
+	};
+
+
   Material::Material()
   {
-
+		_color = (GLfloat*)malloc(3 * sizeof(GLfloat));
+		_color[0] = 1.0f;
+		_color[1] = 1.0f;
+		_color[2] = 1.0f;
   }
 
   Material::~Material()
@@ -25,7 +34,7 @@ namespace Utlop
   {
     glUseProgram(_shader);
 
-    setParameters();
+    setParameters(U_COLOR, T_FLOAT_3, _color);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 		int bufflen = 0;
@@ -49,13 +58,25 @@ namespace Utlop
 		
   }
 
-  void Material::setParameters() {
+  void Material::setParameters(const int uniform_pos, const Utlop::Type uniform_type, const float* value) {
 	
-		float color[3] = { 1.0f, 1.0f, 1.0f };
 
-		GLuint matrix = glGetUniformLocation(_shader, "new_color");
-		printf("%d\n", matrix);
-		glUniform3fv(matrix, 1, color);
+		glUseProgram(_shader);
+
+		switch (uniform_type)
+		{
+			case Utlop::T_FLOAT_1:
+				glUniform1f(uniform_pos, value[0]); break;
+			case Utlop::T_FLOAT_2:
+				glUniform2f(uniform_pos, value[0], value[1]); break;
+			case Utlop::T_FLOAT_3:
+				glUniform3f(uniform_pos, value[0], value[1], value[2]); break;
+			case Utlop::T_FLOAT_4:
+				glUniform4f(uniform_pos, value[0], value[1], value[2], value[3]); break;
+			case Utlop::T_MAT_4x4:
+				glUniformMatrix4fv(uniform_pos, 1, GL_FALSE, value); break;
+			default: break;
+		}
 	
 	}
 
@@ -81,6 +102,11 @@ namespace Utlop
   {
     glUniform1f(glGetUniformLocation(_shader, name), value);
   }
+
+	void Material::setColor(float* color)
+	{
+		_color = color;
+	}
 
   void Material::loadVertexShader(char* filename)
   {

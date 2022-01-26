@@ -50,7 +50,7 @@ namespace Utlop
 
       Utlop::GameScene::_current_scene->_start();
 
-      glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+      glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
       while (!glfwWindowShouldClose(_window._window))
       {
@@ -60,6 +60,8 @@ namespace Utlop
           glfwSetWindowShouldClose(_window._window, GL_TRUE);
 
         glClear(GL_COLOR_BUFFER_BIT);
+
+
 
         Utlop::GameScene::_current_scene->draw();
 

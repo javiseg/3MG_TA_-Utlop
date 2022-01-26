@@ -45,4 +45,8 @@ namespace Utlop
   {
     _transform = transform;
   }
+	void GameObject::setColor(float* color)
+	{
+		_mesh.setColor(color);
+	}
 }

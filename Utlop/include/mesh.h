@@ -22,6 +22,7 @@ namespace Utlop
       void destroy();
 
       void setMaterial(Material material);
+			void setColor(float* color);
 
     protected:
 

@@ -24,6 +24,8 @@ namespace Utlop
       void destroy();
 
       void setTransform(Transform transform);
+			void setColor(float* color);
+
 
     protected:
 
