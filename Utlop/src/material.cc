@@ -2,6 +2,8 @@
 #include <fstream>
 #include <math.h>
 #include <vector>
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 namespace Utlop
 {
@@ -36,7 +38,32 @@ namespace Utlop
 
     setParameters(U_COLOR, T_FLOAT_3, _color);
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    //glDrawArrays(GL_TRIANGLES, 0, 3);
+		mvp_uniform_attribute = glGetUniformLocation(_shader, "mvp");
+		glm::vec3 scaling(1.0f, 1.0f, 1.0f);
+		glm::vec3 translation(-0.5f, 0, 0);
+		glm::vec3 rotation_axis(0, 1.0f, 0);
+		float rotation_angle = 0;
+		glm::mat4 model_matrix = glm::translate(glm::rotate(glm::scale(
+			glm::mat4(1.0f), scaling), rotation_angle, rotation_axis), translation);
+
+		glm::mat4 model_view_projection = model_matrix;
+
+		glUniformMatrix4fv(mvp_uniform_attribute, 1, GL_FALSE, &model_view_projection[0][0]);
+
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		translation = glm::vec3(+0.5f, 0, 0);
+		model_matrix = glm::translate(glm::rotate(glm::scale(
+			glm::mat4(1.0f), scaling), rotation_angle, rotation_axis), translation);
+
+		model_view_projection = model_matrix;
+
+		glUniformMatrix4fv(mvp_uniform_attribute, 1, GL_FALSE, &model_view_projection[0][0]);
+
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+
 		int bufflen = 0;
 		glGetShaderiv(_vertex_shader, GL_COMPILE_STATUS, &bufflen);
 		if (bufflen > 1)

@@ -50,6 +50,7 @@ namespace Utlop
 
       Utlop::GameScene::_current_scene->_start();
 
+			glEnable(GL_DEPTH_TEST);
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
       while (!glfwWindowShouldClose(_window._window))
@@ -59,15 +60,15 @@ namespace Utlop
         if (glfwGetKey(_window._window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
           glfwSetWindowShouldClose(_window._window, GL_TRUE);
 
-        glClear(GL_COLOR_BUFFER_BIT);
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
+				Utlop::GameScene::_current_scene->_update();
 
         Utlop::GameScene::_current_scene->draw();
 
         glfwSwapBuffers(_window._window);
 
-        Utlop::GameScene::_current_scene->_update();
+				/*printf("Objects: %d\n", Utlop::GameScene::_current_scene->_gameObjects.size());*/
 
         glfwPollEvents();
 

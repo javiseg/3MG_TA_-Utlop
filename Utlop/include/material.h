@@ -91,6 +91,7 @@ namespace Utlop
       GLuint _vertex_shader;
       GLuint _fragment_shader;
       GLuint _shader;
+			GLuint mvp_uniform_attribute;
 			float* _color;
 
       void loadVertexShader(char* filename);

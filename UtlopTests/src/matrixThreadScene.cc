@@ -10,14 +10,14 @@ void MatrixThreadScene::start()
   //Utlop::Core::Instance()->getScheduler()->WaitforTask(&task);
 
   triangle.init();
-  triangle2.init();
+	float color[3] = { 1.0f,0.0f,0.0f };
+	//triangle.setColor(color);
   _gameObjects.push_back(triangle);
-  _gameObjects.push_back(triangle2);
 }
 
 void MatrixThreadScene::update()
 {
-  _gameObjects.push_back(triangle);
+  //_gameObjects.push_back(triangle);
 }
 
 void MatrixThreadScene::init_matrix()
