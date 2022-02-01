@@ -16,25 +16,25 @@ namespace Utlop {
 	
 	struct CameraData
 	{
-		Vector3 position_;
-		Vector3 rotation_;
-		Vector3 scale_;
+		glm::vec3 position_;
+		glm::vec3 rotation_;
+		glm::vec3 scale_;
 
-		Vector3 Up;
-		Vector3 Right;
-		Vector3 target_;
-		Vector3 direction_;
+		glm::vec3 Up;
+		glm::vec3 Right;
+		glm::vec3 target_;
+		glm::vec3 direction_;
 
 		float near_;
 		float a_ratio_;
 		float fov_;
 		float far_;
 
-		Matix4x4 transform_;
-		Matix4x4 view_;
-		Matix4x4 projection_;
+		glm::mat4 transform_;
+		glm::mat4 view_;
+		glm::mat4 projection_;
 
-		Matix4x4 view_projection_;
+		glm::mat4 view_projection_;
 	};
 
 	class Camera {

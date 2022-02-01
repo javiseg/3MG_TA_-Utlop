@@ -3,10 +3,10 @@
 
 #include "window.h"
 
+#include "includes.h"
 #include <list>
 #include <vector>
 #include "TaskScheduler.h"
-#include "camera.h"
 #include "gameScene.h"
 
 namespace Utlop
@@ -24,6 +24,7 @@ namespace Utlop
 
       Utlop::Window* getWindow();
       enki::TaskScheduler* getScheduler();
+			Utlop::Camera getCamera();
 
       static Core* Instance();
 

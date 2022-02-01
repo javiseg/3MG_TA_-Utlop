@@ -6,6 +6,7 @@
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
+#include "..\include\core.h"
 
 namespace Utlop
 {
@@ -99,6 +100,11 @@ namespace Utlop
   {
     return &_scheduler;
   }
+
+	Utlop::Camera Core::getCamera()
+	{
+		return camera_;
+	}
 
   Core* Core::Instance()
   {

@@ -1,9 +1,14 @@
+#pragma once
+
 #include "material.h"
 #include <fstream>
 #include <math.h>
 #include <vector>
+#include "matrix_4.h"
 #include "glm/glm.hpp"
+#include "includes.h"
 #include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 namespace Utlop
 {
@@ -39,27 +44,21 @@ namespace Utlop
     setParameters(U_COLOR, T_FLOAT_3, _color);
 
     //glDrawArrays(GL_TRIANGLES, 0, 3);
-		mvp_uniform_attribute = glGetUniformLocation(_shader, "mvp");
+		
+
+		/*glm::mat4 final_matrix = glm::make_mat4(camera_mat_.m);
+		Vector3 cam_pos = Vector3(view_.m + 12);*/
+
+		int projection_mat = glGetUniformLocation(_shader, "u_vp_matrix");
+
 		glm::vec3 scaling(1.0f, 1.0f, 1.0f);
-		glm::vec3 translation(-0.5f, 0, 0);
-		glm::vec3 rotation_axis(0, 1.0f, 0);
+		glm::vec3 translation(-0.6f, 0.0f, 0.0f);
+		glm::vec3 rotation_axis(0.0f, 1.0f, 0.0f);
 		float rotation_angle = 0;
 		glm::mat4 model_matrix = glm::translate(glm::rotate(glm::scale(
 			glm::mat4(1.0f), scaling), rotation_angle, rotation_axis), translation);
-
-		glm::mat4 model_view_projection = model_matrix;
-
-		glUniformMatrix4fv(mvp_uniform_attribute, 1, GL_FALSE, &model_view_projection[0][0]);
-
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
-		translation = glm::vec3(+0.5f, 0, 0);
-		model_matrix = glm::translate(glm::rotate(glm::scale(
-			glm::mat4(1.0f), scaling), rotation_angle, rotation_axis), translation);
-
-		model_view_projection = model_matrix;
-
-		glUniformMatrix4fv(mvp_uniform_attribute, 1, GL_FALSE, &model_view_projection[0][0]);
+		model_matrix *= Core::Instance()->getCamera().data_->view_projection_;
+		glUniformMatrix4fv(projection_mat, 1, GL_FALSE, &model_matrix[0][0]);
 
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 

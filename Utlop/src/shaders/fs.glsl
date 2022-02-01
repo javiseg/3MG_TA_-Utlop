@@ -4,6 +4,6 @@ in vec4 pos_color;
 
 void main()
 {
-    // color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	color = pos_color;
+     cowdalor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	//color = pos_color;
 } 
