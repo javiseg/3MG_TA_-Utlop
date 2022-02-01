@@ -28,6 +28,7 @@ solution("Utlop")
     path.join(UTLOP_DIR, "./deps/glad/include/"),
     path.join(UTLOP_DIR, "./deps/glm/include/"),
     path.join(UTLOP_DIR, "./deps/enkiTS/src/"),
+    path.join(UTLOP_DIR, "./deps/math/")
   }
 
   --Here only the files that we want compile.
@@ -51,6 +52,7 @@ solution("Utlop")
     path.join(UTLOP_DIR, "./deps/glfw/src/osmesa_context.c"),
     path.join(UTLOP_DIR, "./deps/glad/src/glad.c"),
     path.join(UTLOP_DIR, "./deps/enkiTS/src/TaskScheduler.cpp"),
+    path.join(UTLOP_DIR, "./deps/math/")
 
   }
 
@@ -85,6 +87,7 @@ solution("Utlop")
     path.join(UTLOP_DIR, "./deps/glad/include/"),
     path.join(UTLOP_DIR, "./deps/glm/include/"),
     path.join(UTLOP_DIR, "./deps/enkiTS/src/"),
+    path.join(UTLOP_DIR, "./deps/math/")
   }
 
   --Here only the files that we want compile.

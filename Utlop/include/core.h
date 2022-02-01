@@ -6,7 +6,7 @@
 #include <list>
 #include <vector>
 #include "TaskScheduler.h"
-
+#include "camera.h"
 #include "gameScene.h"
 
 namespace Utlop
@@ -35,6 +35,7 @@ namespace Utlop
       float _fps;
       long _frame_time_millis;
       enki::TaskScheduler _scheduler;
+			Camera camera_;
   };
 
 

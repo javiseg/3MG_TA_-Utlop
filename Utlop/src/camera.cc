@@ -1,16 +1,28 @@
 #include "camera.h"
 
-void Utlop::camera::init()
-{
-	using glm::vec3;
-	using glm::mat4;
 
-	vec3 scaling(1.0f, 1.0f, 1.0f);
-	vec3 translation(-0.5f, 0, 0);
-	vec3 rotation_axis(0, 1.0f, 0);
-	float rotation_angle = 0;
-	mat4 model_matrix = glm::translate(glm::rotate(glm::scale(
-		mat4(1.0f), scaling), rotation_angle, rotation_axis), translation);
+namespace Utlop {
 
-	mat4 model_view_projection = model_matrix;
+	
+
+	Camera::Camera()
+	{
+		data_ = (CameraData*) malloc(sizeof(CameraData));
+	}
+
+	Camera::~Camera()
+	{
+	}
+
+	void Camera::init()
+	{
+		data_->Right = Vector3(1.0f, 0.0f, 0.0f);
+	}
+
+	void Camera::update()
+	{
+		printf("Vector: %f, %f, %f\n", data_->Right.x, data_->Right.y, data_->Right.z);
+	}
+
 }
+

@@ -29,7 +29,8 @@ namespace Utlop
     _frame_time_millis = 1000 / (long)_fps;
 
     _scheduler.Initialize();
-
+		//camera_.alloc();
+		camera_.init();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -49,7 +50,7 @@ namespace Utlop
       }
 
       Utlop::GameScene::_current_scene->_start();
-
+			camera_.update();
 			glEnable(GL_DEPTH_TEST);
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
