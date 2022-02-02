@@ -26,9 +26,9 @@ namespace Utlop
 
   void GameScene::draw()
   {
-    for each (GameObject gameObject in _gameObjects)
+    for(int i = 0; i < _gameObjects.size(); i++)
     {
-      gameObject.draw();
+      _gameObjects[i].draw();
     }
   }
 
@@ -39,10 +39,10 @@ namespace Utlop
   void GameScene::_start()
   {
     start();
-    for each (GameObject gameObject in _gameObjects)
-    {
-      gameObject.start();
-    }
+		for (int i = 0; i < _gameObjects.size(); i++)
+		{
+			_gameObjects[i].start();
+		}
 		Utlop::geometric_object cube;
 		cube.init(Utlop::GEO_CUBE);
 		cube.showVertices();
@@ -51,9 +51,9 @@ namespace Utlop
   void GameScene::_update()
   {
     update();
-    for each (GameObject gameObject in _gameObjects)
-    {
-      gameObject.update();
-    }
+		for (int i = 0; i < _gameObjects.size(); i++)
+		{
+			_gameObjects[i].update();
+		}
   }
 }

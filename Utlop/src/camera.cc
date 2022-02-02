@@ -9,7 +9,8 @@ namespace Utlop {
 
 	Camera::Camera()
 	{
-		data_ = (CameraData*) malloc(sizeof(CameraData));
+		//data_ = (CameraData*) malloc(sizeof(CameraData));
+		data_ = std::make_unique<CameraData>();
 	}
 
 	Camera::~Camera()
@@ -22,7 +23,7 @@ namespace Utlop {
 		glm::vec3 scaling(1.0f, 1.0f, 1.0f);
 		glm::vec3 translation(0.0f, 0.0f, 0.0f);
 		glm::vec3 rotation_axis(0.0f, 1.0f, 0.0f);
-		float rotation_angle = 0;
+		float rotation_angle = 0.0f;
 		glm::mat4 model_matrix = glm::translate(glm::rotate(glm::scale(
 			glm::mat4(1.0f), scaling), rotation_angle, rotation_axis), translation);
 

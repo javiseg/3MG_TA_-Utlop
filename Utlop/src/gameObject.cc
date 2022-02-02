@@ -13,7 +13,7 @@ namespace Utlop
 {
   GameObject::GameObject()
   {
-
+		_mesh = std::make_unique<Mesh>();
   }
 
   GameObject::~GameObject()
@@ -23,14 +23,15 @@ namespace Utlop
 
   void GameObject::init()
   {
-    _mesh.init();
-		_mesh.setColor(glm::vec3(0.0f,0.0f,1.0f));
-		_mesh.setPosition(glm::vec3(0.4f, 0.4f, 0.1f));
+    _mesh->init();
+		_mesh->setColor(glm::vec3(0.0f,0.0f,1.0f));
+		_mesh->setPosition(glm::vec3(0.0f, 0.4f, 0.1f));
+		printf("GameObjectInit\n");
   }
 
   void GameObject::draw()
   {
-    _mesh.draw();
+    _mesh->draw();
   }
 
   void GameObject::start()
@@ -40,9 +41,7 @@ namespace Utlop
 
   void GameObject::update()
   {
-		translate(glm::vec3(0.05f, 0.0f, 0.0f), 0.5f);
-		setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    _mesh.update();
+    _mesh->update();
   }
 
   void GameObject::destroy()
@@ -65,11 +64,12 @@ namespace Utlop
 	void GameObject::setPosition(glm::vec3 position)
 	{
 		_transform.setPosition(position);
-		_mesh.setPosition(position);
+		_mesh->setPosition(position);
+
 	}
 	void GameObject::setColor(glm::vec3 color)
 	{
-		_mesh.setColor(color);
+		_mesh->setColor(color);
 	}
 	void GameObject::translate(glm::vec3 position, float speed)
 	{

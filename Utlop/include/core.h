@@ -24,10 +24,12 @@ namespace Utlop
 
       Utlop::Window* getWindow();
       enki::TaskScheduler* getScheduler();
-			Utlop::Camera getCamera();
+			Utlop::Camera* getCamera();
+
+
 
       static Core* Instance();
-
+			
     protected:
 
     private:
@@ -36,7 +38,7 @@ namespace Utlop
       float _fps;
       long _frame_time_millis;
       enki::TaskScheduler _scheduler;
-			Camera camera_;
+			std::unique_ptr<Camera> camera_;
   };
 
 

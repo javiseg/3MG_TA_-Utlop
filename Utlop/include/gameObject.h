@@ -37,7 +37,7 @@ namespace Utlop
       GLuint _vbo;
 
       Transform _transform;
-      Mesh _mesh;
+      std::unique_ptr<Mesh> _mesh;
       float *_vertices;
   };
 

@@ -36,6 +36,7 @@ namespace Utlop
 
   void Material::draw()
   {
+
     glUseProgram(_shader);
 
     
@@ -54,7 +55,8 @@ namespace Utlop
 		float rotation_angle = 0;
 		glm::mat4 model_matrix = glm::translate(glm::rotate(glm::scale(
 			glm::mat4(1.0f), scaling), rotation_angle, rotation_axis), _transform.getPosition());
-		model_matrix *= Core::Instance()->getCamera().data_->view_projection_;
+		printf("Material X: %f, Y: %f, Z: %f\n", _transform.getPosition().x, _transform.getPosition().y, _transform.getPosition().z);
+		model_matrix *= Core::Instance()->getCamera()->data_->view_projection_;
 		glUniformMatrix4fv(projection_mat, 1, GL_FALSE, &model_matrix[0][0]);
 
 		glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -133,7 +135,11 @@ namespace Utlop
 
 	void Material::setPosition(glm::vec3 position)
 	{
-		_transform.setPosition(position);
+		printf("material1 X: %f, Y: %f, Z: %f\n", _transform.getPosition().x,
+			_transform.getPosition().y, _transform.getPosition().z);
+		_transform.setPosition(glm::vec3(position.x, position.y, position.z));
+		printf("material2 X: %f, Y: %f, Z: %f\n", _transform.getPosition().x,
+			_transform.getPosition().y, _transform.getPosition().z);
 	}
 
 	void Material::translate(glm::vec3 position, float speed)

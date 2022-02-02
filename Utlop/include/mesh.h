@@ -3,7 +3,7 @@
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
-
+#include <memory>
 #include "material.h"
 
 namespace Utlop
@@ -32,7 +32,7 @@ namespace Utlop
       GLuint _vao;
       GLuint _vbo;
 
-      Material _material;
+      std::unique_ptr<Material> _material;
       float *_vertices;
   };
 

@@ -17,6 +17,7 @@ namespace Utlop
     _fps = 0.0f;
     _frame_time_millis = 0;
     _instance = this;
+		camera_ = std::make_unique<Camera>();
   }
 
   Core::~Core()
@@ -31,7 +32,7 @@ namespace Utlop
 
     _scheduler.Initialize();
 		//camera_.alloc();
-		camera_.init();
+		camera_->init();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -51,7 +52,7 @@ namespace Utlop
       }
 
       Utlop::GameScene::_current_scene->_start();
-			camera_.update();
+			camera_->update();
 			glEnable(GL_DEPTH_TEST);
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -102,10 +103,11 @@ namespace Utlop
     return &_scheduler;
   }
 
-	Utlop::Camera Core::getCamera()
+	Utlop::Camera* Core::getCamera()
 	{
-		return camera_;
+		return camera_.get();
 	}
+
 
   Core* Core::Instance()
   {

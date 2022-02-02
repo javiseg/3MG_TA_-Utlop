@@ -47,6 +47,6 @@ namespace Utlop {
 			void update();
 		/*private:*/
 			
-			CameraData* data_;
+			std::unique_ptr<CameraData> data_;
 	};
 }

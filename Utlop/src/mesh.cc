@@ -8,7 +8,7 @@ namespace Utlop
 {
   Mesh::Mesh()
   {
-
+		_material = std::make_unique<Material>();
   }
 
   Mesh::~Mesh()
@@ -40,13 +40,13 @@ namespace Utlop
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 		glEnableVertexAttribArray(1);
 
-    _material.init();
-    _material.loadShader("../UtlopTests/src/shaders/vs.glsl", "../UtlopTests/src/shaders/fs.glsl");
+    _material->init();
+    _material->loadShader("../UtlopTests/src/shaders/vs.glsl", "../UtlopTests/src/shaders/fs.glsl");
   }
 
   void Mesh::draw()
   {
-    _material.draw();
+    _material->draw();
   }
 
   void Mesh::start()
@@ -56,7 +56,8 @@ namespace Utlop
 
   void Mesh::update()
   {
-
+		printf("MESH X: %f, Y: %f, Z: %f\n", _material->_transform.getPosition().x,
+			_material->_transform.getPosition().y, _material->_transform.getPosition().z);
 
   }
 
@@ -67,26 +68,26 @@ namespace Utlop
 
 	void Mesh::setMaterialParameters(const int uniform_pos, const Utlop::Type uniform_type, const float* value)
 	{
-		_material.setParameters(uniform_pos, uniform_type, value);
+		_material->setParameters(uniform_pos, uniform_type, value);
 	}
 
 	void Mesh::setMaterial(Material material)
   {
-    _material = material;
+    //_material = material;
   }
 
 	void Mesh::setColor(glm::vec3 color) {
-		_material.setColor(color);
+		_material->setColor(color);
 	}
 
 	void Mesh::translate(glm::vec3 position, float speed)
 	{
-		_material.translate(position, speed);
+		_material->translate(position, speed);
 	}
 
 	void Mesh::setPosition(glm::vec3 position)
 	{
-		_material.setPosition(position);
+		_material->setPosition(position);
 	}
 
 }
