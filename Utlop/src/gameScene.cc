@@ -51,10 +51,8 @@ namespace Utlop
   void GameScene::_update()
   {
     update();
-		float color[3] = { 0.8f,0.3f,0.3f };
     for each (GameObject gameObject in _gameObjects)
     {
-			//gameObject.setColor(color);
       gameObject.update();
     }
   }

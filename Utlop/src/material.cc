@@ -5,7 +5,6 @@
 #include <math.h>
 #include <vector>
 #include "matrix_4.h"
-#include "glm/glm.hpp"
 #include "includes.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -14,16 +13,14 @@ namespace Utlop
 {
 
 	enum UniformType {
-		U_COLOR = 2
+		U_POSITION = 1,
+		U_COLOR = 2,
+		U_MODEL = 3
 	};
 
 
   Material::Material()
   {
-		_color = (GLfloat*)malloc(3 * sizeof(GLfloat));
-		_color[0] = 1.0f;
-		_color[1] = 1.0f;
-		_color[2] = 1.0f;
   }
 
   Material::~Material()
@@ -41,9 +38,9 @@ namespace Utlop
   {
     glUseProgram(_shader);
 
-    setParameters(U_COLOR, T_FLOAT_3, _color);
+    
 
-    //glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 		
 
 		/*glm::mat4 final_matrix = glm::make_mat4(camera_mat_.m);
@@ -52,11 +49,11 @@ namespace Utlop
 		int projection_mat = glGetUniformLocation(_shader, "u_vp_matrix");
 
 		glm::vec3 scaling(1.0f, 1.0f, 1.0f);
-		glm::vec3 translation(-0.6f, 0.0f, 0.0f);
+		//glm::vec3 translation(glm::vec3(0.0f, 0.0f, 0.0f));
 		glm::vec3 rotation_axis(0.0f, 1.0f, 0.0f);
 		float rotation_angle = 0;
 		glm::mat4 model_matrix = glm::translate(glm::rotate(glm::scale(
-			glm::mat4(1.0f), scaling), rotation_angle, rotation_axis), translation);
+			glm::mat4(1.0f), scaling), rotation_angle, rotation_axis), _transform.getPosition());
 		model_matrix *= Core::Instance()->getCamera().data_->view_projection_;
 		glUniformMatrix4fv(projection_mat, 1, GL_FALSE, &model_matrix[0][0]);
 
@@ -129,9 +126,24 @@ namespace Utlop
     glUniform1f(glGetUniformLocation(_shader, name), value);
   }
 
-	void Material::setColor(float* color)
+	void Material::setColor(glm::vec3 color)
 	{
-		_color = color;
+		setParameters(U_COLOR, T_FLOAT_3, &color[0]);
+	}
+
+	void Material::setPosition(glm::vec3 position)
+	{
+		_transform.setPosition(position);
+	}
+
+	void Material::translate(glm::vec3 position, float speed)
+	{
+		_transform.setPosition(_transform.getPosition() + ( position * speed ) );
+	}
+
+	void Material::setTransform(Utlop::Transform transform)
+	{
+		_transform = transform;
 	}
 
   void Material::loadVertexShader(char* filename)

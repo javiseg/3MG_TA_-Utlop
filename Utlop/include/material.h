@@ -2,6 +2,8 @@
 #define UTLOP_MATERIAL 1
 
 #include "glad/glad.h"
+#include "glm/glm.hpp"
+#include "transform.h"
 
 namespace Utlop
 {
@@ -83,7 +85,10 @@ namespace Utlop
       void setInt(const char* name, int value);
       void setFloat(const char* name, float value);
 
-			void setColor(float* color);
+			void setColor(glm::vec3 color);
+			void setPosition(glm::vec3 position);
+			void translate(glm::vec3 position, float speed = 1.0f);
+			void setTransform(Utlop::Transform transform);
 
     protected:
 
@@ -92,7 +97,7 @@ namespace Utlop
       GLuint _fragment_shader;
       GLuint _shader;
 			GLuint mvp_uniform_attribute;
-			float* _color;
+			Transform _transform;
 
       void loadVertexShader(char* filename);
       void loadFragmentShader(char* filename);

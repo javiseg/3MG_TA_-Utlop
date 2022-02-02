@@ -5,7 +5,6 @@
 #include "GLFW/glfw3.h"
 
 #include "material.h"
-#include "transform.h"
 #include "mesh.h"
 
 namespace Utlop
@@ -24,7 +23,11 @@ namespace Utlop
       void destroy();
 
       void setTransform(Transform transform);
-			void setColor(float* color);
+			void setScale(glm::vec3 scale);
+			void setRotation(glm::vec3 rotation);
+			void setPosition(glm::vec3 position);
+			void setColor(glm::vec3 color);
+			void translate(glm::vec3 position, float speed);
 
 
     protected:

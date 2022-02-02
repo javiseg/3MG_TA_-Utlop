@@ -64,6 +64,7 @@ namespace Utlop
 
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
 				Utlop::GameScene::_current_scene->_update();
 
         Utlop::GameScene::_current_scene->draw();

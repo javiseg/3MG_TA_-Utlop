@@ -8,7 +8,6 @@
 
 namespace Utlop
 {
-
   class Mesh
   {
     public:
@@ -21,8 +20,11 @@ namespace Utlop
       void update();
       void destroy();
 
+			void setMaterialParameters(const int uniform_pos, const Utlop::Type uniform_type, const float* value);
       void setMaterial(Material material);
-			void setColor(float* color);
+			void setColor(glm::vec3 color);
+			void setPosition(glm::vec3 position);
+			void translate(glm::vec3 position, float speed);
 
     protected:
 
