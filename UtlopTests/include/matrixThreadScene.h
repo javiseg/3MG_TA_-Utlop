@@ -27,6 +27,4 @@ class MatrixThreadScene: public Utlop::GameScene
 
     ParallelTaskSet task;
 
-    Utlop::GameObject triangle;
-    Utlop::GameObject triangle2;
 };

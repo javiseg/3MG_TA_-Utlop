@@ -9,6 +9,8 @@ void MatrixThreadScene::start()
   //Utlop::Core::Instance()->getScheduler()->AddTaskSetToPipe(&task);
   //Utlop::Core::Instance()->getScheduler()->WaitforTask(&task);
 
+	Utlop::GameObject triangle;
+
   triangle.init();
 	//triangle.setColor(color);
   _gameObjects.push_back(triangle);

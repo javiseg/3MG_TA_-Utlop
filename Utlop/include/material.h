@@ -90,6 +90,14 @@ namespace Utlop
 			void translate(glm::vec3 position, float speed = 1.0f);
 			void setTransform(Utlop::Transform transform);
 			Transform _transform;
+
+			Material& operator=(const Material& other);
+
+			Material(const Material& other);
+			Material(Material&& other);
+
+
+
     protected:
 
     private:

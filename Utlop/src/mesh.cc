@@ -8,7 +8,10 @@ namespace Utlop
 {
   Mesh::Mesh()
   {
-		_material = std::make_unique<Material>();
+		_vao = 0;
+		_vbo = 0;
+		_vertices = nullptr;
+		
   }
 
   Mesh::~Mesh()
@@ -40,6 +43,7 @@ namespace Utlop
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 		glEnableVertexAttribArray(1);
 
+		_material = std::make_shared<Material>();
     _material->init();
     _material->loadShader("../UtlopTests/src/shaders/vs.glsl", "../UtlopTests/src/shaders/fs.glsl");
   }
@@ -83,6 +87,40 @@ namespace Utlop
 	void Mesh::translate(glm::vec3 position, float speed)
 	{
 		_material->translate(position, speed);
+	}
+
+	Mesh& Mesh::operator=(const Mesh& other)
+	{
+		_vao = other._vao;
+		_vbo = other._vbo;
+
+		_material = other._material;
+		_vertices = other._vertices;
+
+		return *this;
+	}
+
+	Mesh::Mesh(std::shared_ptr<Mesh> other)
+	{
+		
+	}
+
+	Mesh::Mesh(const Mesh& other)
+	{
+		_vao = other._vao;
+		_vbo = other._vbo;
+
+		_material = _material = other._material;
+		_vertices = other._vertices;
+	}
+
+	Mesh::Mesh(Mesh&& other)
+	{
+		_vao = other._vao;
+		_vbo = other._vbo;
+
+		_material = other._material;
+		_vertices = other._vertices;
 	}
 
 	void Mesh::setPosition(glm::vec3 position)

@@ -29,6 +29,13 @@ namespace Utlop
 			void setColor(glm::vec3 color);
 			void translate(glm::vec3 position, float speed);
 
+			GameObject& operator=(const GameObject& other);
+			GameObject(const GameObject& other);
+			GameObject(GameObject&& other);
+			
+
+
+			//copia igual stdmove contr
 
     protected:
 
@@ -37,7 +44,7 @@ namespace Utlop
       GLuint _vbo;
 
       Transform _transform;
-      std::unique_ptr<Mesh> _mesh;
+      std::shared_ptr<Mesh> _mesh;
       float *_vertices;
   };
 

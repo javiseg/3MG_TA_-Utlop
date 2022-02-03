@@ -13,7 +13,7 @@ namespace Utlop
 {
   GameObject::GameObject()
   {
-		_mesh = std::make_unique<Mesh>();
+		
   }
 
   GameObject::~GameObject()
@@ -23,6 +23,7 @@ namespace Utlop
 
   void GameObject::init()
   {
+		_mesh = std::make_unique<Mesh>();
     _mesh->init();
 		_mesh->setColor(glm::vec3(0.0f,0.0f,1.0f));
 		_mesh->setPosition(glm::vec3(0.0f, 0.4f, 0.1f));
@@ -76,4 +77,31 @@ namespace Utlop
 		_transform.setPosition(_transform.getPosition() + (position * speed));
 
 	}
+
+	GameObject& GameObject::operator=(const GameObject& other)
+	{
+		_vao = other._vao;
+		_vbo = other._vbo;
+		_transform = other._transform;
+		_mesh = other._mesh;
+		_vertices = other._vertices;
+
+		return *this;
+	}
+	// TEXTURES STB _IMAGE
+	GameObject::GameObject(const GameObject& other) {
+		_vao = other._vao;
+		_vbo = other._vbo;
+		_transform = other._transform;
+		_mesh = other._mesh;
+		_vertices = other._vertices;
+	}
+	GameObject::GameObject(GameObject&& other) {
+		_vao = other._vao;
+		_vbo = other._vbo;
+		_transform = other._transform;
+		_mesh = other._mesh;
+		_vertices = other._vertices;
+	}
+
 }

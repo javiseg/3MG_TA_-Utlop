@@ -17,18 +17,14 @@ namespace Utlop
 
   void GameScene::init()
   {
-    //GameObject go;
-    //go.init();
-    //_gameObjects.push_back(go);
     _current_scene = this;
-    //_start();
   }
 
   void GameScene::draw()
   {
-    for(int i = 0; i < _gameObjects.size(); i++)
+    for each(GameObject _gameObject in _gameObjects)
     {
-      _gameObjects[i].draw();
+      _gameObject.draw();
     }
   }
 
@@ -39,9 +35,11 @@ namespace Utlop
   void GameScene::_start()
   {
     start();
-		for (int i = 0; i < _gameObjects.size(); i++)
+		for(int i = 0; i < _gameObjects.size(); i++)
 		{
 			_gameObjects[i].start();
+			_gameObjects[i].setPosition(glm::vec3(-0.5f, 0.0f, -0.1f));
+			_gameObjects[i].setColor(glm::vec3(0.5f, 0.0f, 1.0f));
 		}
 		Utlop::geometric_object cube;
 		cube.init(Utlop::GEO_CUBE);
@@ -51,9 +49,9 @@ namespace Utlop
   void GameScene::_update()
   {
     update();
-		for (int i = 0; i < _gameObjects.size(); i++)
+		for each (GameObject _gameObject in _gameObjects)
 		{
-			_gameObjects[i].update();
+			_gameObject.update();
 		}
   }
 }

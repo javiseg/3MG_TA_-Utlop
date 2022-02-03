@@ -4,7 +4,6 @@
 #include <fstream>
 #include <math.h>
 #include <vector>
-#include "matrix_4.h"
 #include "includes.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -21,6 +20,7 @@ namespace Utlop
 
   Material::Material()
   {
+		printf("Material\n");
   }
 
   Material::~Material()
@@ -76,7 +76,7 @@ namespace Utlop
 		glGetShaderiv(_fragment_shader, GL_COMPILE_STATUS, &bufflen);
 		if (bufflen != GL_TRUE)
 		{
-			printf("Failed to compile fragment shader.");
+			printf("Failed to compile fragment shader.\n");
 
 		}
 		
@@ -150,6 +150,35 @@ namespace Utlop
 	void Material::setTransform(Utlop::Transform transform)
 	{
 		_transform = transform;
+	}
+
+	Material& Material::operator=(const Material& other)
+	{
+		_vertex_shader = other._vertex_shader;
+		_fragment_shader = other._fragment_shader;
+		_shader = other._shader;
+		mvp_uniform_attribute = other.mvp_uniform_attribute;
+		_transform = other._transform;
+
+		return *this;
+	}
+
+	Material::Material(const Material& other)
+	{
+		_vertex_shader = other._vertex_shader;
+		_fragment_shader = other._fragment_shader;
+		_shader = other._shader;
+		mvp_uniform_attribute = other.mvp_uniform_attribute;
+		_transform = other._transform;
+	}
+
+	Material::Material(Material&& other)
+	{
+		_vertex_shader = other._vertex_shader;
+		_fragment_shader = other._fragment_shader;
+		_shader = other._shader;
+		mvp_uniform_attribute = other.mvp_uniform_attribute;
+		_transform = other._transform;
 	}
 
   void Material::loadVertexShader(char* filename)

@@ -26,13 +26,19 @@ namespace Utlop
 			void setPosition(glm::vec3 position);
 			void translate(glm::vec3 position, float speed);
 
+
+			Mesh& operator=(const Mesh& other);
+			Mesh(std::shared_ptr<Mesh> other);
+			Mesh(const Mesh& other);
+			Mesh(Mesh&& other);
+
     protected:
 
     private:
       GLuint _vao;
       GLuint _vbo;
 
-      std::unique_ptr<Material> _material;
+      std::shared_ptr<Material> _material;
       float *_vertices;
   };
 
