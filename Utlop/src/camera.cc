@@ -20,12 +20,12 @@ namespace Utlop {
 	void Camera::init()
 	{
 		data_->Right = glm::vec3(1.0f, 0.0f, 0.0f);
-		glm::vec3 scaling(1.0f, 1.0f, 1.0f);
-		glm::vec3 translation(0.0f, 0.0f, 0.0f);
-		glm::vec3 rotation_axis(0.0f, 1.0f, 0.0f);
-		float rotation_angle = 0.0f;
+		data_->scale_ = glm::vec3(1.0f, 1.0f, 1.0f);
+		data_->position_ = glm::vec3(0.0f, 0.0f, -5.0f);
+		data_->rotation_ = glm::vec3(0.0f, 1.0f, 0.0f);
+		data_->rotation_angle_ = 0.0f;
 		glm::mat4 model_matrix = glm::translate(glm::rotate(glm::scale(
-			glm::mat4(1.0f), scaling), rotation_angle, rotation_axis), translation);
+			glm::mat4(1.0f), data_->scale_), data_->rotation_angle_, data_->rotation_), data_->position_);
 
 		data_->projection_ = glm::perspective(1.57f, 4.0f / 3.0f, 0.1f, 100.0f);
 		data_->view_ = glm::lookAt(glm::vec3(0.0f,0.0f,1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,1.0f,0.0f));
@@ -35,11 +35,37 @@ namespace Utlop {
 		//std::cout << glm::to_string(data_->projection_) << std::endl;
 
 	}
-	void keyPressed(unsigned char key, int x, int y) {
-	}
 	void Camera::update()
 	{
 	}
+
+	glm::mat4 Camera::getViewProjection()
+	{
+		return data_->view_projection_;
+	}
+
+	void Camera::moveForward(float value)
+	{
+		data_->position_ = glm::vec3(data_->position_[0], data_->position_[1], data_->position_[2] + value);
+		glm::mat4 model_matrix = glm::translate(glm::rotate(glm::scale(
+			glm::mat4(1.0f), data_->scale_), data_->rotation_angle_, data_->rotation_), data_->position_);
+		data_->view_projection_ = data_->projection_ * data_->view_ * model_matrix;
+	}
+	void Camera::moveRight(float value)
+	{
+		data_->position_ = glm::vec3(data_->position_[0] + value, data_->position_[1], data_->position_[2]);
+		glm::mat4 model_matrix = glm::translate(glm::rotate(glm::scale(
+			glm::mat4(1.0f), data_->scale_), data_->rotation_angle_, data_->rotation_), data_->position_);
+		data_->view_projection_ = data_->projection_ * data_->view_ * model_matrix;
+	}
+	void Camera::moveUp(float value)
+	{
+		data_->position_ = glm::vec3(data_->position_[0], data_->position_[1] + value, data_->position_[2]);
+		glm::mat4 model_matrix = glm::translate(glm::rotate(glm::scale(
+			glm::mat4(1.0f), data_->scale_), data_->rotation_angle_, data_->rotation_), data_->position_);
+		data_->view_projection_ = data_->projection_ * data_->view_ * model_matrix;
+	}
+
 
 }
 

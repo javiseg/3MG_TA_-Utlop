@@ -4,11 +4,11 @@
 
 namespace Utlop
 {
-  Transform::Transform(glm::vec3 position, glm::vec3 scale, glm::vec4 rotation)
+  Transform::Transform(glm::vec3 position, glm::vec3 scale, glm::vec3 rotation)
   {
-    _position = position;
-    _scale = scale;
-    _rotation = rotation;
+    position_ = position;
+    scale_ = scale;
+    rotation_ = rotation;
   }
 
   Transform::~Transform()
@@ -18,48 +18,56 @@ namespace Utlop
 
   void Transform::setPosition(glm::vec3 position)
   {
-    _position = position;
+    position_ = position;
   }
 
   void Transform::setScale(glm::vec3 scale)
   {
-    _scale = scale;
+		scale_ = scale;
   }
 
-  void Transform::setRotation(glm::vec4 rotation)
+  void Transform::setRotation(glm::vec3 rotation)
   {
-    _rotation = rotation;
+		rotation_ = rotation;
   }
 
   void Transform::translate(glm::vec3 translation)
   {
-    _position += translation;
+		position_ += translation;
   }
 
   void Transform::translate(glm::vec3 translation, float speed)
   {
-    _position += (translation * speed);
+		position_ += (translation * speed);
   }
 
   void Transform::scale(glm::vec3 scale)
   {
-    _scale *= scale;
+		scale_ *= scale;
   }
 
-  void Transform::rotate(glm::vec4 rotation)
+  void Transform::rotate(glm::vec3 rotation)
   {
-    _rotation += rotation;
+		rotation_ += rotation;
+  }
+  void Transform::rotation_angle(float rot_ang)
+  {
+		rotation_angle_ = rot_ang;
   }
   glm::vec3 Transform::getPosition()
   {
-		return _position;
+		return position_;
   }
   glm::vec3 Transform::getScale()
   {
-		return _scale;
+		return scale_;
   }
   glm::vec3 Transform::getRotation()
   {
-		return _rotation;
+		return rotation_;
   }
+	float Transform::getRotationAngle()
+	{
+		return rotation_angle_;
+	}
 }

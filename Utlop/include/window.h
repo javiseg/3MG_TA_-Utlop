@@ -12,7 +12,7 @@ namespace Utlop
 
       //  Inits the window with a specified size
       void init(int width, int height, char* title);
-
+			GLFWwindow* getWindow();
       friend class Core;
     protected:
 

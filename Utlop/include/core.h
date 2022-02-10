@@ -1,6 +1,6 @@
 #ifndef UTLOP_CORE
 #define UTLOP_CORE 1
-
+#pragma once
 #include "window.h"
 
 #include "includes.h"

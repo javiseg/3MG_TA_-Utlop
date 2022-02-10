@@ -55,7 +55,10 @@ namespace Utlop
 			camera_->update();
 			glEnable(GL_DEPTH_TEST);
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
+			GLint version_max, version_min;
+			glGetIntegerv(GL_MAJOR_VERSION, &version_max);
+			glGetIntegerv(GL_MINOR_VERSION, &version_min);
+			printf("Version: %d.%d \n", version_max, version_min);
       while (!glfwWindowShouldClose(_window._window))
       {
         std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
@@ -64,8 +67,12 @@ namespace Utlop
           glfwSetWindowShouldClose(_window._window, GL_TRUE);
 
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
+				
+				//double xpos, ypos;
+				//glfwGetCursorPos(_window.getWindow(), &xpos, &ypos);
+				//printf("Cursor Position at (%f, %f )\n",xpos, ypos);
+				//Utlop::GameScene::_current_scene->_gameObjects[0].setPosition(glm::vec3(xpos, ypos, 0.0f));
+				
 				Utlop::GameScene::_current_scene->_update();
 
         Utlop::GameScene::_current_scene->draw();

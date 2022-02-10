@@ -89,7 +89,7 @@ namespace Utlop
 			void setPosition(glm::vec3 position);
 			void translate(glm::vec3 position, float speed = 1.0f);
 			void setTransform(Utlop::Transform transform);
-			Transform _transform;
+			
 
 			Material& operator=(const Material& other);
 
@@ -105,7 +105,8 @@ namespace Utlop
       GLuint _fragment_shader;
       GLuint _shader;
 			GLuint mvp_uniform_attribute;
-			
+			GLuint projection_mat_index;
+			Transform _transform;
 
       void loadVertexShader(char* filename);
       void loadFragmentShader(char* filename);

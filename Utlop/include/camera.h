@@ -28,7 +28,7 @@ namespace Utlop {
 		float a_ratio_;
 		float fov_;
 		float far_;
-
+		float rotation_angle_;
 		glm::mat4 transform_;
 		glm::mat4 view_;
 		glm::mat4 projection_;
@@ -44,8 +44,14 @@ namespace Utlop {
 
 			void init();
 			void update();
-		/*private:*/
+
+			glm::mat4 getViewProjection();
 			
+			void moveForward(float value);
+			void moveRight(float value);
+			void moveUp(float value);
+
+		private:			
 			std::unique_ptr<CameraData> data_;
 	};
 }

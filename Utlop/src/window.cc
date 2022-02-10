@@ -24,4 +24,9 @@ namespace Utlop
     _window = _window;
   }
 
+	GLFWwindow* Window::getWindow()
+	{
+		return _window;
+	}
+
 }

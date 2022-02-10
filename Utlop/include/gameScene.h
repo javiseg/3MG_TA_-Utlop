@@ -1,6 +1,6 @@
 #ifndef UTLOP_GAMESCENE
 #define UTLOP_GAMESCENE 1
-
+#pragma once
 #include "gameObject.h"
 
 #include <vector>
@@ -18,9 +18,9 @@ namespace Utlop
       void draw();
       virtual void start();
       virtual void update();
-
+			std::vector<GameObject> _gameObjects;
     protected:
-      std::vector<GameObject> _gameObjects;
+     
 
     private:
       static GameScene* _current_scene;
