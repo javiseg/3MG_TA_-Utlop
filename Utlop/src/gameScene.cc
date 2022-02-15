@@ -39,7 +39,7 @@ namespace Utlop
 		for(int i = 0; i < _gameObjects.size(); i++)
 		{
 			_gameObjects[i].start();
-			_gameObjects[i].setPosition(glm::vec3(-0.5f, 0.0f, -0.1f));
+			_gameObjects[i].setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 			_gameObjects[i].setColor(glm::vec3(0.5f, 0.0f, 1.0f));
 		}
   }
@@ -62,6 +62,9 @@ namespace Utlop
 		}
 		if (key == GLFW_KEY_E) {
 			Core::Instance()->getCamera()->moveUp(0.3f);
+		}
+		if (key == GLFW_KEY_J) {
+			Core::Instance()->getCamera()->RotateCamera(Core::Instance()->getDeltaTime(), 50.0f);
 		}
 			
 	}

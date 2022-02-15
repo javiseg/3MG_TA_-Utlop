@@ -104,7 +104,6 @@ namespace Utlop
       GLuint _vertex_shader;
       GLuint _fragment_shader;
       GLuint _shader;
-			GLuint mvp_uniform_attribute;
 			GLuint projection_mat_index;
 			Transform _transform;
 

@@ -25,7 +25,7 @@ namespace Utlop
       Utlop::Window* getWindow();
       enki::TaskScheduler* getScheduler();
 			Utlop::Camera* getCamera();
-
+			float getDeltaTime();
 
 
       static Core* Instance();
@@ -37,6 +37,7 @@ namespace Utlop
       Utlop::Window _window;
       float _fps;
       long _frame_time_millis;
+			float deltaTime_;
       enki::TaskScheduler _scheduler;
 			std::unique_ptr<Camera> camera_;
   };

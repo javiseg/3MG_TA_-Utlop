@@ -33,13 +33,15 @@ namespace Utlop
   {
     _shader = glCreateProgram();
 		glUseProgram(_shader);
-		
+		projection_mat_index = glGetUniformLocation(_shader, "u_vp_matrix");
+
   }
 
   void Material::draw()
   {
 
-		projection_mat_index = glGetUniformLocation(_shader, "u_vp_matrix");
+		if(projection_mat_index == -1)
+			projection_mat_index = glGetUniformLocation(_shader, "u_vp_matrix");
 
 		glm::vec3 scaling(1.0f, 1.0f, 1.0f);
 		//glm::vec3 translation(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -145,7 +147,6 @@ namespace Utlop
 		_vertex_shader = other._vertex_shader;
 		_fragment_shader = other._fragment_shader;
 		_shader = other._shader;
-		mvp_uniform_attribute = other.mvp_uniform_attribute;
 		_transform = other._transform;
 
 		return *this;
@@ -156,7 +157,6 @@ namespace Utlop
 		_vertex_shader = other._vertex_shader;
 		_fragment_shader = other._fragment_shader;
 		_shader = other._shader;
-		mvp_uniform_attribute = other.mvp_uniform_attribute;
 		_transform = other._transform;
 	}
 
@@ -165,7 +165,6 @@ namespace Utlop
 		_vertex_shader = other._vertex_shader;
 		_fragment_shader = other._fragment_shader;
 		_shader = other._shader;
-		mvp_uniform_attribute = other.mvp_uniform_attribute;
 		_transform = other._transform;
 	}
 

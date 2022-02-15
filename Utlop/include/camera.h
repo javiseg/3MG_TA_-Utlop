@@ -22,7 +22,7 @@ namespace Utlop {
 		glm::vec3 Up;
 		glm::vec3 Right;
 		glm::vec3 target_;
-		glm::vec3 direction_;
+		glm::vec3 direction_; // Front
 
 		float near_;
 		float a_ratio_;
@@ -50,8 +50,14 @@ namespace Utlop {
 			void moveForward(float value);
 			void moveRight(float value);
 			void moveUp(float value);
+			void RotateCamera(float deltaTime, float speed);
 
-		private:			
+		private:
+
+			void UpdateData();
+
 			std::unique_ptr<CameraData> data_;
+			float yaw_ = 0.0f;
+			float pitch_ = -90.0f;
 	};
 }

@@ -7,6 +7,8 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "..\include\core.h"
+#include <time.h>
+
 
 namespace Utlop
 {
@@ -59,6 +61,9 @@ namespace Utlop
 			glGetIntegerv(GL_MAJOR_VERSION, &version_max);
 			glGetIntegerv(GL_MINOR_VERSION, &version_min);
 			printf("Version: %d.%d \n", version_max, version_min);
+
+			float lastFrame = glfwGetTime();
+
       while (!glfwWindowShouldClose(_window._window))
       {
         std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
@@ -67,12 +72,13 @@ namespace Utlop
           glfwSetWindowShouldClose(_window._window, GL_TRUE);
 
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				
+				deltaTime_ = (float)glfwGetTime() - lastFrame;
+				lastFrame = (float)glfwGetTime();
 				//double xpos, ypos;
 				//glfwGetCursorPos(_window.getWindow(), &xpos, &ypos);
 				//printf("Cursor Position at (%f, %f )\n",xpos, ypos);
 				//Utlop::GameScene::_current_scene->_gameObjects[0].setPosition(glm::vec3(xpos, ypos, 0.0f));
-				
+				camera_->update();
 				Utlop::GameScene::_current_scene->_update();
 
         Utlop::GameScene::_current_scene->draw();
@@ -85,9 +91,9 @@ namespace Utlop
 
         std::chrono::system_clock::time_point end_time = std::chrono::system_clock::now();
         std::this_thread::sleep_until(start_time + std::chrono::milliseconds(_frame_time_millis));
-
-        long current_time = (long)(end_time.time_since_epoch().count() - start_time.time_since_epoch().count());
-
+				
+				//long current_time = (long)(end_time.time_since_epoch().count() - start_time.time_since_epoch().count());
+				//printf("%f\n", deltaTime_);
 #ifdef DEBUG
         printf("Desired FPS: %f - Current FPS: %f\n", _fps, current_time / 1000.0f);
 #endif // DEBUG
@@ -113,6 +119,11 @@ namespace Utlop
 	Utlop::Camera* Core::getCamera()
 	{
 		return camera_.get();
+	}
+
+	float Core::getDeltaTime()
+	{
+		return deltaTime_;
 	}
 
 
