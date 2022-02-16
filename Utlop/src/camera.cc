@@ -73,7 +73,12 @@ namespace Utlop {
 	}
 	void Camera::moveUp(float value)
 	{
-		data_->position_ = glm::vec3(data_->position_[0], data_->position_[1] + value, data_->position_[2]);
+		if (value > 0)
+			data_->position_ -= data_->Up * velocity_ * Core::Instance()->getDeltaTime();
+
+		if (value < 0)
+			data_->position_ += data_->Up * velocity_ * Core::Instance()->getDeltaTime(); 
+		
 		UpdateData();
 	}
 
