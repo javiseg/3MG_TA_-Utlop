@@ -50,14 +50,17 @@ namespace Utlop {
 			void moveForward(float value);
 			void moveRight(float value);
 			void moveUp(float value);
-			void RotateCamera(float deltaTime, float speed);
+			void RotateCamera(float deltaTime, float speed, int direction);
 
 		private:
 
 			void UpdateData();
 
 			std::unique_ptr<CameraData> data_;
-			float yaw_ = 0.0f;
-			float pitch_ = -90.0f;
+			float yaw_ = 90.0f;
+			float pitch_ = 0.0f;
+			float velocity_;
+			glm::vec3 WorldUp;
+			glm::vec3 WorldRight;
 	};
 }

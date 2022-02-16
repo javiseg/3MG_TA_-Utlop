@@ -64,7 +64,16 @@ namespace Utlop
 			Core::Instance()->getCamera()->moveUp(0.3f);
 		}
 		if (key == GLFW_KEY_J) {
-			Core::Instance()->getCamera()->RotateCamera(Core::Instance()->getDeltaTime(), 50.0f);
+			Core::Instance()->getCamera()->RotateCamera(Core::Instance()->getDeltaTime(), 100.0f, 0);
+		}
+		if (key == GLFW_KEY_L) {
+			Core::Instance()->getCamera()->RotateCamera(Core::Instance()->getDeltaTime(), 100.0f, 1);
+		}
+		if (key == GLFW_KEY_I) {
+			Core::Instance()->getCamera()->RotateCamera(Core::Instance()->getDeltaTime(), 100.0f, 2);
+		}
+		if (key == GLFW_KEY_K) {
+			Core::Instance()->getCamera()->RotateCamera(Core::Instance()->getDeltaTime(), 100.0f, 3);
 		}
 			
 	}

@@ -2,6 +2,7 @@
 #include <iostream>
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/glm.hpp"
+#include "core.h"
 #include "GLFW/glfw3.h"
 
 namespace Utlop {
@@ -25,12 +26,16 @@ namespace Utlop {
 		data_->scale_ = vec3(1.0f, 1.0f, 1.0f);
 		data_->position_ = vec3(0.0f, 0.0f, -5.0f);
 		data_->rotation_ = vec3(0.0f, 1.0f, 0.0f);
-		data_->target_ = vec3(0.0f, 0.0f, 0.0f);
+		data_->target_ = vec3(0.0f, 0.0f, -1.0f);
+		data_->direction_ = vec3(0.0f, 0.0f, 1.0f);
 		data_->rotation_angle_ = 0.0f;
 
+		WorldUp = vec3(0.0f, 1.0f, 0.0f);
+		WorldRight = vec3(1.0f, 0.0f, 0.0f);
+
+		velocity_ = 10.0f;
 
 		data_->projection_ = perspective(1.57f, 4.0f / 3.0f, 0.1f, 100.0f);
-		data_->view_ = lookAt(data_->position_, data_->target_, data_->Up);
 
 		UpdateData();
 
@@ -48,12 +53,22 @@ namespace Utlop {
 
 	void Camera::moveForward(float value)
 	{
-		data_->position_ = glm::vec3(data_->position_[0], data_->position_[1], data_->position_[2] + value);
+		if(value > 0)
+			data_->position_ += data_->direction_ * velocity_ * Core::Instance()->getDeltaTime();
+		
+		if(value < 0)
+			data_->position_ -= data_->direction_ * velocity_ * Core::Instance()->getDeltaTime();
+		
 		UpdateData();
 	}
 	void Camera::moveRight(float value)
 	{
-		data_->position_ = glm::vec3(data_->position_[0] + value, data_->position_[1], data_->position_[2]);
+		if (value > 0)
+			data_->position_ -= data_->Right * velocity_ * Core::Instance()->getDeltaTime();
+
+		if (value < 0)
+			data_->position_ += data_->Right * velocity_ * Core::Instance()->getDeltaTime();
+		
 		UpdateData();
 	}
 	void Camera::moveUp(float value)
@@ -62,34 +77,47 @@ namespace Utlop {
 		UpdateData();
 	}
 
-	void Camera::RotateCamera(float deltaTime, float speed)
+	void Camera::RotateCamera(float deltaTime, float speed, int direction)
 	{
-		//vec3 position_ = vec3(data_->position_);
-		//vec3 target_ = vec3(data_->target_);
-		////data_->direction_ = normalize(data_->position_ - data_->target_);
-		//vec3 cameraRight = normalize(cross(data_->Up, data_->direction_));
-		//vec3 cameraUp = cross(data_->direction_, cameraRight);
 
-		//yaw_ -= deltaTime * speed;
+		switch (direction) {
+			case 0: {
+				yaw_ += deltaTime * speed;
+			}break;
+			case 1: {
+				yaw_ -= deltaTime * speed;
+			}break;
+			case 2: {
+				pitch_ += deltaTime * speed;
+			}break;
+			case 3: {
+				pitch_ -= deltaTime * speed;
+			}break;
+		}
 
-		//vec3 direction;
-		//direction.x = cos(glm::radians(yaw_)) * cos(radians(pitch_));
-		//direction.z = sin(radians(yaw_)) * cos(radians(pitch_));;
-		//direction.y = radians(pitch_);
-		//
-		//data_->direction_ = normalize(direction);
-		//data_->view_ = lookAt(data_->position_, vec3(0.0f,0.0f,0.0f), data_->Up);
-		//printf("%f \n", data_->position_ - data_->direction_);
+		if (pitch_ > 89.0f)
+			pitch_ = 89.0f;
+		if (pitch_ < -89.0f)
+			pitch_ = -89.0f;
 
-		//data_->target_ = vec3(data_->target_[0] + 1.0f, data_->target_[1], data_->target_[2]);
 
 		UpdateData();
 	}
 	void Camera::UpdateData()
 	{
-		data_->view_ = lookAt(data_->position_, data_->target_, data_->Up);
+		//data_->direction_ = normalize(data_->position_ - data_->target_);
+
+		vec3 direction;
+		direction.x = cos(glm::radians(yaw_)) * cos(glm::radians(pitch_));
+		direction.y = sin(glm::radians(pitch_));
+		direction.z = sin(glm::radians(yaw_)) * cos(glm::radians(pitch_));
+		data_->direction_ = normalize(direction);
+		data_->Right = normalize(cross(data_->direction_, WorldUp));
+		data_->Up = normalize(cross(data_->Right, data_->direction_));
+
+		data_->view_ = lookAt(data_->position_, data_->position_ + data_->direction_, data_->Up);
 		data_->view_projection_ = data_->projection_ * data_->view_;
-		printf("X: %f, Y: %f, Z: %f \n", data_->position_.x, data_->position_.y, data_->position_.z);
+		printf("X: %f, Y: %f, Z: %f \n", data_->direction_.x, data_->direction_.y, data_->direction_.z);
 	}
 
 }
