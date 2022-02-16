@@ -11,7 +11,6 @@ namespace Utlop {
 
 	Camera::Camera()
 	{
-		//data_ = (CameraData*) malloc(sizeof(CameraData));
 		data_ = std::make_unique<CameraData>();
 	}
 
@@ -37,6 +36,9 @@ namespace Utlop {
 
 		data_->projection_ = perspective(1.57f, 4.0f / 3.0f, 0.1f, 100.0f);
 
+		yaw_ = 90.0f;
+		pitch_ = 0.0f;
+
 		UpdateData();
 
 		//std::cout << glm::to_string(data_->projection_) << std::endl;
@@ -48,7 +50,7 @@ namespace Utlop {
 
 	glm::mat4 Camera::getViewProjection()
 	{
-		return data_->view_projection_;
+		return data_->projection_ * data_->view_;
 	}
 
 	void Camera::moveForward(float value)
@@ -87,10 +89,10 @@ namespace Utlop {
 
 		switch (direction) {
 			case 0: {
-				yaw_ += deltaTime * speed;
+				yaw_ -= deltaTime * speed;
 			}break;
 			case 1: {
-				yaw_ -= deltaTime * speed;
+				yaw_ += deltaTime * speed;
 			}break;
 			case 2: {
 				pitch_ += deltaTime * speed;
@@ -104,7 +106,6 @@ namespace Utlop {
 			pitch_ = 89.0f;
 		if (pitch_ < -89.0f)
 			pitch_ = -89.0f;
-
 
 		UpdateData();
 	}
@@ -121,9 +122,7 @@ namespace Utlop {
 		data_->Up = normalize(cross(data_->Right, data_->direction_));
 
 		data_->view_ = lookAt(data_->position_, data_->position_ + data_->direction_, data_->Up);
-		data_->view_projection_ = data_->projection_ * data_->view_;
-		printf("X: %f, Y: %f, Z: %f \n", data_->direction_.x, data_->direction_.y, data_->direction_.z);
-	}
 
+	}
 }
 

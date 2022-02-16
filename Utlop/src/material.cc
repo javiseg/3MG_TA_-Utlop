@@ -6,7 +6,6 @@
 #include <vector>
 #include "includes.h"
 #include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
 
 namespace Utlop
 {
@@ -46,15 +45,18 @@ namespace Utlop
 		glm::vec3 scaling(1.0f, 1.0f, 1.0f);
 		//glm::vec3 translation(glm::vec3(0.0f, 0.0f, 0.0f));
 		glm::vec3 rotation_axis(0.0f, 1.0f, 0.0f);
-		float rotation_angle = 0;
+		float rotation_angle = 0.0f;
 		glm::mat4 model_matrix = glm::translate(glm::rotate(glm::scale(
 			glm::mat4(1.0f), scaling), rotation_angle, rotation_axis), _transform.getPosition());
 		
 		model_matrix *= Core::Instance()->getCamera()->getViewProjection();
 		glUniformMatrix4fv(projection_mat_index, 1, GL_FALSE, &model_matrix[0][0]);
 
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		
+		//DEBUG
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//
 
 		int bufflen = 0;
 		glGetShaderiv(_vertex_shader, GL_COMPILE_STATUS, &bufflen);

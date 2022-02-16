@@ -33,7 +33,6 @@ namespace Utlop {
 		glm::mat4 view_;
 		glm::mat4 projection_;
 
-		glm::mat4 view_projection_;
 	};
 
 	class Camera {
@@ -57,8 +56,8 @@ namespace Utlop {
 			void UpdateData();
 
 			std::unique_ptr<CameraData> data_;
-			float yaw_ = 90.0f;
-			float pitch_ = 0.0f;
+			float yaw_;
+			float pitch_;
 			float velocity_;
 			glm::vec3 WorldUp;
 			glm::vec3 WorldRight;
