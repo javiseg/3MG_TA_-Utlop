@@ -6,6 +6,7 @@
 #include <memory>
 #include "material.h"
 #include "geometry.h"
+#include <vector>
 
 namespace Utlop
 {
@@ -28,7 +29,7 @@ namespace Utlop
 			void translate(glm::vec3 position, float speed);
 			void createCube();
 			void createTriangle();
-			void createObject();
+			void createObject(std::vector<glm::vec3> vertices);
 
 			Mesh& operator=(const Mesh& other);
 			Mesh(std::shared_ptr<Mesh> other);

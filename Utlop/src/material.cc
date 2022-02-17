@@ -41,12 +41,16 @@ namespace Utlop
 		glUseProgram(_shader);
 		
 
-		glDrawElements(GL_TRIANGLES, elements, GL_UNSIGNED_INT, 0);
-		
+		//glDrawElements(GL_TRIANGLES, elements, GL_UNSIGNED_INT, 0);
+		int size;  
+		glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+		glDrawElements(GL_TRIANGLES, size / sizeof(int), GL_UNSIGNED_INT, 0);
+
 		//DEBUG
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		//
-
+		
+		//printf("\n%d\n",sizeof(int));
 		/*int bufflen = 0;
 		glGetShaderiv(_vertex_shader, GL_COMPILE_STATUS, &bufflen);
 		if (bufflen > 1)

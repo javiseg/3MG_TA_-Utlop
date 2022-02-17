@@ -13,8 +13,12 @@ void MatrixThreadScene::start()
 
 	object.init();
 	object.setBasicGeometry(Utlop::Geo::kConst_Cube);
+	//object.setObjectGeometry("../UtlopTests/src/obj/doc.obj");
+	object.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	
 	//triangle.setColor(color);
   _gameObjects.push_back(object);
+
 }
 
 void MatrixThreadScene::update()

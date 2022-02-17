@@ -18,13 +18,16 @@ namespace Utlop
       void draw();
       virtual void start();
       virtual void update();
+			static GameScene* getCurrentScene();
+
 			std::vector<GameObject> _gameObjects;
     protected:
-     
+			
 
     private:
       static GameScene* _current_scene;
       static std::vector<GameScene*> _scenes;
+
       friend class Core;
 
       void _start();

@@ -127,37 +127,61 @@ namespace Utlop
 
 	void Mesh::createTriangle()
 	{
-		float* _vertices = (float*)calloc(18, sizeof(float));
-
 		float vertices[] = {
-			// positions         // colors
-			 0.5f, -0.5f, -0.5f,  // bottom right
-			-0.5f, -0.5f, -0.5f,  // bottom left
-			 0.0f,  0.5f, -0.5f  // top 
+			// first triangle
+			 0.0f,  0.5f, 0.0f,  // top 
+			 0.5f, -0.5f, 0.0f,  // bottom right
+			-0.5f,  -0.5f, 0.0f,  // bottom left 
 		};
 
-		unsigned int indices[] = { 0, 1, 3,
-		1, 2, 3 };
+		unsigned int indices[] = { 0, 1, 2};
 
 
 		glGenVertexArrays(1, &_vao);
 		glGenBuffers(1, &_vbo);
-		glBindVertexArray(_vao);
-		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &_vertices, GL_STATIC_DRAW);
-
 		glGenBuffers(1, &_ebo);
+
+		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
+
+
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
 
-
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
-		n_vertice_ = 6;
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		//n_vertice_ = 3;
 	}
 
-	void Mesh::createObject()
+	void Mesh::createObject(std::vector<glm::vec3> vertices)
 	{
+		glEnableVertexAttribArray(0);
+		// Describe our vertices array to OpenGL (it can't guess its format automatically)
+		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+		glVertexAttribPointer(
+			0,									// attribute
+			4,                  // number of elements per vertex, here (x,y,z,w)
+			GL_FLOAT,           // the type of each element
+			GL_FALSE,           // take our values as-is
+			0,                  // no extra data between each position
+			0                   // offset of first element
+		);
+
+		glEnableVertexAttribArray(5);
+		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+		glVertexAttribPointer(
+			5, // attribute
+			3,                  // number of elements per vertex, here (x,y,z)
+			GL_FLOAT,           // the type of each element
+			GL_FALSE,           // take our values as-is
+			0,                  // no extra data between each position
+			0                   // offset of first element
+		);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
+
+		//n_vertice_ = 6;
 	}
 
 	Mesh& Mesh::operator=(const Mesh& other)

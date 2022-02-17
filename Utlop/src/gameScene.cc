@@ -15,7 +15,9 @@ namespace Utlop
   {
 
   }
-
+	GameScene* GameScene::getCurrentScene() {
+		return _current_scene;
+	}
   void GameScene::init()
   {
     _current_scene = this;
@@ -39,7 +41,7 @@ namespace Utlop
 		for(int i = 0; i < _gameObjects.size(); i++)
 		{
 			_gameObjects[i].start();
-			_gameObjects[i].setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+			//_gameObjects[i].setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 			_gameObjects[i].setColor(glm::vec3(0.5f, 0.0f, 1.0f));
 		}
   }
@@ -75,7 +77,18 @@ namespace Utlop
 		if (key == GLFW_KEY_K) {
 			Core::Instance()->getCamera()->RotateCamera(Core::Instance()->getDeltaTime(), 100.0f, 3);
 		}
-			
+		if (key == GLFW_KEY_C) {
+			for each (GameObject _gameObject in GameScene::getCurrentScene()->_gameObjects)
+			{
+				_gameObject.setBasicGeometry(Utlop::Geo::kConst_Cube);
+			}
+		}
+		if (key == GLFW_KEY_T) {
+			for each (GameObject _gameObject in GameScene::getCurrentScene()->_gameObjects)
+			{
+				_gameObject.setBasicGeometry(Utlop::Geo::kConst_Triangle);
+			}
+		}
 	}
   void GameScene::_update()
   {
