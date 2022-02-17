@@ -104,8 +104,11 @@ namespace Utlop
 			0.5f, -0.5f, 0.5f,        // 22
 			0.5f, -0.5f, -0.5f,        // 23
 		};
-		unsigned int indices[] = { 0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15,
-				16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23 };
+		unsigned int indices[] = { 
+			0, 1, 2,      0, 2, 3,      4, 5, 6, 
+			4, 6, 7,      8, 9, 10,     8, 10, 11, 
+			12, 13, 14,   12, 14, 15,	  16, 17, 18, 
+			16, 18, 19,   20, 21, 22,   20, 22, 23 };
 
 
 		glGenVertexArrays(1, &_vao);
@@ -154,32 +157,21 @@ namespace Utlop
 		//n_vertice_ = 3;
 	}
 
-	void Mesh::createObject(std::vector<glm::vec3> vertices)
+	void Mesh::createObject(std::vector<glm::vec3> vertices, std::vector<glm::vec3> indices)
 	{
-		glEnableVertexAttribArray(0);
-		// Describe our vertices array to OpenGL (it can't guess its format automatically)
-		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-		glVertexAttribPointer(
-			0,									// attribute
-			4,                  // number of elements per vertex, here (x,y,z,w)
-			GL_FLOAT,           // the type of each element
-			GL_FALSE,           // take our values as-is
-			0,                  // no extra data between each position
-			0                   // offset of first element
-		);
+		glGenVertexArrays(1, &_vao);
+		glGenBuffers(1, &_vbo);
+		glGenBuffers(1, &_ebo);
 
-		glEnableVertexAttribArray(5);
 		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-		glVertexAttribPointer(
-			5, // attribute
-			3,                  // number of elements per vertex, here (x,y,z)
-			GL_FLOAT,           // the type of each element
-			GL_FALSE,           // take our values as-is
-			0,                  // no extra data between each position
-			0                   // offset of first element
-		);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
+
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 		//n_vertice_ = 6;
 	}
