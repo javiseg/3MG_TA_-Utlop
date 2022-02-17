@@ -34,7 +34,7 @@ namespace Utlop {
 
 		velocity_ = 10.0f;
 
-		data_->projection_ = perspective(1.57f, 4.0f / 3.0f, 0.1f, 100.0f);
+		data_->projection_ = perspective(1.57f, 1.0f, 0.1f, 100.0f);
 
 		yaw_ = 90.0f;
 		pitch_ = 0.0f;

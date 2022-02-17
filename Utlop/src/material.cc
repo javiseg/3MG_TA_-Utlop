@@ -44,7 +44,7 @@ namespace Utlop
 		glDrawElements(GL_TRIANGLES, elements, GL_UNSIGNED_INT, 0);
 		
 		//DEBUG
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		//
 
 		/*int bufflen = 0;

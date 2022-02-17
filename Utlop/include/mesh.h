@@ -38,6 +38,7 @@ namespace Utlop
       GLuint _vao;
       GLuint _vbo;
 			GLuint _ebo;
+			GLuint _texture;
 
       std::shared_ptr<Material> _material;
 			int n_vertice_;
