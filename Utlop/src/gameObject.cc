@@ -1,6 +1,7 @@
 #include "gameObject.h"
 #include <glad/glad.h>
 #include "GLFW/glfw3.h"
+#include "geometry.h"
 #include <fstream>
 #include <chrono>
 
@@ -24,7 +25,7 @@ namespace Utlop
   void GameObject::init()
   {
 		_mesh = std::make_unique<Mesh>();
-    _mesh->init();
+    _mesh->init(Utlop::Geo::kConst_Cube);
 		_mesh->setColor(glm::vec3(0.0f,0.0f,1.0f));
 		_mesh->setPosition(glm::vec3(0.0f, 0.4f, 0.1f));
 		printf("GameObjectInit\n");

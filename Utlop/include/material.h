@@ -77,7 +77,7 @@ namespace Utlop
       ~Material();
 
       void init();
-      void draw();
+      void draw(int elements);
       virtual void setParameters(const int uniform_pos, const Utlop::Type uniform_type, const float* value);
 
       void loadShader(char* vertexFilename, char* fragmentFilename);
@@ -90,6 +90,7 @@ namespace Utlop
 			void translate(glm::vec3 position, float speed = 1.0f);
 			void setTransform(Utlop::Transform transform);
 			
+			void update();
 
 			Material& operator=(const Material& other);
 

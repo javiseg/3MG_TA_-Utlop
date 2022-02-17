@@ -14,7 +14,7 @@ namespace Utlop
       Mesh();
       ~Mesh();
 
-      void init();
+      void init(unsigned int geoType);
       void draw();
       void start();
       void update();
@@ -37,9 +37,10 @@ namespace Utlop
     private:
       GLuint _vao;
       GLuint _vbo;
+			GLuint _ebo;
 
       std::shared_ptr<Material> _material;
-      float *_vertices;
+			int n_vertice_;
   };
 
 

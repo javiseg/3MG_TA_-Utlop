@@ -11,7 +11,7 @@ namespace Utlop
 {
 
 	enum UniformType {
-		U_POSITION = 1,
+		U_POSITION = 0,
 		U_COLOR = 2,
 		U_MODEL = 3
 	};
@@ -33,32 +33,21 @@ namespace Utlop
     _shader = glCreateProgram();
 		glUseProgram(_shader);
 		projection_mat_index = glGetUniformLocation(_shader, "u_vp_matrix");
-
+		_transform.setScale(glm::vec3(1.0f, 1.0f, 1.0f));
   }
 
-  void Material::draw()
+  void Material::draw(int elements)
   {
-
-		if(projection_mat_index == -1)
-			projection_mat_index = glGetUniformLocation(_shader, "u_vp_matrix");
-
-		glm::vec3 scaling(1.0f, 1.0f, 1.0f);
-		//glm::vec3 translation(glm::vec3(0.0f, 0.0f, 0.0f));
-		glm::vec3 rotation_axis(0.0f, 1.0f, 0.0f);
-		float rotation_angle = 0.0f;
-		glm::mat4 model_matrix = glm::translate(glm::rotate(glm::scale(
-			glm::mat4(1.0f), scaling), rotation_angle, rotation_axis), _transform.getPosition());
+		glUseProgram(_shader);
 		
-		model_matrix *= Core::Instance()->getCamera()->getViewProjection();
-		glUniformMatrix4fv(projection_mat_index, 1, GL_FALSE, &model_matrix[0][0]);
 
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, elements, GL_UNSIGNED_INT, 0);
 		
 		//DEBUG
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		//
 
-		int bufflen = 0;
+		/*int bufflen = 0;
 		glGetShaderiv(_vertex_shader, GL_COMPILE_STATUS, &bufflen);
 		if (bufflen > 1)
 		{
@@ -74,7 +63,7 @@ namespace Utlop
 		{
 			printf("Failed to compile fragment shader.\n");
 
-		}
+		}*/
 		
 		
   }
@@ -142,6 +131,22 @@ namespace Utlop
 	void Material::setTransform(Utlop::Transform transform)
 	{
 		_transform = transform;
+	}
+
+	void Material::update()
+	{
+		if (projection_mat_index == -1)
+			projection_mat_index = glGetUniformLocation(_shader, "u_vp_matrix");
+
+		glm::vec3 scaling(1.0f, 1.0f, 1.0f);
+		//glm::vec3 translation(glm::vec3(0.0f, 0.0f, 0.0f));
+		glm::vec3 rotation_axis(0.0f, 1.0f, 0.0f);
+		float rotation_angle = 0.0f;
+		glm::mat4 model_matrix = glm::translate(glm::rotate(glm::scale(
+			glm::mat4(1.0f), _transform.getScale()), rotation_angle, rotation_axis), _transform.getPosition());
+
+		model_matrix *= Core::Instance()->getCamera()->getViewProjection();
+		glUniformMatrix4fv(projection_mat_index, 1, GL_FALSE, &model_matrix[0][0]);
 	}
 
 	Material& Material::operator=(const Material& other)

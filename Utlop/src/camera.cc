@@ -46,6 +46,7 @@ namespace Utlop {
 	}
 	void Camera::update()
 	{
+		
 	}
 
 	glm::mat4 Camera::getViewProjection()

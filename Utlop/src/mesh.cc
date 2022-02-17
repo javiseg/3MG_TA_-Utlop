@@ -6,11 +6,13 @@
 
 namespace Utlop
 {
+
+
   Mesh::Mesh()
   {
 		_vao = 0;
 		_vbo = 0;
-		_vertices = nullptr;
+		n_vertice_ = 0;
 		
   }
 
@@ -19,27 +21,41 @@ namespace Utlop
 
   }
 
-  void Mesh::init()
+  void Mesh::init(unsigned int geoType)
   {
-  //  _vertices = (float*)calloc(18, sizeof(float));
 
-  //  float vertices[] = {
-  //    // positions         // colors
-  //     0.5f, -0.5f, -0.5f,  // bottom right
-  //    -0.5f, -0.5f, -0.5f,  // bottom left
-  //     0.0f,  0.5f, -0.5f  // top 
-  //  };
-  //  memcpy(_vertices, vertices, 9 * sizeof(float));
+		switch (geoType) {
+			case 0: {
+				  float* _vertices = (float*)calloc(18, sizeof(float));
 
-  //  glGenVertexArrays(1, &_vao);
-  //  glGenBuffers(1, &_vbo);
-		//glBindVertexArray(_vao);
-		//glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-		//glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), _vertices, GL_STATIC_DRAW);
+					float vertices[] = {
+						// positions         // colors
+						 0.5f, -0.5f, -0.5f,  // bottom right
+						-0.5f, -0.5f, -0.5f,  // bottom left
+						 0.0f,  0.5f, -0.5f  // top 
+					};
 
-		//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-		//glEnableVertexAttribArray(0);
-		float vertices[] = {
+					unsigned int indices[] = { 0, 1, 3,
+					1, 2, 3};
+
+
+					glGenVertexArrays(1, &_vao);
+					glGenBuffers(1, &_vbo);
+					glBindVertexArray(_vao);
+					glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+					glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &_vertices, GL_STATIC_DRAW);
+
+					glGenBuffers(1, &_ebo);
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
+					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
+
+
+					glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+					glEnableVertexAttribArray(0);
+					n_vertice_ = 6;
+			}break;
+			case 1: {
+				float vertices[] = {
 				-0.5f, -0.5f, 0.5f,        // 0
 				0.5f, -0.5f, 0.5f,        // 1
 				0.5f, 0.5f, 0.5f,            // 2
@@ -69,20 +85,27 @@ namespace Utlop
 				-0.5f, -0.5f, 0.5f,        // 21
 				0.5f, -0.5f, 0.5f,        // 22
 				0.5f, -0.5f, -0.5f,        // 23
-		};
-		unsigned int indices[] = { 0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15,
-				16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23 };
+				};
+				unsigned int indices[] = { 0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15,
+						16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23 };
 
-		glGenBuffers(1, &_vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-		glBufferData(GL_ARRAY_BUFFER, 72 * sizeof(float), &vertices, GL_STATIC_DRAW);
+				glGenBuffers(1, &_vbo);
+				glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
+
+				glGenBuffers(1, &_ebo);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
+
+				glEnableVertexAttribArray(0);
+				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+				n_vertice_ = 36;
+
+			}break;
+		}
+  
 		
-		glGenBuffers(1, &_vbo);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _vbo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(float), &indices, GL_STATIC_DRAW);
-		
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 		_material = std::make_shared<Material>();
     _material->init();
@@ -91,7 +114,7 @@ namespace Utlop
 
   void Mesh::draw()
   {
-    _material->draw();
+    _material->draw(n_vertice_);
   }
 
   void Mesh::start()
@@ -101,7 +124,7 @@ namespace Utlop
 
   void Mesh::update()
   {
-
+		_material->update();
   }
 
   void Mesh::destroy()
@@ -134,7 +157,6 @@ namespace Utlop
 		_vbo = other._vbo;
 
 		_material = other._material;
-		_vertices = other._vertices;
 
 		return *this;
 	}
@@ -150,7 +172,6 @@ namespace Utlop
 		_vbo = other._vbo;
 
 		_material = _material = other._material;
-		_vertices = other._vertices;
 	}
 
 	Mesh::Mesh(Mesh&& other)
@@ -159,7 +180,6 @@ namespace Utlop
 		_vbo = other._vbo;
 
 		_material = other._material;
-		_vertices = other._vertices;
 	}
 
 	void Mesh::setPosition(glm::vec3 position)
