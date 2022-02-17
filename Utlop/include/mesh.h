@@ -5,6 +5,7 @@
 #include "GLFW/glfw3.h"
 #include <memory>
 #include "material.h"
+#include "geometry.h"
 
 namespace Utlop
 {
@@ -14,7 +15,7 @@ namespace Utlop
       Mesh();
       ~Mesh();
 
-      void init(unsigned int geoType);
+      void init();
       void draw();
       void start();
       void update();
@@ -25,7 +26,9 @@ namespace Utlop
 			void setColor(glm::vec3 color);
 			void setPosition(glm::vec3 position);
 			void translate(glm::vec3 position, float speed);
-
+			void createCube();
+			void createTriangle();
+			void createObject();
 
 			Mesh& operator=(const Mesh& other);
 			Mesh(std::shared_ptr<Mesh> other);

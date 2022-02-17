@@ -29,6 +29,10 @@ namespace Utlop
 			void setColor(glm::vec3 color);
 			void translate(glm::vec3 position, float speed);
 
+			void setBasicGeometry(Utlop::Geo geometry);
+			void setObjectGeometry(const char* src);
+
+
 			GameObject& operator=(const GameObject& other);
 			GameObject(const GameObject& other);
 			GameObject(GameObject&& other);

@@ -25,7 +25,7 @@ namespace Utlop
   void GameObject::init()
   {
 		_mesh = std::make_unique<Mesh>();
-    _mesh->init(Utlop::Geo::kConst_Cube);
+    _mesh->init();
 		_mesh->setColor(glm::vec3(0.0f,0.0f,1.0f));
 		_mesh->setPosition(glm::vec3(0.0f, 0.4f, 0.1f));
 		printf("GameObjectInit\n");
@@ -77,6 +77,22 @@ namespace Utlop
 	{
 		_transform.setPosition(_transform.getPosition() + (position * speed));
 
+	}
+
+	void GameObject::setBasicGeometry(Utlop::Geo geometry)
+	{
+		switch (geometry) {
+			case 0: {
+				_mesh->createTriangle();
+			}break;	
+			case 1: {
+				_mesh->createCube();
+			}break;
+		}
+	}
+
+	void GameObject::setObjectGeometry(const char* src)
+	{
 	}
 
 	GameObject& GameObject::operator=(const GameObject& other)
