@@ -1,8 +1,7 @@
 #ifndef UTLOP_MESH
 #define UTLOP_MESH 1
 
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
+
 #include <memory>
 #include "material.h"
 #include "geometry.h"

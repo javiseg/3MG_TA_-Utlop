@@ -25,5 +25,13 @@ namespace Utlop {
 	  0,0,1,   1,0,1,   0,0,0,   0,1,1
 	};
 
+	struct Geometry {
+		int id_;
+		float* vertices_;
+		unsigned int* indices_;
+	};
+
+
+
 }
 

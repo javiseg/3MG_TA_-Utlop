@@ -91,6 +91,9 @@ namespace Utlop
 			}break;
 		}
 	}
+	float normalized(float value, float max, float min) {
+		return (value - min) / (max - min);
+	}
 
 	bool loadOBJ(const char* path,
 		std::vector <float>& out_vertices,
@@ -99,10 +102,12 @@ namespace Utlop
 		std::vector <unsigned int>& out_indices) {
 
 		std::vector< unsigned int > vertexIndices, uvIndices, normalIndices;
-		std::vector< glm::vec3 > temp_vertices;
+		std::vector< float > temp_vertices;
 		std::vector< glm::vec2 > temp_uvs;
 		std::vector< glm::vec3 > temp_normals;
 		std::vector< glm::vec3 > temp_indices;
+
+		float max = 1.0f, min = -1.0f;
 
 		FILE* file = fopen(path, "r");
 		if (file == NULL) {
@@ -122,22 +127,29 @@ namespace Utlop
 			if (strcmp(&lineHeader[0], "v") == 0) {
 				glm::vec3 vertex;
 				fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
-				printf("%f %f %f\n", vertex.x, vertex.y, vertex.z);
-				out_vertices.push_back(vertex.x);
-				out_vertices.push_back(vertex.y);
-				out_vertices.push_back(vertex.z);
+				
+				if (vertex.x > max || vertex.y > max || vertex.z > max) {
+					max = std::max(vertex.x, vertex.y);
+					max = std::max(max, vertex.z);
+				}
+				if (vertex.x < min || vertex.y < min || vertex.z < min) {
+					min = std::min(vertex.x, vertex.y);
+					min = std::min(min, vertex.z);
+				}
+
+				temp_vertices.push_back(vertex.x);
+				temp_vertices.push_back(vertex.y);
+				temp_vertices.push_back(vertex.z);
 			}
 			else if (strcmp(lineHeader, "vt") == 0) {
 				glm::vec2 uv;
 				fscanf(file, "%f %f\n", &uv.x, &uv.y);
-				printf("%f %f\n", uv.x, uv.y);
 				temp_uvs.push_back(uv);
 
 			}
 			else if (strcmp(lineHeader, "vn") == 0) {
 				glm::vec3 normal;
 				fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
-				printf("%f %f %f\n", normal.x, normal.y, normal.z);
 				temp_normals.push_back(normal);
 			}
 			else if (strcmp(lineHeader, "f") == 0) {
@@ -148,8 +160,7 @@ namespace Utlop
 					printf("File can't be read by our simple parser : ( Try exporting with other options\n");
 					return false;
 				}
-				printf("%d/%d/%d %d/%d/%d %d/%d/%d\n", vertexIndex[0], uvIndex[0], normalIndex[0], vertexIndex[1], uvIndex[1], normalIndex[1], vertexIndex[2], uvIndex[2], normalIndex[2]);
-
+				
 				vertexIndices.push_back(vertexIndex[0]);
 				vertexIndices.push_back(vertexIndex[1]);
 				vertexIndices.push_back(vertexIndex[2]);
@@ -160,11 +171,17 @@ namespace Utlop
 				normalIndices.push_back(normalIndex[1]);
 				normalIndices.push_back(normalIndex[2]);
 
-				out_indices.push_back(vertexIndex[0]);
-				out_indices.push_back(vertexIndex[1]);
-				out_indices.push_back(vertexIndex[2]);
+
+
+
+				out_indices.push_back(vertexIndex[0] - 1);
+				out_indices.push_back(vertexIndex[1] - 1);
+				out_indices.push_back(vertexIndex[2] - 1);
 
 			}
+		}
+		for (int i = 0; i < temp_vertices.size(); i++) {
+			out_vertices.push_back(normalized(temp_vertices[i], max, min));
 		}
 		
 		return true;
@@ -180,25 +197,8 @@ namespace Utlop
 
 		bool res = loadOBJ(src, vertices, uvs, normals, indices);
 		// "../UtlopTests/src/shaders/vs.glsl"
-		printf("");
-
+		
 		_mesh->createObject(vertices, indices);
-		printf("\n");
-		for (int i = 0; i < vertices.size(); i++) {
-			if (i % 3 == 0 && i > 0) {
-				printf("\n");
-			}
-			printf("%f ", vertices[i]);
-			
-		}
-		printf("\n");
-		for (int i = 0; i < indices.size(); i++) {
-			if (i % 3 == 0 && i > 0) {
-				printf("\n");
-			}
-			printf("%d ", indices[i]);
-			
-		}
 
 	}
 

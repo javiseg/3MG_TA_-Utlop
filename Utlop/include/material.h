@@ -1,7 +1,8 @@
 #ifndef UTLOP_MATERIAL
 #define UTLOP_MATERIAL 1
 
-#include "glad/glad.h"
+#include <glad\glad.h>
+#include <GLFW\glfw3.h>
 #include "glm/glm.hpp"
 #include "transform.h"
 

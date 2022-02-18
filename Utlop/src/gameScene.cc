@@ -21,11 +21,12 @@ namespace Utlop
   void GameScene::init()
   {
     _current_scene = this;
+		geometryData_ = std::make_unique<std::vector<Geometry>>();
   }
 
   void GameScene::draw()
   {
-    for each(GameObject _gameObject in _gameObjects)
+    for each(GameObject _gameObject in gameObjects_)
     {
       _gameObject.draw();
     }
@@ -38,12 +39,14 @@ namespace Utlop
   void GameScene::_start()
   {
     start();
-		for(int i = 0; i < _gameObjects.size(); i++)
+		for(int i = 0; i < gameObjects_.size(); i++)
 		{
-			_gameObjects[i].start();
+			gameObjects_[i].start();
 			//_gameObjects[i].setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-			_gameObjects[i].setColor(glm::vec3(0.5f, 0.0f, 1.0f));
+			gameObjects_[i].setColor(glm::vec3(0.5f, 0.0f, 1.0f));
 		}
+		Geometry geo;
+		geo.id_ = 3;
   }
 	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
@@ -78,15 +81,21 @@ namespace Utlop
 			Core::Instance()->getCamera()->RotateCamera(Core::Instance()->getDeltaTime(), 100.0f, 3);
 		}
 		if (key == GLFW_KEY_C) {
-			for each (GameObject _gameObject in GameScene::getCurrentScene()->_gameObjects)
+			for each (GameObject _gameObject in GameScene::getCurrentScene()->gameObjects_)
 			{
 				_gameObject.setBasicGeometry(Utlop::Geo::kConst_Cube);
 			}
 		}
 		if (key == GLFW_KEY_T) {
-			for each (GameObject _gameObject in GameScene::getCurrentScene()->_gameObjects)
+			for each (GameObject _gameObject in GameScene::getCurrentScene()->gameObjects_)
 			{
 				_gameObject.setBasicGeometry(Utlop::Geo::kConst_Triangle);
+			}
+		}
+		if (key == GLFW_KEY_O) {
+			for each (GameObject _gameObject in GameScene::getCurrentScene()->gameObjects_)
+			{
+				_gameObject.setObjectGeometry("../UtlopTests/src/obj/lego.obj");
 			}
 		}
 	}
@@ -96,9 +105,10 @@ namespace Utlop
 		//glfwPollEvents();
 		glfwSetKeyCallback(Core::Instance()->getWindow()->getWindow(), key_callback);
 		
-		for each (GameObject _gameObject in _gameObjects)
+		for each (GameObject _gameObject in gameObjects_)
 		{
 			_gameObject.update();
 		}
+
   }
 }

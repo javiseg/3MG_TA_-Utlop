@@ -1,10 +1,6 @@
 #ifndef UTLOP_GAMEOBJECT
 #define UTLOP_GAMEOBJECT 1
 
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
-
-#include "material.h"
 #include "mesh.h"
 
 namespace Utlop
