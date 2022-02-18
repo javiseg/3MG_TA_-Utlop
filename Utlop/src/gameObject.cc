@@ -183,17 +183,21 @@ namespace Utlop
 		printf("");
 
 		_mesh->createObject(vertices, indices);
+		printf("\n");
 		for (int i = 0; i < vertices.size(); i++) {
+			if (i % 3 == 0 && i > 0) {
+				printf("\n");
+			}
 			printf("%f ", vertices[i]);
-			if (i % 3 == 0) {
-				printf("\n");
-			}
+			
 		}
+		printf("\n");
 		for (int i = 0; i < indices.size(); i++) {
-			printf("%f ", indices[i]);
-			if (i % 3 == 0) {
+			if (i % 3 == 0 && i > 0) {
 				printf("\n");
 			}
+			printf("%d ", indices[i]);
+			
 		}
 
 	}
