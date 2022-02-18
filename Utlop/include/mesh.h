@@ -29,7 +29,7 @@ namespace Utlop
 			void translate(glm::vec3 position, float speed);
 			void createCube();
 			void createTriangle();
-			void createObject(std::vector<glm::vec3> vertices, std::vector<glm::vec3> indices);
+			void createObject(std::vector<float> vertices, std::vector<unsigned int> indices);
 
 			Mesh& operator=(const Mesh& other);
 			Mesh(std::shared_ptr<Mesh> other);

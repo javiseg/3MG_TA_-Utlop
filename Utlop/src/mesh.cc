@@ -157,18 +157,18 @@ namespace Utlop
 		//n_vertice_ = 3;
 	}
 
-	void Mesh::createObject(std::vector<glm::vec3> vertices, std::vector<glm::vec3> indices)
+	void Mesh::createObject(std::vector<float> vertices, std::vector<unsigned int> indices)
 	{
 		glGenVertexArrays(1, &_vao);
 		glGenBuffers(1, &_vbo);
 		glGenBuffers(1, &_ebo);
 
 		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
 
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
