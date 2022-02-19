@@ -18,10 +18,17 @@ namespace Utlop
 	GameScene* GameScene::getCurrentScene() {
 		return _current_scene;
 	}
+	std::shared_ptr<Utlop::Geometry> GameScene::CreateGeometry()
+	{
+		return std::make_shared<Utlop::Geometry>((int)geometryData_.size());
+	}
+	std::vector<std::shared_ptr<Utlop::Geometry>> GameScene::getGeometries()
+	{
+		return geometryData_;
+	}
   void GameScene::init()
   {
     _current_scene = this;
-		geometryData_ = std::make_unique<std::vector<Geometry>>();
   }
 
   void GameScene::draw()
@@ -45,8 +52,7 @@ namespace Utlop
 			//_gameObjects[i].setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 			gameObjects_[i].setColor(glm::vec3(0.5f, 0.0f, 1.0f));
 		}
-		Geometry geo;
-		geo.id_ = 3;
+		
   }
 	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
@@ -83,19 +89,19 @@ namespace Utlop
 		if (key == GLFW_KEY_C) {
 			for each (GameObject _gameObject in GameScene::getCurrentScene()->gameObjects_)
 			{
-				_gameObject.setBasicGeometry(Utlop::Geo::kConst_Cube);
+				_gameObject.setGeometry(Utlop::Geo::kConst_Cube);
 			}
 		}
 		if (key == GLFW_KEY_T) {
 			for each (GameObject _gameObject in GameScene::getCurrentScene()->gameObjects_)
 			{
-				_gameObject.setBasicGeometry(Utlop::Geo::kConst_Triangle);
+				_gameObject.setGeometry(Utlop::Geo::kConst_Triangle);
 			}
 		}
 		if (key == GLFW_KEY_O) {
 			for each (GameObject _gameObject in GameScene::getCurrentScene()->gameObjects_)
 			{
-				_gameObject.setObjectGeometry("../UtlopTests/src/obj/lego.obj");
+				_gameObject.setGeometry("../UtlopTests/src/obj/lego.obj");
 			}
 		}
 	}

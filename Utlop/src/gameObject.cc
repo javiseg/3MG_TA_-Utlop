@@ -80,7 +80,7 @@ namespace Utlop
 
 	}
 
-	void GameObject::setBasicGeometry(Utlop::Geo geometry)
+	void GameObject::setGeometry(Utlop::Geo geometry)
 	{
 		switch (geometry) {
 			case 0: {
@@ -91,6 +91,7 @@ namespace Utlop
 			}break;
 		}
 	}
+
 	float normalized(float value, float max, float min) {
 		return (value - min) / (max - min);
 	}
@@ -127,7 +128,7 @@ namespace Utlop
 			if (strcmp(&lineHeader[0], "v") == 0) {
 				glm::vec3 vertex;
 				fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
-				
+
 				if (vertex.x > max || vertex.y > max || vertex.z > max) {
 					max = std::max(vertex.x, vertex.y);
 					max = std::max(max, vertex.z);
@@ -154,13 +155,13 @@ namespace Utlop
 			}
 			else if (strcmp(lineHeader, "f") == 0) {
 				std::string vertex1, vertex2, vertex3;
-				
+
 				int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
 				if (matches != 9) {
 					printf("File can't be read by our simple parser : ( Try exporting with other options\n");
 					return false;
 				}
-				
+
 				vertexIndices.push_back(vertexIndex[0]);
 				vertexIndices.push_back(vertexIndex[1]);
 				vertexIndices.push_back(vertexIndex[2]);
@@ -183,12 +184,11 @@ namespace Utlop
 		for (int i = 0; i < temp_vertices.size(); i++) {
 			out_vertices.push_back(normalized(temp_vertices[i], max, min));
 		}
-		
-		return true;
 
+		return true;
 	}
 
-	void GameObject::setObjectGeometry(const char* src)
+	void GameObject::setGeometry(char* src)
 	{
 		std::vector<float> vertices;
 		std::vector< glm::vec2 > uvs;
@@ -197,9 +197,8 @@ namespace Utlop
 
 		bool res = loadOBJ(src, vertices, uvs, normals, indices);
 		// "../UtlopTests/src/shaders/vs.glsl"
-		
-		_mesh->createObject(vertices, indices);
 
+		_mesh->createObject(vertices, indices);
 	}
 
 	GameObject& GameObject::operator=(const GameObject& other)

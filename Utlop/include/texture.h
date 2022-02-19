@@ -2,7 +2,7 @@
 #include <string>
 
 namespace Utlop {
-	struct Texture {
+	class Texture {
 		unsigned int id;
 		std::string type;
 	};

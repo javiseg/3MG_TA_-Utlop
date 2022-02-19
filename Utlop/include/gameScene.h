@@ -4,6 +4,7 @@
 
 #include "gameObject.h"
 #include "geometry.h"
+#include "texture.h"
 
 namespace Utlop
 {
@@ -19,7 +20,8 @@ namespace Utlop
       virtual void start();
       virtual void update();
 			static GameScene* getCurrentScene();
-
+			std::shared_ptr<Utlop::Geometry> CreateGeometry();
+			std::vector<std::shared_ptr<Utlop::Geometry>> getGeometries();
 			std::vector<Utlop::GameObject> gameObjects_;
     protected:
 			
@@ -27,7 +29,8 @@ namespace Utlop
     private:
       static GameScene* _current_scene;
       static std::vector<GameScene*> _scenes;
-			std::unique_ptr<std::vector<Utlop::Geometry>> geometryData_;
+			std::vector<std::shared_ptr<Utlop::Geometry>> geometryData_;
+			std::vector<std::shared_ptr<Utlop::Texture>> textureData_;
 
       friend class Core;
 
