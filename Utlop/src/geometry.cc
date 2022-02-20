@@ -55,7 +55,7 @@ bool loadOBJ(const char* path,
 		else if (strcmp(lineHeader, "vt") == 0) {
 			glm::vec2 uv;
 			fscanf(file, "%f %f\n", &uv.x, &uv.y);
-			temp_uvs.push_back(uv);
+			out_uvs.push_back(uv);
 
 		}
 		else if (strcmp(lineHeader, "vn") == 0) {
@@ -123,4 +123,5 @@ void Utlop::Geometry::newGeometryData(char* src)
 	std::vector< glm::vec3 > normals;
 
 	bool res = loadOBJ(src, vertices_, uvs, normals, indices_);
+	printf("");
 }

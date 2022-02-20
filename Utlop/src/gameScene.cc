@@ -1,4 +1,5 @@
 #include "gameScene.h"
+#include "GLFW/glfw3.h"
 #include "core.h"
 
 namespace Utlop
@@ -78,10 +79,12 @@ namespace Utlop
   void GameScene::_start()
   {
     start();
-		for each (auto & gameObject_ in gameObjects_)
+		for each (auto & gameObject_ in GameScene::getCurrentScene()->gameObjects_)
 		{
-			gameObject_->setColor(glm::vec3(0.5, 1.0f, 1.0f));
+			//gameObject_->setColor(glm::vec3(0.5, 1.0f, 1.0f));
+			//gameObject_->setTexture("../UtlopTests/src/textures/texture.jpg");
 		}
+		
 		
   }
 	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)

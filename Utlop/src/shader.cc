@@ -17,8 +17,6 @@ void Utlop::Shader::setFloat(const char* name, float value)
 
 void Utlop::Shader::setParameters(const int uniform_pos, const Utlop::Type uniform_type, const float* value)
 {
-
-
 	glUseProgram(id_);
 
 	switch (uniform_type)

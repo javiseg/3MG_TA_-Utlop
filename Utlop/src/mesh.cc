@@ -14,8 +14,8 @@ namespace Utlop
 		vao_ = 0;
 		vbo_ = 0;
 		ebo_ = 0;
-		id_geometry_ = 0;
-		id_texture_ = 0;
+		id_geometry_ = -1;
+		id_texture_ = -1;
 		
   }
 
@@ -55,9 +55,11 @@ namespace Utlop
 
 	void Mesh::draw(Shader& shader)
 	{
+		shader.use();
 		glBindVertexArray(vao_);
 		int size;
 		glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+		
 
 		glDrawElements(GL_TRIANGLES, size / sizeof(int), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
@@ -111,29 +113,6 @@ namespace Utlop
 
 	}
 
-
-
-
-
-
-	void Mesh::createObject(std::vector<float> vertices, std::vector<unsigned int> indices)
-	{
-		glGenVertexArrays(1, &vao_);
-		glGenBuffers(1, &vbo_);
-		glGenBuffers(1, &ebo_);
-
-		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
-
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-		//n_vertice_ = 6;
-	}
 
 	Mesh& Mesh::operator=(const Mesh& other)
 	{

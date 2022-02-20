@@ -70,8 +70,10 @@ namespace Utlop {
 
 	enum UniformType {
 		U_POSITION = 0,
-		U_COLOR = 2,
-		U_MODEL = 3
+		U_COLOR = 1,
+		U_MODEL = 2,
+		U_TEXTURE = 3,
+		U_NORMALS = 4
 	};
 
 

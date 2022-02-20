@@ -9,21 +9,23 @@ void MatrixThreadScene::start()
   //Utlop::Core::Instance()->getScheduler()->AddTaskSetToPipe(&task);
   //Utlop::Core::Instance()->getScheduler()->WaitforTask(&task);
 
-	Utlop::GameObject object;
+	//Utlop::GameObject object;
 
-	object.init();
-	object.setGeometry(Utlop::Geo::kConst_Cube);
-	//object.setGeometry("../UtlopTests/src/obj/doc.obj");
-	object.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-	
+	//object.init();
+	//object.setGeometry(Utlop::Geo::kConst_Cube);
+	////object.setGeometry("../UtlopTests/src/obj/doc.obj");
+	//object.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	//
 	//triangle.setColor(color);
-	addGameObject(object);
+	//addGameObject(object);
 
 	Utlop::GameObject object2;
 
 	object2.init();
+	//object2.setGeometry("../UtlopTests/src/obj/lego.obj");
 	object2.setGeometry(Utlop::Geo::kConst_Triangle);
-	object2.setPosition(glm::vec3(-0.4f, 0.0f, 0.0f));
+	object2.setColor(glm::vec3(0.5f, 0.0f, 1.0f));
+	object2.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	addGameObject(object2);
 
 }

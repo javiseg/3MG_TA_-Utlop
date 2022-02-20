@@ -101,11 +101,29 @@ namespace Utlop
 		shader_->loadShaderFiles(vertex, fragment);
 	}
 
+	void GameObject::setTexture(char* path)
+	{
+		shader_->loadFragmentShader("../UtlopTests/src/shaders/fs_texture.glsl");
+		Texture text(path);
+		textures_.push_back(text);
+		textures_.back().Bind();
+		shader_->setInt("u_Texture", 3);
+		
+		TextureCoords text_coords;
+		text_coords.setCoordsFromFile("../UtlopTests/src/obj/doc.obj");
+		textureCoords_.push_back(text_coords);
+	
+		
+	}
+
 	GameObject& GameObject::operator=(const GameObject& other)
 	{
 		transform_ = other.transform_;
 		mesh_ = other.mesh_;
 		shader_ = other.shader_;
+		projection_mat_index_ = other.projection_mat_index_;
+		textures_ = other.textures_;
+		textureCoords_ = other.textureCoords_;
 
 		return *this;
 	}
@@ -115,12 +133,18 @@ namespace Utlop
 		transform_ = other.transform_;
 		mesh_ = other.mesh_;
 		shader_ = other.shader_;
+		projection_mat_index_ = other.projection_mat_index_;
+		textures_ = other.textures_;
+		textureCoords_ = other.textureCoords_;
 	}
 	GameObject::GameObject(GameObject&& other) {
 
 		transform_ = other.transform_;
 		mesh_ = other.mesh_;
 		shader_ = other.shader_;
+		projection_mat_index_ = other.projection_mat_index_;
+		textures_ = other.textures_;
+		textureCoords_ = other.textureCoords_;
 	}
 
 }

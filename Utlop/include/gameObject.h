@@ -2,6 +2,8 @@
 #define UTLOP_GAMEOBJECT 1
 
 #include "mesh.h"
+#include "texture.h"
+#include "transform.h"
 
 namespace Utlop
 {
@@ -14,7 +16,6 @@ namespace Utlop
 
       void init();
       void draw();
-      void start();
       void update();
       void destroy();
 
@@ -28,12 +29,14 @@ namespace Utlop
 			void setGeometry(Utlop::Geo geometry);
 			void setGeometry(char* src);
 			void setShader(char* vertex, char* fragment);
+			void setTexture(char* path);
 
 			GameObject& operator=(const GameObject& other);
 			GameObject(const GameObject& other);
 			GameObject(GameObject&& other);
 			
 
+			std::shared_ptr<Shader> shader_;
 
 			//copia igual stdmove contr
 
@@ -43,8 +46,9 @@ namespace Utlop
 
       Transform transform_;
       std::shared_ptr<Mesh> mesh_;
-			std::shared_ptr<Shader> shader_;
-			
+			vector<Texture> textures_;
+			vector<TextureCoords> textureCoords_;
+
 			int projection_mat_index_;
   };
 
