@@ -20,15 +20,21 @@ namespace Utlop
       virtual void start();
       virtual void update();
 			static GameScene* getCurrentScene();
-			std::shared_ptr<Utlop::Geometry> CreateGeometry();
+			unsigned int CreateGeometry();
 			std::vector<std::shared_ptr<Utlop::Geometry>> getGeometries();
-			std::vector<Utlop::GameObject> gameObjects_;
+			std::shared_ptr<Utlop::Geometry> getGeometryByID(unsigned int id);
+			int getGeometryID(unsigned int id);
+			int getGeometryByType(Geo type);
+			
+			void addGameObject(Utlop::GameObject gO);
+
+			std::vector<std::shared_ptr<Utlop::GameObject>> gameObjects_;
     protected:
 			
 
     private:
-      static GameScene* _current_scene;
-      static std::vector<GameScene*> _scenes;
+      static GameScene* current_scene_;
+      static std::vector<GameScene*> scenes_;
 			std::vector<std::shared_ptr<Utlop::Geometry>> geometryData_;
 			std::vector<std::shared_ptr<Utlop::Texture>> textureData_;
 

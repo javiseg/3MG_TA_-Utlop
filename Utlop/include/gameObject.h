@@ -27,7 +27,7 @@ namespace Utlop
 
 			void setGeometry(Utlop::Geo geometry);
 			void setGeometry(char* src);
-
+			void setShader(char* vertex, char* fragment);
 
 			GameObject& operator=(const GameObject& other);
 			GameObject(const GameObject& other);
@@ -40,12 +40,12 @@ namespace Utlop
     protected:
 
     private:
-      GLuint _vao;
-      GLuint _vbo;
 
-      Transform _transform;
-      std::shared_ptr<Mesh> _mesh;
-      float *_vertices;
+      Transform transform_;
+      std::shared_ptr<Mesh> mesh_;
+			std::shared_ptr<Shader> shader_;
+			
+			int projection_mat_index_;
   };
 
 

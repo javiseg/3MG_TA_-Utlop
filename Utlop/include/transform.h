@@ -10,10 +10,8 @@ namespace Utlop
   class Transform
   {
     public:
-      Transform(glm::vec3 position = { 0.0f, 0.0f, 0.0f }, 
-                glm::vec3 scale = { 0.0f, 0.0f, 0.0f }, 
-                glm::vec3 rotation = { 0.0f, 0.0f, 0.0f });
-      ~Transform();
+      Transform();
+			~Transform();
 
       void setPosition(glm::vec3 position);
       void setScale(glm::vec3 scale);
@@ -30,6 +28,9 @@ namespace Utlop
 			glm::vec3 getRotation();
 			float getRotationAngle();
 
+			Transform& operator=(const Transform& other);
+			Transform(const Transform& other);
+			Transform(Transform&& other);
     protected:
 
     private:

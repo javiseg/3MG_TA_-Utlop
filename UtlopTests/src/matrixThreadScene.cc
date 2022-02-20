@@ -17,7 +17,14 @@ void MatrixThreadScene::start()
 	object.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	
 	//triangle.setColor(color);
-	gameObjects_.push_back(object);
+	addGameObject(object);
+
+	Utlop::GameObject object2;
+
+	object2.init();
+	object2.setGeometry(Utlop::Geo::kConst_Triangle);
+	object2.setPosition(glm::vec3(-0.4f, 0.0f, 0.0f));
+	addGameObject(object2);
 
 }
 

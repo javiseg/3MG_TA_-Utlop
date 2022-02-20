@@ -53,10 +53,10 @@ namespace Utlop
         printf("Failed to initialize GLAD");
       }
 
-      Utlop::GameScene::_current_scene->_start();
+      Utlop::GameScene::current_scene_->_start();
 			camera_->update();
 			glEnable(GL_DEPTH_TEST);
-      glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+      glClearColor(160.0f/255.0f, 160.0f / 255.0f, 160.0f / 255.0f, 1.0f);
 			GLint version_max, version_min;
 			glGetIntegerv(GL_MAJOR_VERSION, &version_max);
 			glGetIntegerv(GL_MINOR_VERSION, &version_min);
@@ -77,15 +77,15 @@ namespace Utlop
 				//double xpos, ypos;
 				//glfwGetCursorPos(_window.getWindow(), &xpos, &ypos);
 				//printf("Cursor Position at (%f, %f )\n",xpos, ypos);
-				//Utlop::GameScene::_current_scene->_gameObjects[0].setPosition(glm::vec3(xpos, ypos, 0.0f));
+				//Utlop::GameScene::current_scene_->_gameObjects[0].setPosition(glm::vec3(xpos, ypos, 0.0f));
 				camera_->update();
-				Utlop::GameScene::_current_scene->_update();
+				Utlop::GameScene::current_scene_->_update();
 
-        Utlop::GameScene::_current_scene->draw();
+        Utlop::GameScene::current_scene_->draw();
 
         glfwSwapBuffers(_window._window);
 
-				/*printf("Objects: %d\n", Utlop::GameScene::_current_scene->_gameObjects.size());*/
+				/*printf("Objects: %d\n", Utlop::GameScene::current_scene_->_gameObjects.size());*/
 
         glfwPollEvents();
 

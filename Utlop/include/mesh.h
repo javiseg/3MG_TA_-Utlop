@@ -1,10 +1,11 @@
-#ifndef UTLOP_MESH
-#define UTLOP_MESH 1
+#ifndef UTLOPmesh_
+#define UTLOPmesh_ 1
 
 
 #include <memory>
 #include "material.h"
 #include "geometry.h"
+#include "shader.h"
 #include <vector>
 
 namespace Utlop
@@ -15,19 +16,15 @@ namespace Utlop
       Mesh();
       ~Mesh();
 
-      void init();
-      void draw();
+      void init(Geo type);
+      void init(Geo type, char* src);
+      void draw(Shader& shader);
       void start();
       void update();
       void destroy();
 
-			void setMaterialParameters(const int uniform_pos, const Utlop::Type uniform_type, const float* value);
-      void setMaterial(Material material);
-			void setColor(glm::vec3 color);
-			void setPosition(glm::vec3 position);
-			void translate(glm::vec3 position, float speed);
-			void createCube();
-			void createTriangle();
+			void setupMesh();
+
 			void createObject(std::vector<float> vertices, std::vector<unsigned int> indices);
 
 			Mesh& operator=(const Mesh& other);
@@ -38,16 +35,18 @@ namespace Utlop
     protected:
 
     private:
-      GLuint _vao;
-      GLuint _vbo;
-			GLuint _ebo;
-			GLuint _texture;
+      GLuint vao_;
+      GLuint vbo_;
+			GLuint ebo_;
+			GLuint texture_;
 
-      std::shared_ptr<Material> _material;
-			int n_vertice_;
-  };
+      //std::shared_ptr<Material> material_;
+			unsigned int id_geometry_;
+			unsigned int id_texture_;
+			Geo type_;
+	};
 
 
 }
 
-#endif // !UTLOP_MESH
+#endif // !UTLOPmesh_

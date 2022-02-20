@@ -3,12 +3,12 @@
 
 namespace Utlop
 {
-  GameScene* GameScene::_current_scene = nullptr;
-  std::vector<GameScene*> GameScene::_scenes = std::vector<GameScene*>();
+  GameScene* GameScene::current_scene_ = nullptr;
+  std::vector<GameScene*> GameScene::scenes_ = std::vector<GameScene*>();
 
   GameScene::GameScene()
   {
-    _scenes.push_back(this);
+    scenes_.push_back(this);
   }
 
   GameScene::~GameScene()
@@ -16,26 +16,58 @@ namespace Utlop
 
   }
 	GameScene* GameScene::getCurrentScene() {
-		return _current_scene;
+		return current_scene_;
 	}
-	std::shared_ptr<Utlop::Geometry> GameScene::CreateGeometry()
+	unsigned int GameScene::CreateGeometry()
 	{
-		return std::make_shared<Utlop::Geometry>((int)geometryData_.size());
+		geometryData_.push_back(std::make_shared<Utlop::Geometry>((int)geometryData_.size()));
+		return geometryData_.size()-1;
 	}
 	std::vector<std::shared_ptr<Utlop::Geometry>> GameScene::getGeometries()
 	{
 		return geometryData_;
 	}
+	std::shared_ptr<Utlop::Geometry> GameScene::getGeometryByID(unsigned int id)
+	{
+		if (id < geometryData_.size()) {
+			return geometryData_[id];
+		}
+		else {
+			return nullptr;
+		}
+	}
+	int GameScene::getGeometryID(unsigned int id)
+	{
+		for each (auto& geometry in geometryData_) {
+			if (geometry->getID() == id) {
+				return geometry->getID();
+			}
+		}
+		return -1;
+	}
+	int GameScene::getGeometryByType(Geo type)
+	{
+		for (int i = 0; i < geometryData_.size(); i++) {
+			if (geometryData_[i]->getType() == type) {
+				return geometryData_[i]->getID();
+			}
+		}
+		return -1;
+	}
+	void GameScene::addGameObject(Utlop::GameObject gO)
+	{
+		gameObjects_.push_back(std::make_shared<GameObject>(gO));
+	}
   void GameScene::init()
   {
-    _current_scene = this;
+    current_scene_ = this;
   }
 
   void GameScene::draw()
   {
-    for each(GameObject _gameObject in gameObjects_)
+    for each(auto& gameObject_ in gameObjects_)
     {
-      _gameObject.draw();
+      gameObject_->draw();
     }
   }
 
@@ -46,11 +78,9 @@ namespace Utlop
   void GameScene::_start()
   {
     start();
-		for(int i = 0; i < gameObjects_.size(); i++)
+		for each (auto & gameObject_ in gameObjects_)
 		{
-			gameObjects_[i].start();
-			//_gameObjects[i].setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-			gameObjects_[i].setColor(glm::vec3(0.5f, 0.0f, 1.0f));
+			gameObject_->setColor(glm::vec3(0.5, 1.0f, 1.0f));
 		}
 		
   }
@@ -87,21 +117,21 @@ namespace Utlop
 			Core::Instance()->getCamera()->RotateCamera(Core::Instance()->getDeltaTime(), 100.0f, 3);
 		}
 		if (key == GLFW_KEY_C) {
-			for each (GameObject _gameObject in GameScene::getCurrentScene()->gameObjects_)
+			for each (auto& gameObject_ in GameScene::getCurrentScene()->gameObjects_)
 			{
-				_gameObject.setGeometry(Utlop::Geo::kConst_Cube);
+				gameObject_->setGeometry(Utlop::Geo::kConst_Cube);
 			}
 		}
 		if (key == GLFW_KEY_T) {
-			for each (GameObject _gameObject in GameScene::getCurrentScene()->gameObjects_)
+			for each (auto& gameObject_ in GameScene::getCurrentScene()->gameObjects_)
 			{
-				_gameObject.setGeometry(Utlop::Geo::kConst_Triangle);
+				gameObject_->setGeometry(Utlop::Geo::kConst_Triangle);
 			}
 		}
 		if (key == GLFW_KEY_O) {
-			for each (GameObject _gameObject in GameScene::getCurrentScene()->gameObjects_)
+			for each (auto& gameObject_ in GameScene::getCurrentScene()->gameObjects_)
 			{
-				_gameObject.setGeometry("../UtlopTests/src/obj/lego.obj");
+				gameObject_->setGeometry("../UtlopTests/src/obj/lego.obj");
 			}
 		}
 	}
@@ -111,9 +141,9 @@ namespace Utlop
 		//glfwPollEvents();
 		glfwSetKeyCallback(Core::Instance()->getWindow()->getWindow(), key_callback);
 		
-		for each (GameObject _gameObject in gameObjects_)
+		for each (auto & gameObject_ in gameObjects_)
 		{
-			_gameObject.update();
+			gameObject_->update();
 		}
 
   }
