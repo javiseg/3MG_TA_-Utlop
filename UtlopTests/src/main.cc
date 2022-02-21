@@ -7,7 +7,7 @@ int main()
 {
 	Utlop::Core core;
 	core.init(1000.0f);
-	core.getWindow()->init(1020, 780, "Utlop");
+	core.getWindow()->init(1080, 780, "Utlop");
 	MatrixThreadScene scene;
 	scene.init();
 	core.start();

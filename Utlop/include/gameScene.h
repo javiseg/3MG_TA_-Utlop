@@ -25,8 +25,11 @@ namespace Utlop
 			std::shared_ptr<Utlop::Geometry> getGeometryByID(unsigned int id);
 			int getGeometryID(unsigned int id);
 			int getGeometryByType(Geo type);
+			int getGeometryByType(Geo type, char* src);
 			
 			void addGameObject(Utlop::GameObject gO);
+
+			void ImGUI();
 
 			std::vector<std::shared_ptr<Utlop::GameObject>> gameObjects_;
     protected:

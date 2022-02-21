@@ -42,8 +42,9 @@ namespace Utlop
 	void Mesh::init(Geo type, char* src)
 	{
 		type_ = type;
-		if (GameScene::getCurrentScene()->getGeometryByType(type_) != -1) {
-			id_geometry_ = GameScene::getCurrentScene()->getGeometryByType(type_);
+
+		if (GameScene::getCurrentScene()->getGeometryByType(type_, src) != -1) {
+			id_geometry_ = GameScene::getCurrentScene()->getGeometryByType(type_, src);
 		}
 		else {
 			id_geometry_ = GameScene::getCurrentScene()->CreateGeometry();

@@ -1,6 +1,7 @@
 #include "gameScene.h"
 #include "GLFW/glfw3.h"
 #include "core.h"
+#include "imgui.h"
 
 namespace Utlop
 {
@@ -55,9 +56,32 @@ namespace Utlop
 		}
 		return -1;
 	}
+	int GameScene::getGeometryByType(Geo type, char* src)
+	{
+		for (int i = 0; i < geometryData_.size(); i++) {
+			if (geometryData_[i]->getType() == type && geometryData_[i]->IsSameOBJ(src)) {
+				return geometryData_[i]->getID();
+			}
+		}
+		return -1;
+	}
 	void GameScene::addGameObject(Utlop::GameObject gO)
 	{
 		gameObjects_.push_back(std::make_shared<GameObject>(gO));
+	}
+	void GameScene::ImGUI()
+	{
+		if (ImGui::Begin("Utlop Test")) {
+
+			ImGui::SetWindowPos(ImVec2(960, 0), ImGuiCond_FirstUseEver);
+			ImGui::SetWindowSize(ImVec2(400, 704));
+
+			
+			ImGui::End();
+
+
+			ImGui::Render();
+		}
 	}
   void GameScene::init()
   {
@@ -84,8 +108,9 @@ namespace Utlop
 			//gameObject_->setColor(glm::vec3(0.5, 1.0f, 1.0f));
 			//gameObject_->setTexture("../UtlopTests/src/textures/texture.jpg");
 		}
-		
-		
+		/*ImGui::CreateContext();
+		ImGui::StyleColorsDark();*/
+
   }
 	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{

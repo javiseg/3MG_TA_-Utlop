@@ -71,14 +71,15 @@ namespace Utlop {
 	class Geometry {
 		public:
 
-			Geometry() : id_(0) {
+			Geometry() : id_(0), source_("") {
 			}
-			Geometry(int id) : id_(id) {
+			Geometry(int id) : id_(id), source_("") {
 			}
 			Geometry(const Geometry& other) {
 				id_ = other.id_;
 				vertices_ = other.vertices_;
 				indices_ = other.indices_;
+				source_ = other.source_;
 			}
 			~Geometry() {
 				vertices_.resize(0);
@@ -106,6 +107,9 @@ namespace Utlop {
 			inline const Geo getType() const {
 				return type_;
 			}
+			inline bool IsSameOBJ(char* src) {
+				return strcmp(src, source_) == 0;
+			}
 			inline const std::vector<float> getVertices() const {
 				return vertices_;
 			}
@@ -123,6 +127,7 @@ namespace Utlop {
 			std::vector<float> vertices_;
 			std::vector<unsigned int> indices_;
 			Geo type_;
+			char* source_;
 	};
 
 

@@ -7,6 +7,7 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "..\include\core.h"
+#include "imgui.h"
 #include <time.h>
 
 
@@ -74,6 +75,7 @@ namespace Utlop
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				deltaTime_ = (float)glfwGetTime() - lastFrame;
 				lastFrame = (float)glfwGetTime();
+
 				//double xpos, ypos;
 				//glfwGetCursorPos(_window.getWindow(), &xpos, &ypos);
 				//printf("Cursor Position at (%f, %f )\n",xpos, ypos);
@@ -88,6 +90,8 @@ namespace Utlop
 				/*printf("Objects: %d\n", Utlop::GameScene::current_scene_->_gameObjects.size());*/
 
         glfwPollEvents();
+
+				Utlop::GameScene::current_scene_->ImGUI();
 
         std::chrono::system_clock::time_point end_time = std::chrono::system_clock::now();
         std::this_thread::sleep_until(start_time + std::chrono::milliseconds(_frame_time_millis));
@@ -104,6 +108,7 @@ namespace Utlop
   void Core::stop()
   {
     glfwTerminate();
+		ImGui::DestroyContext();
   }
 
   Utlop::Window* Core::getWindow()

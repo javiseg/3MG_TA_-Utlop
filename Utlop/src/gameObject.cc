@@ -30,7 +30,7 @@ namespace Utlop
 		mesh_ = std::make_shared<Mesh>();
 		shader_ = make_shared<Shader>();
 		shader_->loadShaderFiles("../UtlopTests/src/shaders/vs.glsl", "../UtlopTests/src/shaders/fs.glsl");
-
+		projection_mat_index_ = shader_->uniformLocation("u_vp_matrix");
   }
 
   void GameObject::draw()
@@ -42,7 +42,7 @@ namespace Utlop
   void GameObject::update()
   {
     
-		projection_mat_index_ = shader_->uniformLocation("u_vp_matrix");
+		shader_->use();
 		
 		glm::mat4 model_matrix = glm::translate(glm::rotate(glm::scale(
 		glm::mat4(1.0f), transform_.getScale()), transform_.getRotationAngle(), transform_.getRotation()), transform_.getPosition());

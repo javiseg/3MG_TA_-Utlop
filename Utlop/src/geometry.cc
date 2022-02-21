@@ -118,7 +118,7 @@ void Utlop::Geometry::newGeometryData(Geo type)
 void Utlop::Geometry::newGeometryData(char* src)
 {
 	type_ = Geo::kConst_OBJ;
-
+	source_ = src;
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals;
 
