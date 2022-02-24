@@ -26,8 +26,8 @@ void MatrixThreadScene::start()
 	object2.init();
 	//object2.setGeometry("../UtlopTests/src/obj/lego.obj");
 	object2.setGeometry(Utlop::Geo::kConst_Triangle);
-	object2.setColor(glm::vec3(0.5f, 0.0f, 1.0f));
-	object2.setPosition(glm::vec3(-0.5f, 0.0f, 0.0f));
+	object2.setColor(glm::vec3(0.3f, 0.1f, 1.0f));
+	object2.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	addGameObject(object2);
 	
 	object3.init();

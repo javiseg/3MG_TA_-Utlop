@@ -41,6 +41,7 @@ namespace Utlop
       static std::vector<GameScene*> scenes_;
 			std::vector<std::shared_ptr<Utlop::Geometry>> geometryData_;
 			std::vector<std::shared_ptr<Utlop::Texture>> textureData_;
+			std::vector<std::shared_ptr<Utlop::Mesh>> meshes_;
 
       friend class Core;
 

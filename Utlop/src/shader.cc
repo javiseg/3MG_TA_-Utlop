@@ -44,6 +44,17 @@ void Utlop::Shader::loadShaderFiles(const char* vS, const char* fS)
 	loadFragmentShader(fS);
 
 	glLinkProgram(id_);
+	/*float values[3];
+	values[0] = 1.0f;
+	values[1] = 0.5f;
+	values[2] = 0.31f;
+	setParameters(uniformLocation("material.ambient"), T_FLOAT_3,  values);
+	setParameters(uniformLocation("material.diffuse"), T_FLOAT_3, values);
+	values[0] = 0.5f;
+	values[2] = 0.5f;
+
+	setParameters(uniformLocation("material.specular"), T_FLOAT_3, values);
+	setParameters(uniformLocation("material.shininess"), T_FLOAT, values);*/
 }
 
 void Utlop::Shader::loadVertexShader(const char* filename)

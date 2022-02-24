@@ -160,7 +160,7 @@ namespace Utlop
 		if (key == GLFW_KEY_O) {
 			for each (auto& gameObject_ in GameScene::getCurrentScene()->gameObjects_)
 			{
-				gameObject_->setGeometry("../UtlopTests/src/obj/robot.obj");
+				gameObject_->setGeometry("../UtlopTests/src/obj/backpack.obj");
 			}
 		}
 		if (key == GLFW_KEY_P && action == GLFW_PRESS) {

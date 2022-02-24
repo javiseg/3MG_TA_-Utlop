@@ -63,7 +63,7 @@ namespace Utlop
 		
 
 		glDrawElements(GL_TRIANGLES, size / sizeof(int), GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
+		
 
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -89,29 +89,29 @@ namespace Utlop
 
 	void Mesh::setupMesh()
 	{
-		glGenVertexArrays(1, &vao_);
-		glGenBuffers(1, &vbo_);
-		glGenBuffers(1, &ebo_);
+		glCreateVertexArrays(1, &vao_);
+		glCreateBuffers(1, &vbo_);
+		glCreateBuffers(1, &ebo_);
 
-		glBindVertexArray(vao_);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-		glBufferData(GL_ARRAY_BUFFER, 
+		glNamedBufferData(vbo_, 
 			GameScene::getCurrentScene()->getGeometryByID(id_geometry_)->getVertices().size() * sizeof(float),
 			&GameScene::getCurrentScene()->getGeometryByID(id_geometry_)->getVertices()[0],
 			GL_STATIC_DRAW);
 		
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+
+		glNamedBufferData(ebo_,
 			GameScene::getCurrentScene()->getGeometryByID(id_geometry_)->getIndices().size() * sizeof(unsigned int),
 			&GameScene::getCurrentScene()->getGeometryByID(id_geometry_)->getIndices()[0],
 			GL_STATIC_DRAW);
 
-		glEnableVertexAttribArray(0);
+		glEnableVertexArrayAttrib(vao_, 0);
 		// Back here when applying normals etc:
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		glVertexArrayAttribFormat(vao_, 0, 3, GL_FLOAT, GL_FALSE, 0);
 		//
-		glBindVertexArray(0);
 
+		glVertexArrayVertexBuffer(vao_, 0, vbo_, 0, 3 * sizeof(unsigned int));
+
+		glVertexArrayElementBuffer(vao_, ebo_);
 	}
 
 
