@@ -27,7 +27,7 @@ void MatrixThreadScene::start()
 	//object2.setGeometry("../UtlopTests/src/obj/lego.obj");
 	object2.setGeometry(Utlop::Geo::kConst_Triangle);
 	object2.setColor(glm::vec3(0.5f, 0.0f, 1.0f));
-	object2.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	object2.setPosition(glm::vec3(-0.5f, 0.0f, 0.0f));
 	addGameObject(object2);
 	
 	object3.init();
@@ -35,13 +35,13 @@ void MatrixThreadScene::start()
 	object3.setGeometry(Utlop::Geo::kConst_Cube);
 	object3.setColor(glm::vec3(0.5f, 0.0f, 1.0f));
 	object3.setPosition(glm::vec3(0.5f, 0.0f, 0.0f));
-	addGameObject(object3);
+	//addGameObject(object3);
 
-	object4.init();
+	/*object4.init();
 	object4.setGeometry("../UtlopTests/src/obj/electricbox.obj");
 	object4.setColor(glm::vec3(0.0f, 0.0f, 1.0f));
-	object4.setPosition(glm::vec3(-0.5f, 0.0f, 0.0f));
-	addGameObject(object4);
+	object4.setPosition(glm::vec3(-0.5f, 0.0f, 0.0f));*/
+	//addGameObject(object4);
 
 }
 

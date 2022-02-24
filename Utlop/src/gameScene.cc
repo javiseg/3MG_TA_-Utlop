@@ -71,7 +71,7 @@ namespace Utlop
 	}
 	void GameScene::ImGUI()
 	{
-		if (ImGui::Begin("Utlop Test")) {
+		/*if (ImGui::Begin("Utlop Test")) {
 
 			ImGui::SetWindowPos(ImVec2(960, 0), ImGuiCond_FirstUseEver);
 			ImGui::SetWindowSize(ImVec2(400, 704));
@@ -81,11 +81,12 @@ namespace Utlop
 
 
 			ImGui::Render();
-		}
+		}*/
 	}
   void GameScene::init()
   {
     current_scene_ = this;
+		polygon_ = false;
   }
 
   void GameScene::draw()
@@ -105,7 +106,7 @@ namespace Utlop
     start();
 		for each (auto & gameObject_ in GameScene::getCurrentScene()->gameObjects_)
 		{
-			//gameObject_->setColor(glm::vec3(0.5, 1.0f, 1.0f));
+			gameObject_->setColor(glm::vec3(0.5, 1.0f, 1.0f));
 			//gameObject_->setTexture("../UtlopTests/src/textures/texture.jpg");
 		}
 		/*ImGui::CreateContext();
@@ -159,8 +160,17 @@ namespace Utlop
 		if (key == GLFW_KEY_O) {
 			for each (auto& gameObject_ in GameScene::getCurrentScene()->gameObjects_)
 			{
-				gameObject_->setGeometry("../UtlopTests/src/obj/lego.obj");
+				gameObject_->setGeometry("../UtlopTests/src/obj/robot.obj");
 			}
+		}
+		if (key == GLFW_KEY_P && action == GLFW_PRESS) {
+			if (GameScene::getCurrentScene()->polygon_) {
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			}
+			else {
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			}
+			GameScene::getCurrentScene()->polygon_ = !GameScene::getCurrentScene()->polygon_;
 		}
 	}
   void GameScene::_update()

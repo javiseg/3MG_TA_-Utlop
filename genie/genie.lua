@@ -53,9 +53,7 @@ solution("Utlop")
     path.join(UTLOP_DIR, "./deps/glfw/src/osmesa_context.c"),
     path.join(UTLOP_DIR, "./deps/glad/src/glad.c"),
     path.join(UTLOP_DIR, "./deps/enkiTS/src/TaskScheduler.cpp"),
-    path.join(UTLOP_DIR, "./deps/math/"),
-    path.join(UTLOP_DIR, "./deps/imgui/imgui_impl_glfw.cpp"),
-    path.join(UTLOP_DIR, "./deps/imgui/imgui_impl_opengl3.cpp")
+    path.join(UTLOP_DIR, "./deps/math/")
  
 
   }

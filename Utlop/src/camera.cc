@@ -23,10 +23,10 @@ namespace Utlop {
 		data_->Right = vec3(1.0f, 0.0f, 0.0f);
 		data_->Up = vec3(0.0f, 1.0f, 0.0f);
 		data_->scale_ = vec3(1.0f, 1.0f, 1.0f);
-		data_->position_ = vec3(0.0f, 0.0f, -5.0f);
+		data_->position_ = vec3(0.0f, 0.0f, 15.0f);
 		data_->rotation_ = vec3(0.0f, 1.0f, 0.0f);
 		data_->target_ = vec3(0.0f, 0.0f, -1.0f);
-		data_->direction_ = vec3(0.0f, 0.0f, 1.0f);
+		data_->direction_ = vec3(0.0f, 0.0f, -1.0f);
 		data_->rotation_angle_ = 0.0f;
 
 		WorldUp = vec3(0.0f, 1.0f, 0.0f);
@@ -34,9 +34,9 @@ namespace Utlop {
 
 		velocity_ = 10.0f;
 
-		data_->projection_ = perspective(1.57f, 1.0f, 0.1f, 100.0f);
+		//data_->projection_ = perspective(1.57f, 1.0f, 0.1f, 100.0f);
 		data_->projection_ = glm::perspective(glm::radians(45.0f), (float)1020 / (float)780, 0.1f, 100.0f);
-		yaw_ = 90.0f;
+		yaw_ = -90.0f;
 		pitch_ = 0.0f;
 
 		UpdateData();

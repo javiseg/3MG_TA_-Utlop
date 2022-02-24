@@ -32,6 +32,7 @@ namespace Utlop
 			void ImGUI();
 
 			std::vector<std::shared_ptr<Utlop::GameObject>> gameObjects_;
+			bool polygon_;
     protected:
 			
 
@@ -43,6 +44,7 @@ namespace Utlop
 
       friend class Core;
 
+			
       void _start();
       void _update();
   };

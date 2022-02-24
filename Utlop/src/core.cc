@@ -56,8 +56,11 @@ namespace Utlop
 
       Utlop::GameScene::current_scene_->_start();
 			camera_->update();
-			glEnable(GL_DEPTH_TEST);
+
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       glClearColor(160.0f/255.0f, 160.0f / 255.0f, 160.0f / 255.0f, 1.0f);
+			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_LESS);
 			GLint version_max, version_min;
 			glGetIntegerv(GL_MAJOR_VERSION, &version_max);
 			glGetIntegerv(GL_MINOR_VERSION, &version_min);
@@ -108,7 +111,7 @@ namespace Utlop
   void Core::stop()
   {
     glfwTerminate();
-		ImGui::DestroyContext();
+		//ImGui::DestroyContext();
   }
 
   Utlop::Window* Core::getWindow()
