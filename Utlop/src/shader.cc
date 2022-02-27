@@ -1,5 +1,5 @@
 #include "shader.h"
-
+#include "glm/gtc/type_ptr.hpp"
 void Utlop::Shader::setBool(const char* name, bool value)
 {
 	glUniform1i(glGetUniformLocation(id_, name), (int)value);
@@ -18,7 +18,7 @@ void Utlop::Shader::setFloat(const char* name, float value)
 void Utlop::Shader::setParameters(const int uniform_pos, const Utlop::Type uniform_type, const float* value)
 {
 	glUseProgram(id_);
-
+	int pepe = glGetUniformLocation(id_, "new_color");
 	switch (uniform_type)
 	{
 	case Utlop::T_FLOAT_1:
@@ -44,6 +44,9 @@ void Utlop::Shader::loadShaderFiles(const char* vS, const char* fS)
 	loadFragmentShader(fS);
 
 	glLinkProgram(id_);
+
+	checkCompileErrors(id_, "PROGRAM");
+	checkCompileErrors(id_, "LINK");
 	/*float values[3];
 	values[0] = 1.0f;
 	values[1] = 0.5f;
@@ -89,9 +92,19 @@ void Utlop::Shader::loadFragmentShader(const char* filename)
 	//glDeleteShader(_fragment_shader);
 }
 
-int Utlop::Shader::uniformLocation(char* src)
+int Utlop::Shader::uniformLocation(const GLchar* src)
 {
 	return glGetUniformLocation(id_, src);
+}
+void Utlop::Shader::setMat4fv(glm::mat4 value, const GLchar* name, GLboolean transpose)
+{
+	this->use();
+	int projection_mat_index_ = uniformLocation(name);
+	int model_mat_index_ = uniformLocation("ModelMatrix");
+	int view_mat_index_ = uniformLocation("ViewMatrix");
+	glUniformMatrix4fv(glGetUniformLocation(this->id_, name), 1, transpose, &value[0][0]);
+
+	glUseProgram(0);
 }
 
 void Utlop::Shader::checkCompileErrors(unsigned int shader, std::string type)

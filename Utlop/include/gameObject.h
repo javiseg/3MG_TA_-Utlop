@@ -26,8 +26,7 @@ namespace Utlop
 			void setColor(glm::vec3 color);
 			void translate(glm::vec3 position, float speed);
 
-			void setGeometry(Utlop::Geo geometry);
-			void setGeometry(char* src);
+			void addMesh(int indexmesh);
 			void setShader(char* vertex, char* fragment);
 			void setTexture(char* path);
 
@@ -36,7 +35,6 @@ namespace Utlop
 			GameObject(GameObject&& other);
 			
 
-			std::shared_ptr<Shader> shader_;
 
 			//copia igual stdmove contr
 
@@ -45,9 +43,11 @@ namespace Utlop
     private:
 
       Transform transform_;
-      std::shared_ptr<Mesh> mesh_;
+			vector<GLuint> meshIndices_;
+			vector<Transform> transformVector_;
 			vector<Texture> textures_;
 			vector<TextureCoords> textureCoords_;
+			std::shared_ptr<Shader> shader_;
 
 			int projection_mat_index_;
   };

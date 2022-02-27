@@ -3,7 +3,9 @@
 #include "GLFW/glfw3.h"
 #include <fstream>
 #include "gameScene.h"
+#include "glm/gtc/matrix_transform.hpp"
 #include <chrono>
+#include "core.h"
 
 namespace Utlop
 {
@@ -14,49 +16,50 @@ namespace Utlop
 		vao_ = 0;
 		vbo_ = 0;
 		ebo_ = 0;
-		id_geometry_ = -1;
-		id_texture_ = -1;
+		transform_.setPosition(vec3(0.0f));
+		transform_.setScale(vec3(1.0f));
+		transform_.setRotation(vec3(0.0f));
+		transform_.rotation_angle(0.0f);
+		origin_ = vec3(0.0f);
 		
   }
+
+	Mesh::Mesh(char* src, Geo type, vector<float> vertices, vector<GLuint> verticesIndices, vector<float> texCoords, vector<GLuint> texIndices, vector<float> normals, vector<GLuint> normalsIndices)
+	{
+		vertices_ = vertices;
+		verticesIndices_ = verticesIndices;
+
+		texCoords_ = texCoords;
+		texIndices_ = texIndices;
+
+		normals_ = normals;
+		normalsIndices_ = normalsIndices;
+		objPath_ = src;
+
+		type_ = type;
+
+		transform_.setPosition(vec3(0.0f, 0.0f, 0.0f));
+		transform_.setScale(vec3(1.0f));
+		transform_.setRotation(vec3(0.0f));
+		transform_.rotation_angle(0.0f);
+		origin_ = vec3(0.0f);
+
+		setupMesh();
+	}
 
   Mesh::~Mesh()
   {
 
   }
 
-  void Mesh::init(Geo type)
-  {
-		type_ = type;
-		if (GameScene::getCurrentScene()->getGeometryByType(type_) != -1) {
-			id_geometry_ = GameScene::getCurrentScene()->getGeometryByType(type_);
-		}
-		else {
-			id_geometry_ = GameScene::getCurrentScene()->CreateGeometry();
-			
-			GameScene::getCurrentScene()->getGeometryByID(id_geometry_)->newGeometryData(type_);
-		}
-		setupMesh();
-
-	}
-
-	void Mesh::init(Geo type, char* src)
-	{
-		type_ = type;
-
-		if (GameScene::getCurrentScene()->getGeometryByType(type_, src) != -1) {
-			id_geometry_ = GameScene::getCurrentScene()->getGeometryByType(type_, src);
-		}
-		else {
-			id_geometry_ = GameScene::getCurrentScene()->CreateGeometry();
-
-			GameScene::getCurrentScene()->getGeometryByID(id_geometry_)->newGeometryData(src);
-		}
-		setupMesh();
-	}
 
 	void Mesh::draw(Shader& shader)
 	{
+
+		UpdateModelMatrix();
+		UpdateUniforms(shader);
 		shader.use();
+
 		glBindVertexArray(vao_);
 		int size;
 		glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
@@ -93,16 +96,12 @@ namespace Utlop
 		glCreateBuffers(1, &vbo_);
 		glCreateBuffers(1, &ebo_);
 
-		glNamedBufferData(vbo_, 
-			GameScene::getCurrentScene()->getGeometryByID(id_geometry_)->getVertices().size() * sizeof(float),
-			&GameScene::getCurrentScene()->getGeometryByID(id_geometry_)->getVertices()[0],
-			GL_STATIC_DRAW);
+		glNamedBufferData(vbo_,	vertices_.size() * sizeof(float),
+			&vertices_[0], GL_STATIC_DRAW);
 		
 
-		glNamedBufferData(ebo_,
-			GameScene::getCurrentScene()->getGeometryByID(id_geometry_)->getIndices().size() * sizeof(unsigned int),
-			&GameScene::getCurrentScene()->getGeometryByID(id_geometry_)->getIndices()[0],
-			GL_STATIC_DRAW);
+		glNamedBufferData(ebo_, verticesIndices_.size() * sizeof(unsigned int),
+			&verticesIndices_[0],	GL_STATIC_DRAW);
 
 		glEnableVertexArrayAttrib(vao_, 0);
 		// Back here when applying normals etc:
@@ -114,27 +113,80 @@ namespace Utlop
 		glVertexArrayElementBuffer(vao_, ebo_);
 	}
 
+	void Mesh::UpdateModelMatrix()
+	{
+		this->ModelMatrix = glm::mat4(1.f);
+		this->ModelMatrix = glm::translate(this->ModelMatrix, this->origin_);
+		this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->transform_.getRotation().x), glm::vec3(1.0f, 0.f, 0.f));
+		this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->transform_.getRotation().y), glm::vec3(0.0f, 1.0f, 0.0f));
+		this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->transform_.getRotation().z), glm::vec3(0.0f, 0.0f, 1.0f));
+		this->ModelMatrix = glm::translate(this->ModelMatrix, this->transform_.getPosition() - this->origin_);
+		this->ModelMatrix = glm::scale(this->ModelMatrix, this->transform_.getScale());
+	}
+
+	void Mesh::UpdateUniforms(Shader& shader)
+	{
+		shader.setMat4fv(ModelMatrix, "ModelMatrix");
+	}
+
+	void Mesh::SetTransform(Transform tr)
+	{
+		transform_ = tr;
+	}
 
 	Mesh& Mesh::operator=(const Mesh& other)
 	{
 		vao_ = other.vao_;
 		vbo_ = other.vbo_;
-
+		ebo_ = other.ebo_;
+		vertices_ = other.vertices_;
+		verticesIndices_ = other.verticesIndices_;
+		texCoords_ = other.texCoords_;
+		texIndices_ = other.texIndices_;
+		normals_ = other.normals_;
+		normalsIndices_ = other.normalsIndices_;
+		objPath_ = other.objPath_;
+		type_ = other.type_;
+		origin_ = other.origin_;
+		transform_ = other.transform_;
 		//material_ = other.material_;
 
 		return *this;
 	}
 
+
 	Mesh::Mesh(std::shared_ptr<Mesh> other)
 	{
-		
+		vao_ = other->vao_;
+		vbo_ = other->vbo_;
+		ebo_ = other->ebo_;
+		vertices_ = other->vertices_;
+		verticesIndices_ = other->verticesIndices_;
+		texCoords_ = other->texCoords_;
+		texIndices_ = other->texIndices_;
+		normals_ = other->normals_;
+		normalsIndices_ = other->normalsIndices_;
+		objPath_ = other->objPath_;
+		type_ = other->type_;
+		origin_ = other->origin_;
+		transform_ = other->transform_;
 	}
 
 	Mesh::Mesh(const Mesh& other)
 	{
 		vao_ = other.vao_;
 		vbo_ = other.vbo_;
-
+		ebo_ = other.ebo_;
+		vertices_ = other.vertices_;
+		verticesIndices_ = other.verticesIndices_;
+		texCoords_ = other.texCoords_;
+		texIndices_ = other.texIndices_;
+		normals_ = other.normals_;
+		normalsIndices_ = other.normalsIndices_;
+		objPath_ = other.objPath_;
+		type_ = other.type_;
+		origin_ = other.origin_;
+		transform_ = other.transform_;
 		//material_ = material_ = other.material_;
 	}
 
@@ -142,7 +194,133 @@ namespace Utlop
 	{
 		vao_ = other.vao_;
 		vbo_ = other.vbo_;
+		ebo_ = other.ebo_;
+		vertices_ = other.vertices_;
+		verticesIndices_ = other.verticesIndices_;
+		texCoords_ = other.texCoords_;
+		texIndices_ = other.texIndices_;
+		normals_ = other.normals_;
+		normalsIndices_ = other.normalsIndices_;
+		objPath_ = other.objPath_;
+		type_ = other.type_;
+		origin_ = other.origin_;
+		transform_ = other.transform_;
 
 		//material_ = other.material_;
+	}
+
+	float normalized(float value, float max, float min) {
+		return (value - min) / (max - min);
+	}
+
+	bool loadOBJ(const char* path,
+		std::vector <float>& out_vertices,
+		std::vector <float>& out_texCoords,
+		std::vector <float>& out_normals,
+		std::vector <unsigned int>& out_indices,
+		std::vector <unsigned int>& out_texIndices,
+		std::vector <unsigned int>& out_normalIndices) {
+
+		std::vector< float > temp_vertices;
+
+
+		float max = 1.0f, min = -1.0f;
+
+		FILE* file = fopen(path, "r");
+		if (file == NULL) {
+			printf("Impossible to open the file !\n");
+			return false;
+		}
+		unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
+		while (1) {
+
+			char lineHeader[128];
+			// Lee la primera palabra de la línea
+			int res = fscanf(file, "%s\n", lineHeader);
+			if (res == EOF)
+				break;
+
+			//printf("%s\n", lineHeader);
+			if (strcmp(&lineHeader[0], "v") == 0) {
+				glm::vec3 vertex;
+				fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
+
+				if (vertex.x > max || vertex.y > max || vertex.z > max) {
+					max = std::max(vertex.x, vertex.y);
+					max = std::max(max, vertex.z);
+				}
+				if (vertex.x < min || vertex.y < min || vertex.z < min) {
+					min = std::min(vertex.x, vertex.y);
+					min = std::min(min, vertex.z);
+				}
+
+				temp_vertices.push_back(vertex.x);
+				temp_vertices.push_back(vertex.y);
+				temp_vertices.push_back(vertex.z);
+			}
+			else if (strcmp(lineHeader, "vt") == 0) {
+				glm::vec2 uv;
+				fscanf(file, "%f %f\n", &uv.x, &uv.y);
+				out_texCoords.push_back(uv.x);
+				out_texCoords.push_back(uv.y);
+
+			}
+			else if (strcmp(lineHeader, "vn") == 0) {
+				glm::vec3 normal;
+				fscanf(file, "%03f %03f %03f\n", &normal.x, &normal.y, &normal.z);
+				out_normals.push_back(normal.x);
+				out_normals.push_back(normal.y);
+				out_normals.push_back(normal.z);
+			}
+			else if (strcmp(lineHeader, "f") == 0) {
+				std::string vertex1, vertex2, vertex3;
+
+				int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
+				if (matches != 9) {
+					printf("File can't be read by our simple parser : ( Try exporting with other options\n");
+					return false;
+				}
+
+				out_indices.push_back(vertexIndex[0] - 1);
+				out_indices.push_back(vertexIndex[1] - 1);
+				out_indices.push_back(vertexIndex[2] - 1);
+				out_texIndices.push_back(uvIndex[0] - 1);
+				out_texIndices.push_back(uvIndex[1] - 1);
+				out_texIndices.push_back(uvIndex[2] - 1);
+				out_normalIndices.push_back(normalIndex[0] - 1);
+				out_normalIndices.push_back(normalIndex[1] - 1);
+				out_normalIndices.push_back(normalIndex[2] - 1);
+
+			}
+		}
+		for (int i = 0; i < temp_vertices.size(); i++) {
+			out_vertices.push_back(normalized(temp_vertices[i], max, min));
+		}
+
+		return true;
+	}
+	Utlop::Mesh* loadMeshFromOBJ(char* path) {
+		std::vector <float> vertices;
+		std::vector <float> texCoords;
+		std::vector <float> normals;
+		std::vector <unsigned int> indices;
+		std::vector <unsigned int> texIndices;
+		std::vector <unsigned int> normalIndices;
+
+		if (loadOBJ(path, vertices, texCoords, normals, indices,
+			texIndices, normalIndices)) {
+			Utlop::Mesh m;
+			m.vertices_ = vertices;
+			m.verticesIndices_ = indices;
+			m.texCoords_ = texCoords;
+			m.texIndices_ = texIndices;
+			m.normals_ = normals;
+			m.normalsIndices_ = normalIndices;
+			m.type_ = kConst_OBJ;
+			return new Utlop::Mesh(path, kConst_OBJ, vertices, indices, texCoords, texIndices, normals, normalIndices);
+		}
+		else
+			return nullptr;
+
 	}
 }

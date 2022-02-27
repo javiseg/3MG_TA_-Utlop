@@ -20,7 +20,7 @@ namespace Utlop
 	GameScene* GameScene::getCurrentScene() {
 		return current_scene_;
 	}
-	unsigned int GameScene::CreateGeometry()
+	/*unsigned int GameScene::CreateGeometry()
 	{
 		geometryData_.push_back(std::make_shared<Utlop::Geometry>((int)geometryData_.size()));
 		return geometryData_.size()-1;
@@ -64,10 +64,80 @@ namespace Utlop
 			}
 		}
 		return -1;
-	}
+	}*/
 	void GameScene::addGameObject(Utlop::GameObject gO)
 	{
 		gameObjects_.push_back(std::make_shared<GameObject>(gO));
+	}
+	int GameScene::CreateMesh(Geo type)
+	{
+		for (int i = 0; i < meshes_.size(); i++) {
+			if (meshes_[i]->type_ == type) {
+				return i;
+			}
+		}
+		Mesh newMesh;
+		newMesh.type_ = type;
+		newMesh.objPath_ = "";
+		switch (type) {
+			case kConst_Triangle: {
+				newMesh.vertices_.insert(newMesh.vertices_.begin(), begin(TriangleArray), end(TriangleArray));
+				newMesh.verticesIndices_.insert(newMesh.verticesIndices_.begin(), begin(TriangleArrayIndices), end(TriangleArrayIndices));
+			}break;
+			case kConst_Cube: {
+				newMesh.vertices_.insert(newMesh.vertices_.begin(), begin(CubeArray), end(CubeArray));
+				newMesh.verticesIndices_.insert(newMesh.verticesIndices_.begin(), begin(CubeArrayIndices), end(CubeArrayIndices));
+			}break;
+			default:
+				return -1;
+			}
+		newMesh.setupMesh();
+		meshes_.push_back(make_shared<Mesh>(newMesh));
+		
+		return meshes_.size() - 1;
+	}
+	int GameScene::CreateMesh(Geo type, char* src)
+	{
+		
+		for (int i = 0; i < meshes_.size(); i++) {
+			if (meshes_[i]->type_ == type && strcmp(meshes_[i]->objPath_, src) == 0){
+				return i;
+			}
+			if (i == 2) {
+				printf("");
+			}
+		}
+
+		meshes_.push_back(make_shared<Mesh>(*loadMeshFromOBJ(src)));
+		
+		/**/
+		printf("\nMesh Loaded\n");
+
+		return meshes_.size() - 1;
+
+	}
+	int GameScene::getMeshIndexByType(Geo type)
+	{
+		for (int i = 0; i < meshes_.size(); i++) {
+			if (meshes_[i]->type_ == type) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	int GameScene::getMeshIndexByType(Geo type, const char* src)
+	{
+		for (int i = 0; i < meshes_.size(); i++) {
+			if (meshes_[i]->type_ == type &&
+				strcmp(meshes_[i]->objPath_, src) == 0) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	std::vector<std::shared_ptr<Utlop::Mesh>> GameScene::getMeshes()
+	{
+		return meshes_;
 	}
 	void GameScene::ImGUI()
 	{
@@ -104,11 +174,21 @@ namespace Utlop
   void GameScene::_start()
   {
     start();
-		for each (auto & gameObject_ in GameScene::getCurrentScene()->gameObjects_)
-		{
-			gameObject_->setColor(glm::vec3(0.5, 1.0f, 1.0f));
-			//gameObject_->setTexture("../UtlopTests/src/textures/texture.jpg");
-		}
+		GameObject gO;
+		gO.init();
+		gO.setPosition(vec3(-3.0f, 0.0f, 0.0f));
+		gO.setColor(glm::vec3(1.0, 0.5f, 0.0f));
+		gO.addMesh(CreateMesh(kConst_OBJ, "../UtlopTests/src/obj/backpack.obj"));
+		addGameObject(gO);
+		
+		GameObject gO2;
+		gO2.init();
+		gO2.setPosition(vec3(3.0f, 0.0f, 0.0f));
+		gO2.setColor(glm::vec3(0.5, 1.0f, 1.0f));
+		gO2.addMesh(CreateMesh(kConst_Cube));
+		addGameObject(gO2);
+
+		
 		/*ImGui::CreateContext();
 		ImGui::StyleColorsDark();*/
 
@@ -145,22 +225,24 @@ namespace Utlop
 		if (key == GLFW_KEY_K) {
 			Core::Instance()->getCamera()->RotateCamera(Core::Instance()->getDeltaTime(), 100.0f, 3);
 		}
-		if (key == GLFW_KEY_C) {
+		if (key == GLFW_KEY_C && action == GLFW_PRESS) {
 			for each (auto& gameObject_ in GameScene::getCurrentScene()->gameObjects_)
 			{
-				gameObject_->setGeometry(Utlop::Geo::kConst_Cube);
+				gameObject_->addMesh(GameScene::getCurrentScene()->CreateMesh(kConst_Cube));
+
 			}
 		}
-		if (key == GLFW_KEY_T) {
+		if (key == GLFW_KEY_T && action == GLFW_PRESS) {
 			for each (auto& gameObject_ in GameScene::getCurrentScene()->gameObjects_)
 			{
-				gameObject_->setGeometry(Utlop::Geo::kConst_Triangle);
+				gameObject_->addMesh(GameScene::getCurrentScene()->CreateMesh(kConst_Triangle));
+
 			}
 		}
-		if (key == GLFW_KEY_O) {
+		if (key == GLFW_KEY_O && action == GLFW_PRESS) {
 			for each (auto& gameObject_ in GameScene::getCurrentScene()->gameObjects_)
 			{
-				gameObject_->setGeometry("../UtlopTests/src/obj/backpack.obj");
+				gameObject_->addMesh(GameScene::getCurrentScene()->CreateMesh(kConst_OBJ, "../UtlopTests/src/obj/backpack.obj"));
 			}
 		}
 		if (key == GLFW_KEY_P && action == GLFW_PRESS) {

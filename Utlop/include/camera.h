@@ -45,6 +45,8 @@ namespace Utlop {
 			void update();
 
 			glm::mat4 getViewProjection();
+			glm::mat4 getView();
+			glm::mat4 getProjection();
 			
 			void moveForward(float value);
 			void moveRight(float value);

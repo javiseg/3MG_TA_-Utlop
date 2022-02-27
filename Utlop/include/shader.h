@@ -1,5 +1,6 @@
 #pragma once
 #include "glad/glad.h"
+#include "glm/mat4x4.hpp"
 #include <iostream>
 #include <fstream>
 
@@ -121,7 +122,8 @@ namespace Utlop {
 		void loadVertexShader(const char* filename);
 		void loadFragmentShader(const char* filename);
 
-		int uniformLocation(char* src);
+		int uniformLocation(const GLchar* src);
+		void setMat4fv(glm::mat4 value, const GLchar* name, GLboolean transpose = GL_FALSE);
 
 	private:
 		unsigned int id_;

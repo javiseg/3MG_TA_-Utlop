@@ -51,7 +51,22 @@ namespace Utlop {
 
 	glm::mat4 Camera::getViewProjection()
 	{
+		UpdateData();
+		this->data_->view_ = glm::lookAt(this->data_->position_, this->data_->position_ + this->data_->direction_, this->data_->Up);
+
 		return data_->projection_ * data_->view_;
+	}
+
+  glm::mat4 Camera::getView()
+  {
+		UpdateData();
+		this->data_->view_ = glm::lookAt(this->data_->position_, this->data_->position_ + this->data_->direction_, this->data_->Up);
+    return data_->view_;
+  }
+
+	glm::mat4 Camera::getProjection()
+	{
+		return data_->projection_;
 	}
 
 	void Camera::moveForward(float value)
@@ -114,16 +129,13 @@ namespace Utlop {
 	{
 		//data_->direction_ = normalize(data_->position_ - data_->target_);
 
-		vec3 direction;
-		direction.x = cos(glm::radians(yaw_)) * cos(glm::radians(pitch_));
-		direction.y = sin(glm::radians(pitch_));
-		direction.z = sin(glm::radians(yaw_)) * cos(glm::radians(pitch_));
-		data_->direction_ = normalize(direction);
-		data_->Right = normalize(cross(data_->direction_, WorldUp));
-		data_->Up = normalize(cross(data_->Right, data_->direction_));
+		this->data_->direction_.x = cos(glm::radians(this->yaw_)) * cos(glm::radians(this->pitch_));
+		this->data_->direction_.y = sin(glm::radians(this->pitch_));
+		this->data_->direction_.z = sin(glm::radians(this->yaw_)) * cos(glm::radians(this->pitch_));
 
-		data_->view_ = lookAt(data_->position_, data_->position_ + data_->direction_, data_->Up);
-
+		this->data_->direction_ = glm::normalize(this->data_->direction_);
+		this->data_->Right = glm::normalize(glm::cross(this->data_->direction_, this->WorldUp));
+		this->data_->Up = glm::normalize(glm::cross(this->data_->Right, this->data_->direction_));
 	}
 }
 

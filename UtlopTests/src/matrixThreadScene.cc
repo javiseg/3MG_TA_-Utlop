@@ -4,44 +4,7 @@
 void MatrixThreadScene::start()
 {
   matrix_a = matrix_b = matrix_c = nullptr;
-  //init_matrix();
-  //sum_matrix();
-  //Utlop::Core::Instance()->getScheduler()->AddTaskSetToPipe(&task);
-  //Utlop::Core::Instance()->getScheduler()->WaitforTask(&task);
-
-	//Utlop::GameObject object;
-
-	//object.init();
-	//object.setGeometry(Utlop::Geo::kConst_Cube);
-	////object.setGeometry("../UtlopTests/src/obj/doc.obj");
-	//object.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-	//
-	//triangle.setColor(color);
-	//addGameObject(object);
-
-	Utlop::GameObject object2;
-	Utlop::GameObject object3;
-	Utlop::GameObject object4;
-
-	object2.init();
-	//object2.setGeometry("../UtlopTests/src/obj/lego.obj");
-	object2.setGeometry(Utlop::Geo::kConst_Triangle);
-	object2.setColor(glm::vec3(0.3f, 0.1f, 1.0f));
-	object2.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-	addGameObject(object2);
-	
-	object3.init();
-	//object2.setGeometry("../UtlopTests/src/obj/lego.obj");
-	object3.setGeometry(Utlop::Geo::kConst_Cube);
-	object3.setColor(glm::vec3(0.5f, 0.0f, 1.0f));
-	object3.setPosition(glm::vec3(0.5f, 0.0f, 0.0f));
-	//addGameObject(object3);
-
-	/*object4.init();
-	object4.setGeometry("../UtlopTests/src/obj/electricbox.obj");
-	object4.setColor(glm::vec3(0.0f, 0.0f, 1.0f));
-	object4.setPosition(glm::vec3(-0.5f, 0.0f, 0.0f));*/
-	//addGameObject(object4);
+ 
 
 }
 

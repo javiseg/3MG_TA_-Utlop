@@ -3,8 +3,8 @@
 #pragma once
 
 #include "gameObject.h"
-#include "geometry.h"
 #include "texture.h"
+#include "mesh.h"
 
 namespace Utlop
 {
@@ -20,14 +20,13 @@ namespace Utlop
       virtual void start();
       virtual void update();
 			static GameScene* getCurrentScene();
-			unsigned int CreateGeometry();
-			std::vector<std::shared_ptr<Utlop::Geometry>> getGeometries();
-			std::shared_ptr<Utlop::Geometry> getGeometryByID(unsigned int id);
-			int getGeometryID(unsigned int id);
-			int getGeometryByType(Geo type);
-			int getGeometryByType(Geo type, char* src);
-			
 			void addGameObject(Utlop::GameObject gO);
+
+			int CreateMesh(Geo type);
+			int CreateMesh(Geo type, char* src);
+			int getMeshIndexByType(Geo type);
+			int getMeshIndexByType(Geo type, const char* src);
+			std::vector<std::shared_ptr<Utlop::Mesh>> getMeshes();
 
 			void ImGUI();
 
@@ -39,7 +38,6 @@ namespace Utlop
     private:
       static GameScene* current_scene_;
       static std::vector<GameScene*> scenes_;
-			std::vector<std::shared_ptr<Utlop::Geometry>> geometryData_;
 			std::vector<std::shared_ptr<Utlop::Texture>> textureData_;
 			std::vector<std::shared_ptr<Utlop::Mesh>> meshes_;
 

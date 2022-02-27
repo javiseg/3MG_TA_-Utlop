@@ -14,9 +14,12 @@ layout (location = VERT_NORMAL) in vec3 normals;
 out vec3 out_color;
 out vec2 text_coords;
 
+layout(location = 5) uniform mat4 ModelMatrix;
+layout(location = 6) uniform mat4 ViewMatrix;
+layout(location = 7) uniform mat4 ProjectionMatrix;
+
 void main()
 {
-	text_coords = aTexCoord;
-    gl_Position = u_vp_matrix * vec4(position, 1.0);
 	out_color = new_color;
+	gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(position, 1.0f);
 }
