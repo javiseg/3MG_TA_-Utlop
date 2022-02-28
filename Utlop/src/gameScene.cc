@@ -111,11 +111,13 @@ namespace Utlop
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-		ImGui::SetNextWindowSize(
-			ImVec2(250.0f, 150.0f),
-			ImGuiCond_FirstUseEver // after first launch it will use values from imgui.ini
-		);
+		ImGui::SetNextWindowPos(ImVec2(0, 0)); 
+		ImGui::SetNextWindowSize(ImVec2(300, 780));
 		if (ImGui::Begin("Utlop Engine")) {
+			
+			ImGui::ColorEdit4("Color", &bColor[0]);
+			glClearColor(bColor.x, bColor.y, bColor.z, 1.0f);
+			
 			ImGui::Text("Objects");
 			
 			if (ImGui::Button("Add Game Object")) {
@@ -125,8 +127,19 @@ namespace Utlop
 
 			ImGui::TextColored(ImVec4(1, 1, 0, 1), "Current GameObjects");
 			ImGui::BeginChild("GameObject");
-			for (int n = 0; n < gameObjects_.size(); n++)
+			vec3 position;
+			for (int n = 0; n < gameObjects_.size(); n++) {
 				ImGui::Text("%04d: Object", n);
+				for (int i = 0; i < gameObjects_[n]->getMeshIndices().size(); i++) {
+					position = gameObjects_[n]->getMeshPosition(i);
+					ImGui::SetCursorPosX(100.0f);
+					ImGui::Text("%04d: Mesh", gameObjects_[n]->getMeshIndices()[i]);
+					std::string slidername = "Mesh " + std::to_string(i) + " Object " + std::to_string(n);
+					ImGui::SliderFloat3(slidername.c_str(), &position[0], -10.0f, 10.0f);
+					gameObjects_[n]->setMeshPosition(i, position);
+				}
+			}
+				
 			ImGui::EndChild();
 			
 			
@@ -189,6 +202,7 @@ namespace Utlop
 
 	void GameScene::destroy()
 	{
+
 		DestroyImGUI();
 	}
 
@@ -197,7 +211,7 @@ namespace Utlop
     start();
 
 		InitImGUI();
-
+		bColor = vec4(0.0f);
 		GameObject gO;
 		gO.init();
 		gO.setPosition(vec3(-3.0f, 0.0f, 0.0f));

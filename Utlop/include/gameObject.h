@@ -20,6 +20,8 @@ namespace Utlop
       void destroy();
 
       void setTransform(Transform transform);
+			void setMeshPosition(int meshIndex, vec3 pos);
+			vec3 getMeshPosition(int meshIndex);
 			void setScale(glm::vec3 scale);
 			void setRotation(glm::vec3 rotation);
 			void setPosition(glm::vec3 position);
@@ -27,8 +29,10 @@ namespace Utlop
 			void translate(glm::vec3 position, float speed);
 
 			void addMesh(int indexmesh);
+			vector<GLuint> getMeshIndices();
 			void setShader(char* vertex, char* fragment);
 			void setTexture(char* path);
+
 
 			GameObject& operator=(const GameObject& other);
 			GameObject(const GameObject& other);

@@ -46,6 +46,7 @@ namespace Utlop
 			std::vector<std::shared_ptr<Utlop::Texture>> textureData_;
 			std::vector<std::shared_ptr<Utlop::Mesh>> meshes_;
 
+			vec4 bColor;
       friend class Core;
 
 			

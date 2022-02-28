@@ -65,6 +65,14 @@ namespace Utlop
   {
     transform_ = transform;
   }
+  void GameObject::setMeshPosition(int meshIndex, vec3 pos)
+  {
+		transformVector_[meshIndex].setPosition(pos);
+  }
+	vec3 GameObject::getMeshPosition(int meshIndex)
+	{
+		return transformVector_[meshIndex].getPosition();
+	}
 	void GameObject::setScale(glm::vec3 scale)
 	{
 		transform_.setScale(scale);
@@ -93,6 +101,11 @@ namespace Utlop
 		
 		transformVector_.push_back(transform_);
 		meshIndices_.push_back(indexmesh);
+	}
+
+	vector<GLuint> GameObject::getMeshIndices()
+	{
+		return meshIndices_;
 	}
 
 	void GameObject::setShader(char* vertex, char* fragment)
