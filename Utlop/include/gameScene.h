@@ -5,6 +5,7 @@
 #include "gameObject.h"
 #include "texture.h"
 #include "mesh.h"
+#include "imgui.h"
 
 namespace Utlop
 {
@@ -19,8 +20,10 @@ namespace Utlop
       void draw();
       virtual void start();
       virtual void update();
+			void destroy();
 			static GameScene* getCurrentScene();
 			void addGameObject(Utlop::GameObject gO);
+			void addDefaultGameObject();
 
 			int CreateMesh(Geo type);
 			int CreateMesh(Geo type, char* src);
@@ -29,6 +32,8 @@ namespace Utlop
 			std::vector<std::shared_ptr<Utlop::Mesh>> getMeshes();
 
 			void ImGUI();
+			void InitImGUI();
+			void DestroyImGUI();
 
 			std::vector<std::shared_ptr<Utlop::GameObject>> gameObjects_;
 			bool polygon_;

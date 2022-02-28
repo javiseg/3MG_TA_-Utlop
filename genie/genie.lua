@@ -29,7 +29,8 @@ solution("Utlop")
     path.join(UTLOP_DIR, "./deps/glm/include/"),
     path.join(UTLOP_DIR, "./deps/enkiTS/src/"),
     path.join(UTLOP_DIR, "./deps/math/"),
-    path.join(UTLOP_DIR, "./deps/imgui/")
+    path.join(UTLOP_DIR, "./deps/imgui/"),
+    path.join(UTLOP_DIR, "./deps/imgui/backends/")
   }
 
   --Here only the files that we want compile.
@@ -53,8 +54,11 @@ solution("Utlop")
     path.join(UTLOP_DIR, "./deps/glfw/src/osmesa_context.c"),
     path.join(UTLOP_DIR, "./deps/glad/src/glad.c"),
     path.join(UTLOP_DIR, "./deps/enkiTS/src/TaskScheduler.cpp"),
-    path.join(UTLOP_DIR, "./deps/math/")
- 
+    path.join(UTLOP_DIR, "./deps/math/"),
+    path.join(UTLOP_DIR, "./deps/imgui/*.cc"),
+    path.join(UTLOP_DIR, "./deps/imgui/*.cpp"),
+    path.join(UTLOP_DIR, "./deps/imgui/backends/imgui_impl_glfw.cpp"),
+    path.join(UTLOP_DIR, "./deps/imgui/backends/imgui_impl_opengl3.cpp"),
 
   }
 
@@ -110,8 +114,8 @@ solution("Utlop")
     targetdir(path.join(UTLOP_TEST_DIR, "./bin/Release"))
 
     configuration "Debug"
-    --links{"opengl32", "shell32", "user32", "gdi32", path.join(UTLOP_DIR, "./bin/debug/Utlop"), path.join(UTLOP_DIR, "./deps/imgui/ESAT"), path.join(UTLOP_DIR, "./deps/imgui/ESAT_d")}
-    links{"opengl32", "shell32", "user32", "gdi32", "Utlop",  path.join(UTLOP_DIR, "./deps/imgui/ESAT"), path.join(UTLOP_DIR, "./deps/imgui/ESAT_d")}
+    --links{"opengl32", "shell32", "user32", "gdi32", path.join(UTLOP_DIR, "./bin/debug/Utlop")}
+    links{"opengl32", "shell32", "user32", "gdi32", "Utlop" }
 	wholearchive{"Utlop"}
     defines{"_DEBUG",
             "_CRT_SECURE_NO_WARNINGS",

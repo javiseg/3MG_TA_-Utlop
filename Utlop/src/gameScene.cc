@@ -2,6 +2,8 @@
 #include "GLFW/glfw3.h"
 #include "core.h"
 #include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 namespace Utlop
 {
@@ -20,54 +22,19 @@ namespace Utlop
 	GameScene* GameScene::getCurrentScene() {
 		return current_scene_;
 	}
-	/*unsigned int GameScene::CreateGeometry()
-	{
-		geometryData_.push_back(std::make_shared<Utlop::Geometry>((int)geometryData_.size()));
-		return geometryData_.size()-1;
-	}
-	std::vector<std::shared_ptr<Utlop::Geometry>> GameScene::getGeometries()
-	{
-		return geometryData_;
-	}
-	std::shared_ptr<Utlop::Geometry> GameScene::getGeometryByID(unsigned int id)
-	{
-		if (id < geometryData_.size()) {
-			return geometryData_[id];
-		}
-		else {
-			return nullptr;
-		}
-	}
-	int GameScene::getGeometryID(unsigned int id)
-	{
-		for each (auto& geometry in geometryData_) {
-			if (geometry->getID() == id) {
-				return geometry->getID();
-			}
-		}
-		return -1;
-	}
-	int GameScene::getGeometryByType(Geo type)
-	{
-		for (int i = 0; i < geometryData_.size(); i++) {
-			if (geometryData_[i]->getType() == type) {
-				return geometryData_[i]->getID();
-			}
-		}
-		return -1;
-	}
-	int GameScene::getGeometryByType(Geo type, char* src)
-	{
-		for (int i = 0; i < geometryData_.size(); i++) {
-			if (geometryData_[i]->getType() == type && geometryData_[i]->IsSameOBJ(src)) {
-				return geometryData_[i]->getID();
-			}
-		}
-		return -1;
-	}*/
+
 	void GameScene::addGameObject(Utlop::GameObject gO)
 	{
 		gameObjects_.push_back(std::make_shared<GameObject>(gO));
+	}
+	void GameScene::addDefaultGameObject()
+	{
+		GameObject gO;
+		gO.init();
+		gO.setPosition(vec3(0.0f, 0.0f, 0.0f));
+		gO.setColor(glm::vec3(0.5, 1.0f, 0.0f));
+		gO.addMesh(CreateMesh(kConst_Cube));
+		addGameObject(gO);
 	}
 	int GameScene::CreateMesh(Geo type)
 	{
@@ -141,22 +108,71 @@ namespace Utlop
 	}
 	void GameScene::ImGUI()
 	{
-		/*if (ImGui::Begin("Utlop Test")) {
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		ImGui::SetNextWindowSize(
+			ImVec2(250.0f, 150.0f),
+			ImGuiCond_FirstUseEver // after first launch it will use values from imgui.ini
+		);
+		if (ImGui::Begin("Utlop Engine")) {
+			ImGui::Text("Objects");
+			
+			if (ImGui::Button("Add Game Object")) {
+				addDefaultGameObject();
+			}
 
-			ImGui::SetWindowPos(ImVec2(960, 0), ImGuiCond_FirstUseEver);
-			ImGui::SetWindowSize(ImVec2(400, 704));
 
+			ImGui::TextColored(ImVec4(1, 1, 0, 1), "Current GameObjects");
+			ImGui::BeginChild("GameObject");
+			for (int n = 0; n < gameObjects_.size(); n++)
+				ImGui::Text("%04d: Object", n);
+			ImGui::EndChild();
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			
 			ImGui::End();
 
 
+
+
 			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		}
+		
+		/*if (ImGui::Begin("Utlop Test")) {
+
+			
 		}*/
+	}
+  void GameScene::InitImGUI()
+  {
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGui::StyleColorsDark();
+		ImGui_ImplGlfw_InitForOpenGL(Core::Instance()->getWindow()->getWindow(), true);
+		ImGui_ImplOpenGL3_Init("#version 460");
+  }
+	void GameScene::DestroyImGUI()
+	{
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
 	}
   void GameScene::init()
   {
     current_scene_ = this;
 		polygon_ = false;
+		
   }
 
   void GameScene::draw()
@@ -171,9 +187,17 @@ namespace Utlop
 
   void GameScene::update() { }
 
+	void GameScene::destroy()
+	{
+		DestroyImGUI();
+	}
+
   void GameScene::_start()
   {
     start();
+
+		InitImGUI();
+
 		GameObject gO;
 		gO.init();
 		gO.setPosition(vec3(-3.0f, 0.0f, 0.0f));

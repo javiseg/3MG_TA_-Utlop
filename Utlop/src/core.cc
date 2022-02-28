@@ -83,9 +83,9 @@ namespace Utlop
 				//glfwGetCursorPos(_window.getWindow(), &xpos, &ypos);
 				//printf("Cursor Position at (%f, %f )\n",xpos, ypos);
 				//Utlop::GameScene::current_scene_->_gameObjects[0].setPosition(glm::vec3(xpos, ypos, 0.0f));
-				camera_->update();
-				Utlop::GameScene::current_scene_->_update();
 
+				Utlop::GameScene::current_scene_->_update();
+				Utlop::GameScene::current_scene_->ImGUI();
         Utlop::GameScene::current_scene_->draw();
 
         glfwSwapBuffers(_window._window);
@@ -94,7 +94,7 @@ namespace Utlop
 
         glfwPollEvents();
 
-				Utlop::GameScene::current_scene_->ImGUI();
+				
 
         std::chrono::system_clock::time_point end_time = std::chrono::system_clock::now();
         std::this_thread::sleep_until(start_time + std::chrono::milliseconds(_frame_time_millis));
@@ -111,6 +111,7 @@ namespace Utlop
   void Core::stop()
   {
     glfwTerminate();
+		Utlop::GameScene::current_scene_->DestroyImGUI();
 		//ImGui::DestroyContext();
   }
 
