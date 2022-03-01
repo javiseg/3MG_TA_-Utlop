@@ -160,13 +160,17 @@ namespace Utlop
 
 			ImGui::TextColored(ImVec4(1, 1, 0, 1), "Current GameObjects");
 			ImGui::BeginChild("GameObject");
-			vec3 position;
+			vec3 position, object_position;
 			for (int n = 0; n < gameObjects_.size(); n++) {
-				ImGui::Text("%04d: Object", n);
+				ImGui::Text("%02d: Object", n);
+				object_position = gameObjects_[n]->getPosition();
+				std::string slidername ="Object " + std::to_string(n);
+				ImGui::SliderFloat3(slidername.c_str(), &object_position[0], -10.0f, 10.0f);
+				gameObjects_[n]->setPosition(object_position);
 				for (int i = 0; i < gameObjects_[n]->getMeshIndices().size(); i++) {
 					position = gameObjects_[n]->getMeshPosition(i);
 					ImGui::SetCursorPosX(100.0f);
-					ImGui::Text("%04d: Mesh", gameObjects_[n]->getMeshIndices()[i]);
+					ImGui::Text("%02d: Mesh", gameObjects_[n]->getMeshIndices()[i]);
 					std::string slidername = "Mesh " + std::to_string(i) + " Object " + std::to_string(n);
 					ImGui::SliderFloat3(slidername.c_str(), &position[0], -10.0f, 10.0f);
 					gameObjects_[n]->setMeshPosition(i, position);
@@ -248,20 +252,21 @@ namespace Utlop
 		InitImGUI();
 		bColor = vec4(0.0f);
 
-		//AddTexture("../UtlopTests/src/textures/texture.jpg");
+		AddTexture("../UtlopTests/src/textures/default.png");
+		AddTexture("../UtlopTests/src/textures/texture.jpg");
 
 
 		GameObject gO;
 		gO.init();
-		gO.setPosition(vec3(-3.0f, 0.0f, 0.0f));
+		gO.setPosition(vec3(0.0f, 0.0f, 0.0f));
 		gO.setColor(glm::vec3(1.0, 0.5f, 0.0f));
 		gO.addMesh(CreateMesh(kConst_OBJ, "../UtlopTests/src/obj/backpack.obj"));
 		addGameObject(gO);
 		
-		GameObject gO2;
+		/*GameObject gO2;
 		gO2.init();
 		gO2.setPosition(vec3(3.0f, 0.0f, 0.0f));
-		gO2.setColor(glm::vec3(0.5, 1.0f, 1.0f));
+		gO2.setColor(glm::vec3(0.5, 1.0f, 1.0f));*/
 		//gO2.addMesh(CreateMesh(kConst_Cube));
 		//addGameObject(gO2);
 

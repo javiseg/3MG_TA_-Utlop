@@ -88,7 +88,8 @@ namespace Utlop
 			void UpdateModelMatrix();
 			void UpdateUniforms(Shader& shader);
 			void SetTransform(Transform tr);
-		
+			void SetOrigin(vec3 origin);
+
 			Mesh& operator=(const Mesh& other);
 			Mesh(std::shared_ptr<Mesh> other);
 			Mesh(const Mesh& other);

@@ -20,8 +20,11 @@ namespace Utlop
       void destroy();
 
       void setTransform(Transform transform);
+			vec3 getPosition();
+
 			void setMeshPosition(int meshIndex, vec3 pos);
 			vec3 getMeshPosition(int meshIndex);
+
 			void setScale(glm::vec3 scale);
 			void setRotation(glm::vec3 rotation);
 			void setPosition(glm::vec3 position);
@@ -51,7 +54,7 @@ namespace Utlop
 			vector<Transform> transformVector_;
 			vector<Texture> textures_;
 			std::shared_ptr<Shader> shader_;
-			//std::shared_ptr<Shader> shader_texture_;
+			std::shared_ptr<Shader> shader_texture_;
 
   };
 

@@ -66,10 +66,14 @@ namespace Utlop
 		/*int size;
 		glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 		*/
-		/*if (texCoords_.size() > 0 && GameScene::getCurrentScene()->textureData_.size() > 0) {
+		if (texCoords_.size() > 0 && GameScene::getCurrentScene()->textureData_.size() > 0) {
+			glBindTextureUnit(0, GameScene::getCurrentScene()->textureData_[1]->id_);
+			glUniform1i(glGetUniformLocation(shader.ID(), "ourTexture"), 0);
+		}
+		else {
 			glBindTextureUnit(0, GameScene::getCurrentScene()->textureData_[0]->id_);
 			glUniform1i(glGetUniformLocation(shader.ID(), "ourTexture"), 0);
-		}*/
+		}
 		glBindVertexArray(vao_);
 
 		glDrawElements(GL_TRIANGLES, verticesIndices_.size() * sizeof(GLuint), GL_UNSIGNED_INT, 0);
@@ -119,11 +123,11 @@ namespace Utlop
 
 		glVertexArrayElementBuffer(vao_, ebo_);
 
-		/*if (texCoords_.size() > 0) {
 
-			glCreateBuffers(1, &tbo_);
-			glCreateBuffers(1, &etbo_);
+		glCreateBuffers(1, &tbo_);
+		glCreateBuffers(1, &etbo_);
 
+		if (texCoords_.size() > 0) {
 			glNamedBufferData(tbo_, texCoords_.size() * sizeof(float), &texCoords_[0], GL_STATIC_DRAW);
 			glNamedBufferData(etbo_, texIndices_.size() * sizeof(GLuint), &texIndices_[0], GL_STATIC_DRAW);
 
@@ -134,7 +138,7 @@ namespace Utlop
 			glVertexArrayVertexBuffer(vao_, 3, tbo_, 0, 3 * sizeof(unsigned int));
 			glVertexArrayElementBuffer(vao_, etbo_);
 
-		}*/
+		}
 
 	}
 
@@ -157,6 +161,11 @@ namespace Utlop
 	void Mesh::SetTransform(Transform tr)
 	{
 		transform_ = tr;
+	}
+
+	void Mesh::SetOrigin(vec3 origin)
+	{
+		origin_ = origin;
 	}
 
 	Mesh& Mesh::operator=(const Mesh& other)

@@ -26,25 +26,26 @@ namespace Utlop
   void GameObject::init()
   {
 		shader_ = make_shared<Shader>();
-		//shader_texture_ = make_shared<Shader>();
+		shader_texture_ = make_shared<Shader>();
 		shader_->loadShaderFiles("../UtlopTests/src/shaders/vs.glsl", "../UtlopTests/src/shaders/fs.glsl");
-		//shader_texture_->loadShaderFiles("../UtlopTests/src/shaders/vs.glsl", "../UtlopTests/src/shaders/fs_texture.glsl");
+		shader_texture_->loadShaderFiles("../UtlopTests/src/shaders/vs.glsl", "../UtlopTests/src/shaders/fs_texture.glsl");
 		
 		
 		shader_->setMat4fv(Core::Instance()->getCamera()->getView(), "ViewMatrix");
 		shader_->setMat4fv(Core::Instance()->getCamera()->getProjection(), "ProjectionMatrix");
-		//shader_texture_->setMat4fv(Core::Instance()->getCamera()->getView(), "ViewMatrix");
-		//shader_texture_->setMat4fv(Core::Instance()->getCamera()->getProjection(), "ProjectionMatrix");
+		shader_texture_->setMat4fv(Core::Instance()->getCamera()->getView(), "ViewMatrix");
+		shader_texture_->setMat4fv(Core::Instance()->getCamera()->getProjection(), "ProjectionMatrix");
 	}
 
   void GameObject::draw()
   {
 		for (int i = 0; i < meshIndices_.size(); i++) {
+			GameScene::getCurrentScene()->getMeshes()[meshIndices_[i]]->SetOrigin(transform_.getPosition());
 			GameScene::getCurrentScene()->getMeshes()[meshIndices_[i]]->SetTransform(transformVector_[i]);
 			//if(GameScene::getCurrentScene()->getMeshes()[meshIndices_[i]]->texCoords_.size() == 0)
 				//GameScene::getCurrentScene()->getMeshes()[meshIndices_[i]]->draw(*shader_);
 			//else
-				GameScene::getCurrentScene()->getMeshes()[meshIndices_[i]]->draw(*shader_);
+				GameScene::getCurrentScene()->getMeshes()[meshIndices_[i]]->draw(*shader_texture_);
 		}
   }
 
@@ -59,7 +60,7 @@ namespace Utlop
 		model_matrix *= Core::Instance()->getCamera()->getViewProjection();
 		glUniformMatrix4fv(projection_mat_index_, 1, GL_FALSE, &model_matrix[0][0]);*/
 		shader_->setMat4fv(Core::Instance()->getCamera()->getView(), "ViewMatrix");
-		//shader_texture_->setMat4fv(Core::Instance()->getCamera()->getView(), "ViewMatrix");
+		shader_texture_->setMat4fv(Core::Instance()->getCamera()->getView(), "ViewMatrix");
 		
 	}
 
@@ -72,6 +73,10 @@ namespace Utlop
   {
     transform_ = transform;
   }
+	vec3 GameObject::getPosition()
+	{
+		return transform_.getPosition();
+	}
   void GameObject::setMeshPosition(int meshIndex, vec3 pos)
   {
 		transformVector_[meshIndex].setPosition(pos);
@@ -132,7 +137,7 @@ namespace Utlop
 	{
 		transform_ = other.transform_;
 		shader_ = other.shader_;
-		//shader_texture_ = other.shader_texture_;
+		shader_texture_ = other.shader_texture_;
 		textures_ = other.textures_;
 		meshIndices_ = other.meshIndices_;
 		transformVector_ = other.transformVector_;
@@ -144,7 +149,7 @@ namespace Utlop
 
 		transform_ = other.transform_;
 		shader_ = other.shader_;
-		//shader_texture_ = other.shader_texture_;
+		shader_texture_ = other.shader_texture_;
 		textures_ = other.textures_;
 		meshIndices_ = other.meshIndices_;
 		transformVector_ = other.transformVector_;
@@ -153,7 +158,7 @@ namespace Utlop
 
 		transform_ = other.transform_;
 		shader_ = other.shader_;
-		//shader_texture_ = other.shader_texture_;
+		shader_texture_ = other.shader_texture_;
 		textures_ = other.textures_;
 		meshIndices_ = other.meshIndices_;
 		transformVector_ = other.transformVector_;
