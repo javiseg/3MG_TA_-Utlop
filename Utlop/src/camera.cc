@@ -32,7 +32,7 @@ namespace Utlop {
 		WorldUp = vec3(0.0f, 1.0f, 0.0f);
 		WorldRight = vec3(1.0f, 0.0f, 0.0f);
 
-		velocity_ = 10.0f;
+		velocity_ = 40.0f;
 
 		//data_->projection_ = perspective(1.57f, 1.0f, 0.1f, 100.0f);
 		data_->projection_ = glm::perspective(glm::radians(45.0f), (float)1380 / (float)780, 0.1f, 100.0f);

@@ -23,7 +23,8 @@ namespace Utlop
 		transform_.setRotation(vec3(0.0f));
 		transform_.rotation_angle(0.0f);
 		origin_ = vec3(0.0f);
-		
+		objPath_ = "";
+		ModelMatrix = mat4(0.0f);
   }
 
 	Mesh::Mesh(char* src, Geo type, vector<float> vertices, vector<GLuint> verticesIndices, vector<float> texCoords, vector<GLuint> texIndices, vector<float> normals, vector<GLuint> normalsIndices)
@@ -67,7 +68,7 @@ namespace Utlop
 		glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 		*/
 		if (texCoords_.size() > 0 && GameScene::getCurrentScene()->textureData_.size() > 0) {
-			glBindTextureUnit(0, GameScene::getCurrentScene()->textureData_[1]->id_);
+			glBindTextureUnit(0, GameScene::getCurrentScene()->textureData_[2]->id_);
 			//glUniform1i(glGetUniformLocation(shader.ID(), "ourTexture"), 0);
 		}
 		else {
@@ -266,8 +267,7 @@ namespace Utlop
 		std::vector <float>& out_normals,
 		std::vector <unsigned int>& out_indices,
 		std::vector <unsigned int>& out_texIndices,
-		std::vector <unsigned int>& out_normalIndices, 
-		std::vector <Vertex>& out_vertices_total) {
+		std::vector <unsigned int>& out_normalIndices) {
 
 		std::vector< float > temp_vertices;
 
@@ -342,7 +342,7 @@ namespace Utlop
 
 			}
 		}
-		for (int i = 0; i < temp_vertices.size(); i++) {
+		for (size_t i = 0; i < temp_vertices.size(); i++) {
 			out_vertices.push_back(normalized(temp_vertices[i], max, min));
 		}
 
@@ -355,10 +355,9 @@ namespace Utlop
 		std::vector <unsigned int> indices;
 		std::vector <unsigned int> texIndices;
 		std::vector <unsigned int> normalIndices;
-		std::vector<Vertex> vertices_total;
 
 		if (loadOBJ(path, vertices, texCoords, normals, indices,
-			texIndices, normalIndices, vertices_total)) {
+			texIndices, normalIndices)) {
 			Utlop::Mesh m;
 			m.vertices_ = vertices;
 			m.verticesIndices_ = indices;
@@ -367,6 +366,7 @@ namespace Utlop
 			m.normals_ = normals;
 			m.normalsIndices_ = normalIndices;
 			m.type_ = kConst_OBJ;
+			m.objPath_ = path;
 			return new Utlop::Mesh(path, kConst_OBJ, vertices, indices, texCoords, texIndices, normals, normalIndices);
 		}
 		else

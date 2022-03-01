@@ -103,7 +103,7 @@ namespace Utlop {
 		}
 		Shader::Shader(std::shared_ptr<Shader> other)
 		{
-			
+			id_ = other->id_;
 		}
 
 		Shader::Shader(Shader&& other)

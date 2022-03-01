@@ -15,6 +15,8 @@ namespace Utlop
 
   GameScene::GameScene()
   {
+		bColor = vec4(0.0f);
+		polygon_ = false;
     scenes_.push_back(this);
   }
 
@@ -41,7 +43,7 @@ namespace Utlop
 	}
 	int GameScene::CreateMesh(Geo type)
 	{
-		for (int i = 0; i < meshes_.size(); i++) {
+		for (size_t i = 0; i < meshes_.size(); i++) {
 			if (meshes_[i]->type_ == type) {
 				return i;
 			}
@@ -69,7 +71,7 @@ namespace Utlop
 	int GameScene::CreateMesh(Geo type, char* src)
 	{
 		
-		for (int i = 0; i < meshes_.size(); i++) {
+		for (size_t i = 0; i < meshes_.size(); i++) {
 			if (meshes_[i]->type_ == type && strcmp(meshes_[i]->objPath_, src) == 0){
 				return i;
 			}
@@ -88,7 +90,7 @@ namespace Utlop
 	}
 	int GameScene::getMeshIndexByType(Geo type)
 	{
-		for (int i = 0; i < meshes_.size(); i++) {
+		for (size_t i = 0; i < meshes_.size(); i++) {
 			if (meshes_[i]->type_ == type) {
 				return i;
 			}
@@ -97,7 +99,7 @@ namespace Utlop
 	}
 	int GameScene::getMeshIndexByType(Geo type, const char* src)
 	{
-		for (int i = 0; i < meshes_.size(); i++) {
+		for (size_t i = 0; i < meshes_.size(); i++) {
 			if (meshes_[i]->type_ == type &&
 				strcmp(meshes_[i]->objPath_, src) == 0) {
 				return i;
@@ -161,13 +163,13 @@ namespace Utlop
 			ImGui::TextColored(ImVec4(1, 1, 0, 1), "Current GameObjects");
 			ImGui::BeginChild("GameObject");
 			vec3 position, object_position;
-			for (int n = 0; n < gameObjects_.size(); n++) {
+			for (size_t n = 0; n < gameObjects_.size(); n++) {
 				ImGui::Text("%02d: Object", n);
 				object_position = gameObjects_[n]->getPosition();
 				std::string slidername ="Object " + std::to_string(n);
 				ImGui::SliderFloat3(slidername.c_str(), &object_position[0], -10.0f, 10.0f);
 				gameObjects_[n]->setPosition(object_position);
-				for (int i = 0; i < gameObjects_[n]->getMeshIndices().size(); i++) {
+				for (size_t i = 0; i < gameObjects_[n]->getMeshIndices().size(); i++) {
 					position = gameObjects_[n]->getMeshPosition(i);
 					ImGui::SetCursorPosX(100.0f);
 					ImGui::Text("%02d: Mesh", gameObjects_[n]->getMeshIndices()[i]);
@@ -254,13 +256,14 @@ namespace Utlop
 
 		AddTexture("../UtlopTests/src/textures/default.png");
 		AddTexture("../UtlopTests/src/textures/texture.jpg");
+		AddTexture("../UtlopTests/src/textures/backpack/diffuse.jpg");
 
 
 		GameObject gO;
 		gO.init();
 		gO.setPosition(vec3(0.0f, 0.0f, 0.0f));
 		gO.setColor(glm::vec3(1.0, 0.5f, 0.0f));
-		gO.addMesh(CreateMesh(kConst_OBJ, "../UtlopTests/src/obj/doc.obj"));
+		gO.addMesh(CreateMesh(kConst_OBJ, "../UtlopTests/src/obj/backpack.obj"));
 		addGameObject(gO);
 		
 		/*GameObject gO2;
@@ -324,7 +327,7 @@ namespace Utlop
 		if (key == GLFW_KEY_O && action == GLFW_PRESS) {
 			for each (auto& gameObject_ in GameScene::getCurrentScene()->gameObjects_)
 			{
-				gameObject_->addMesh(GameScene::getCurrentScene()->CreateMesh(kConst_OBJ, "../UtlopTests/src/obj/lego.obj"));
+				gameObject_->addMesh(GameScene::getCurrentScene()->CreateMesh(kConst_OBJ, "../UtlopTests/src/obj/backpack.obj"));
 			}
 		}
 		if (key == GLFW_KEY_P && action == GLFW_PRESS) {
