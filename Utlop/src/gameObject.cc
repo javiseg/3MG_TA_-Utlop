@@ -25,14 +25,14 @@ namespace Utlop
 
   void GameObject::init()
   {
-		shader_ = make_shared<Shader>();
+		//shader_ = make_shared<Shader>();
 		shader_texture_ = make_shared<Shader>();
-		shader_->loadShaderFiles("../UtlopTests/src/shaders/vs.glsl", "../UtlopTests/src/shaders/fs.glsl");
+		//shader_->loadShaderFiles("../UtlopTests/src/shaders/vs.glsl", "../UtlopTests/src/shaders/fs.glsl");
 		shader_texture_->loadShaderFiles("../UtlopTests/src/shaders/vs.glsl", "../UtlopTests/src/shaders/fs_texture.glsl");
 		
 		
-		shader_->setMat4fv(Core::Instance()->getCamera()->getView(), "ViewMatrix");
-		shader_->setMat4fv(Core::Instance()->getCamera()->getProjection(), "ProjectionMatrix");
+		//shader_->setMat4fv(Core::Instance()->getCamera()->getView(), "ViewMatrix");
+		//shader_->setMat4fv(Core::Instance()->getCamera()->getProjection(), "ProjectionMatrix");
 		shader_texture_->setMat4fv(Core::Instance()->getCamera()->getView(), "ViewMatrix");
 		shader_texture_->setMat4fv(Core::Instance()->getCamera()->getProjection(), "ProjectionMatrix");
 	}
@@ -59,7 +59,7 @@ namespace Utlop
 
 		model_matrix *= Core::Instance()->getCamera()->getViewProjection();
 		glUniformMatrix4fv(projection_mat_index_, 1, GL_FALSE, &model_matrix[0][0]);*/
-		shader_->setMat4fv(Core::Instance()->getCamera()->getView(), "ViewMatrix");
+		//shader_->setMat4fv(Core::Instance()->getCamera()->getView(), "ViewMatrix");
 		shader_texture_->setMat4fv(Core::Instance()->getCamera()->getView(), "ViewMatrix");
 		
 	}
@@ -100,7 +100,7 @@ namespace Utlop
 	void GameObject::setColor(glm::vec3 color)
 	{
 		
-		shader_->setParameters(U_COLOR, T_FLOAT_3, &color[0]);
+		//shader_->setParameters(U_COLOR, T_FLOAT_3, &color[0]);
 	}
 	void GameObject::translate(glm::vec3 position, float speed)
 	{

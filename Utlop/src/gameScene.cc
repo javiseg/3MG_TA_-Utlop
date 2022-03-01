@@ -260,7 +260,7 @@ namespace Utlop
 		gO.init();
 		gO.setPosition(vec3(0.0f, 0.0f, 0.0f));
 		gO.setColor(glm::vec3(1.0, 0.5f, 0.0f));
-		gO.addMesh(CreateMesh(kConst_OBJ, "../UtlopTests/src/obj/backpack.obj"));
+		gO.addMesh(CreateMesh(kConst_OBJ, "../UtlopTests/src/obj/doc.obj"));
 		addGameObject(gO);
 		
 		/*GameObject gO2;
@@ -324,7 +324,7 @@ namespace Utlop
 		if (key == GLFW_KEY_O && action == GLFW_PRESS) {
 			for each (auto& gameObject_ in GameScene::getCurrentScene()->gameObjects_)
 			{
-				gameObject_->addMesh(GameScene::getCurrentScene()->CreateMesh(kConst_OBJ, "../UtlopTests/src/obj/backpack.obj"));
+				gameObject_->addMesh(GameScene::getCurrentScene()->CreateMesh(kConst_OBJ, "../UtlopTests/src/obj/lego.obj"));
 			}
 		}
 		if (key == GLFW_KEY_P && action == GLFW_PRESS) {

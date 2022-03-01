@@ -117,7 +117,7 @@ namespace Utlop
     protected:
 
     private:
-      GLuint vao_;
+			GLuint vao_;
       GLuint vbo_;
 			GLuint ebo_;
 			GLuint tbo_;

@@ -68,11 +68,11 @@ namespace Utlop
 		*/
 		if (texCoords_.size() > 0 && GameScene::getCurrentScene()->textureData_.size() > 0) {
 			glBindTextureUnit(0, GameScene::getCurrentScene()->textureData_[1]->id_);
-			glUniform1i(glGetUniformLocation(shader.ID(), "ourTexture"), 0);
+			//glUniform1i(glGetUniformLocation(shader.ID(), "ourTexture"), 0);
 		}
 		else {
 			glBindTextureUnit(0, GameScene::getCurrentScene()->textureData_[0]->id_);
-			glUniform1i(glGetUniformLocation(shader.ID(), "ourTexture"), 0);
+			//glUniform1i(glGetUniformLocation(shader.ID(), "ourTexture"), 0);
 		}
 		glBindVertexArray(vao_);
 
@@ -111,7 +111,7 @@ namespace Utlop
 			&vertices_[0], GL_STATIC_DRAW);
 		
 
-		glNamedBufferData(ebo_, verticesIndices_.size() * sizeof(unsigned int),
+		glNamedBufferData(ebo_, verticesIndices_.size() * sizeof(GLuint),
 			&verticesIndices_[0],	GL_STATIC_DRAW);
 
 		glEnableVertexArrayAttrib(vao_, 0);
@@ -119,7 +119,7 @@ namespace Utlop
 		glVertexArrayAttribFormat(vao_, 0, 3, GL_FLOAT, GL_FALSE, 0);
 		//
 
-		glVertexArrayVertexBuffer(vao_, 0, vbo_, 0, 3 * sizeof(unsigned int));
+		glVertexArrayVertexBuffer(vao_, 0, vbo_, 0, 3 * sizeof(GLuint));
 
 		glVertexArrayElementBuffer(vao_, ebo_);
 
@@ -128,6 +128,7 @@ namespace Utlop
 		glCreateBuffers(1, &etbo_);
 
 		if (texCoords_.size() > 0) {
+
 			glNamedBufferData(tbo_, texCoords_.size() * sizeof(float), &texCoords_[0], GL_STATIC_DRAW);
 			glNamedBufferData(etbo_, texIndices_.size() * sizeof(GLuint), &texIndices_[0], GL_STATIC_DRAW);
 
@@ -135,7 +136,7 @@ namespace Utlop
 			glVertexArrayAttribBinding(vao_, 3, 0);
 			glVertexArrayAttribFormat(vao_, 3, 2, GL_FLOAT, GL_FALSE, 0);
 
-			glVertexArrayVertexBuffer(vao_, 3, tbo_, 0, 3 * sizeof(unsigned int));
+			glVertexArrayVertexBuffer(vao_, 3, tbo_, 0, 2 * sizeof(GLuint));
 			glVertexArrayElementBuffer(vao_, etbo_);
 
 		}
@@ -256,7 +257,7 @@ namespace Utlop
 	}
 
 	float normalized(float value, float max, float min) {
-		return (value - min) / (max - min);
+		return  (value / max);
 	}
 
 	bool loadOBJ(const char* path,
@@ -293,9 +294,9 @@ namespace Utlop
 				glm::vec3 vertex;
 				fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
 
-				if (vertex.x > max || vertex.y > max || vertex.z > max) {
-					max = std::max(vertex.x, vertex.y);
-					max = std::max(max, vertex.z);
+				if (abs(vertex.x) > max || abs(vertex.y) > max || abs(vertex.z) > max) {
+					max = abs(std::max(vertex.x, vertex.y));
+					max = abs(std::max(max, vertex.z));
 				}
 				if (vertex.x < min || vertex.y < min || vertex.z < min) {
 					min = std::min(vertex.x, vertex.y);
