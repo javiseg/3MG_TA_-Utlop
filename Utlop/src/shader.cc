@@ -99,9 +99,6 @@ int Utlop::Shader::uniformLocation(const GLchar* src)
 void Utlop::Shader::setMat4fv(glm::mat4 value, const GLchar* name, GLboolean transpose)
 {
 	this->use();
-	int projection_mat_index_ = uniformLocation(name);
-	int model_mat_index_ = uniformLocation("ModelMatrix");
-	int view_mat_index_ = uniformLocation("ViewMatrix");
 	glUniformMatrix4fv(glGetUniformLocation(this->id_, name), 1, transpose, &value[0][0]);
 
 	glUseProgram(0);

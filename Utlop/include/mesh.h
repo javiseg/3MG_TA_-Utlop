@@ -62,6 +62,14 @@ namespace Utlop
 
 	using namespace glm;
 	using namespace std;
+
+	struct Vertex {
+		vec3 vertices;
+		vec2 texCoords;
+		vec3 normals;
+	};
+
+
   class Mesh
   {
     public:
@@ -100,6 +108,8 @@ namespace Utlop
 
 			Transform transform_;
 
+
+
 			mat4 ModelMatrix;
 			vec3 origin_;
 
@@ -109,7 +119,8 @@ namespace Utlop
       GLuint vao_;
       GLuint vbo_;
 			GLuint ebo_;
-			
+			GLuint tbo_;
+			GLuint etbo_;
 			
 	};
 

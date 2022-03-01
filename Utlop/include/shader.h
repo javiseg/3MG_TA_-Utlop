@@ -111,6 +111,7 @@ namespace Utlop {
 			id_ = other.id_;
 		}
 		~Shader() {}
+		unsigned int ID() { return id_; }
 
 		void use() { glUseProgram(id_); }
 

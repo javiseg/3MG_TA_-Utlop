@@ -29,13 +29,16 @@ namespace Utlop
 			int CreateMesh(Geo type, char* src);
 			int getMeshIndexByType(Geo type);
 			int getMeshIndexByType(Geo type, const char* src);
-			std::vector<std::shared_ptr<Utlop::Mesh>> getMeshes();
+			std::vector<std::shared_ptr<Utlop::Mesh>>& getMeshes();
+
+			void AddTexture(string path);
 
 			void ImGUI();
 			void InitImGUI();
 			void DestroyImGUI();
 
 			std::vector<std::shared_ptr<Utlop::GameObject>> gameObjects_;
+			std::vector<std::shared_ptr<Utlop::Texture>> textureData_;
 			bool polygon_;
     protected:
 			
@@ -43,7 +46,6 @@ namespace Utlop
     private:
       static GameScene* current_scene_;
       static std::vector<GameScene*> scenes_;
-			std::vector<std::shared_ptr<Utlop::Texture>> textureData_;
 			std::vector<std::shared_ptr<Utlop::Mesh>> meshes_;
 
 			vec4 bColor;

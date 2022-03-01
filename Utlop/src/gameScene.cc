@@ -5,6 +5,9 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 namespace Utlop
 {
   GameScene* GameScene::current_scene_ = nullptr;
@@ -102,9 +105,39 @@ namespace Utlop
 		}
 		return -1;
 	}
-	std::vector<std::shared_ptr<Utlop::Mesh>> GameScene::getMeshes()
+	std::vector<std::shared_ptr<Utlop::Mesh>>& GameScene::getMeshes()
 	{
 		return meshes_;
+	}
+	void GameScene::AddTexture(string path)
+	{
+		stbi_set_flip_vertically_on_load(true);
+		unsigned char* text_buffer_;
+
+		Texture tmpText;
+
+		text_buffer_ = stbi_load(path.c_str(), &tmpText.width_, &tmpText.height_, &tmpText.bpp_, 4);
+
+		if (text_buffer_) {
+
+
+			glCreateTextures(GL_TEXTURE_2D, 1, &tmpText.id_);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+			glTextureStorage2D(tmpText.id_, 1, GL_RGBA8, tmpText.width_, tmpText.height_);
+			glTextureSubImage2D(tmpText.id_, 0, 0, 0, tmpText.width_, tmpText.height_, GL_RGBA, GL_UNSIGNED_BYTE, text_buffer_);
+			glGenerateTextureMipmap(tmpText.id_);
+			
+
+			stbi_image_free(text_buffer_);
+
+			textureData_.push_back(make_shared<Texture>(tmpText));
+		}
+		
 	}
 	void GameScene::ImGUI()
 	{
@@ -202,7 +235,9 @@ namespace Utlop
 
 	void GameScene::destroy()
 	{
-
+		for each (auto & texture in textureData_) {
+			glDeleteTextures(1, &texture->id_);
+		}
 		DestroyImGUI();
 	}
 
@@ -212,6 +247,10 @@ namespace Utlop
 
 		InitImGUI();
 		bColor = vec4(0.0f);
+
+		//AddTexture("../UtlopTests/src/textures/texture.jpg");
+
+
 		GameObject gO;
 		gO.init();
 		gO.setPosition(vec3(-3.0f, 0.0f, 0.0f));
@@ -223,8 +262,8 @@ namespace Utlop
 		gO2.init();
 		gO2.setPosition(vec3(3.0f, 0.0f, 0.0f));
 		gO2.setColor(glm::vec3(0.5, 1.0f, 1.0f));
-		gO2.addMesh(CreateMesh(kConst_Cube));
-		addGameObject(gO2);
+		//gO2.addMesh(CreateMesh(kConst_Cube));
+		//addGameObject(gO2);
 
 		
 		/*ImGui::CreateContext();

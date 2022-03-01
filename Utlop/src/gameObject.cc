@@ -16,7 +16,6 @@ namespace Utlop
 {
   GameObject::GameObject()
   {
-		projection_mat_index_ = -1;
   }
 
   GameObject::~GameObject()
@@ -27,18 +26,25 @@ namespace Utlop
   void GameObject::init()
   {
 		shader_ = make_shared<Shader>();
+		//shader_texture_ = make_shared<Shader>();
 		shader_->loadShaderFiles("../UtlopTests/src/shaders/vs.glsl", "../UtlopTests/src/shaders/fs.glsl");
-		projection_mat_index_ = shader_->uniformLocation("u_vp_matrix");
+		//shader_texture_->loadShaderFiles("../UtlopTests/src/shaders/vs.glsl", "../UtlopTests/src/shaders/fs_texture.glsl");
+		
 		
 		shader_->setMat4fv(Core::Instance()->getCamera()->getView(), "ViewMatrix");
 		shader_->setMat4fv(Core::Instance()->getCamera()->getProjection(), "ProjectionMatrix");
+		//shader_texture_->setMat4fv(Core::Instance()->getCamera()->getView(), "ViewMatrix");
+		//shader_texture_->setMat4fv(Core::Instance()->getCamera()->getProjection(), "ProjectionMatrix");
 	}
 
   void GameObject::draw()
   {
 		for (int i = 0; i < meshIndices_.size(); i++) {
 			GameScene::getCurrentScene()->getMeshes()[meshIndices_[i]]->SetTransform(transformVector_[i]);
-			GameScene::getCurrentScene()->getMeshes()[meshIndices_[i]]->draw(*shader_);
+			//if(GameScene::getCurrentScene()->getMeshes()[meshIndices_[i]]->texCoords_.size() == 0)
+				//GameScene::getCurrentScene()->getMeshes()[meshIndices_[i]]->draw(*shader_);
+			//else
+				GameScene::getCurrentScene()->getMeshes()[meshIndices_[i]]->draw(*shader_);
 		}
   }
 
@@ -53,6 +59,7 @@ namespace Utlop
 		model_matrix *= Core::Instance()->getCamera()->getViewProjection();
 		glUniformMatrix4fv(projection_mat_index_, 1, GL_FALSE, &model_matrix[0][0]);*/
 		shader_->setMat4fv(Core::Instance()->getCamera()->getView(), "ViewMatrix");
+		//shader_texture_->setMat4fv(Core::Instance()->getCamera()->getView(), "ViewMatrix");
 		
 	}
 
@@ -115,15 +122,8 @@ namespace Utlop
 
 	void GameObject::setTexture(char* path)
 	{
-		shader_->loadFragmentShader("../UtlopTests/src/shaders/fs_texture.glsl");
-		Texture text(path);
-		textures_.push_back(text);
-		textures_.back().Bind();
-		shader_->setInt("u_Texture", 3);
 		
-		TextureCoords text_coords;
-		text_coords.setCoordsFromFile("../UtlopTests/src/obj/doc.obj");
-		textureCoords_.push_back(text_coords);
+
 	
 		
 	}
@@ -132,9 +132,8 @@ namespace Utlop
 	{
 		transform_ = other.transform_;
 		shader_ = other.shader_;
-		projection_mat_index_ = other.projection_mat_index_;
+		//shader_texture_ = other.shader_texture_;
 		textures_ = other.textures_;
-		textureCoords_ = other.textureCoords_;
 		meshIndices_ = other.meshIndices_;
 		transformVector_ = other.transformVector_;
 
@@ -145,9 +144,8 @@ namespace Utlop
 
 		transform_ = other.transform_;
 		shader_ = other.shader_;
-		projection_mat_index_ = other.projection_mat_index_;
+		//shader_texture_ = other.shader_texture_;
 		textures_ = other.textures_;
-		textureCoords_ = other.textureCoords_;
 		meshIndices_ = other.meshIndices_;
 		transformVector_ = other.transformVector_;
 	}
@@ -155,9 +153,8 @@ namespace Utlop
 
 		transform_ = other.transform_;
 		shader_ = other.shader_;
-		projection_mat_index_ = other.projection_mat_index_;
+		//shader_texture_ = other.shader_texture_;
 		textures_ = other.textures_;
-		textureCoords_ = other.textureCoords_;
 		meshIndices_ = other.meshIndices_;
 		transformVector_ = other.transformVector_;
 	}

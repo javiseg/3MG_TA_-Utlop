@@ -50,10 +50,9 @@ namespace Utlop
 			vector<GLuint> meshIndices_;
 			vector<Transform> transformVector_;
 			vector<Texture> textures_;
-			vector<TextureCoords> textureCoords_;
 			std::shared_ptr<Shader> shader_;
+			//std::shared_ptr<Shader> shader_texture_;
 
-			int projection_mat_index_;
   };
 
 

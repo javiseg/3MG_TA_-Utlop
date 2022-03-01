@@ -16,6 +16,8 @@ namespace Utlop
 		vao_ = 0;
 		vbo_ = 0;
 		ebo_ = 0;
+		tbo_ = 0;
+		etbo_ = 0;
 		transform_.setPosition(vec3(0.0f));
 		transform_.setScale(vec3(1.0f));
 		transform_.setRotation(vec3(0.0f));
@@ -60,12 +62,17 @@ namespace Utlop
 		UpdateUniforms(shader);
 		shader.use();
 
-		glBindVertexArray(vao_);
-		int size;
-		glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 		
+		/*int size;
+		glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+		*/
+		/*if (texCoords_.size() > 0 && GameScene::getCurrentScene()->textureData_.size() > 0) {
+			glBindTextureUnit(0, GameScene::getCurrentScene()->textureData_[0]->id_);
+			glUniform1i(glGetUniformLocation(shader.ID(), "ourTexture"), 0);
+		}*/
+		glBindVertexArray(vao_);
 
-		glDrawElements(GL_TRIANGLES, size / sizeof(int), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, verticesIndices_.size() * sizeof(GLuint), GL_UNSIGNED_INT, 0);
 		
 
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -111,6 +118,24 @@ namespace Utlop
 		glVertexArrayVertexBuffer(vao_, 0, vbo_, 0, 3 * sizeof(unsigned int));
 
 		glVertexArrayElementBuffer(vao_, ebo_);
+
+		/*if (texCoords_.size() > 0) {
+
+			glCreateBuffers(1, &tbo_);
+			glCreateBuffers(1, &etbo_);
+
+			glNamedBufferData(tbo_, texCoords_.size() * sizeof(float), &texCoords_[0], GL_STATIC_DRAW);
+			glNamedBufferData(etbo_, texIndices_.size() * sizeof(GLuint), &texIndices_[0], GL_STATIC_DRAW);
+
+			glEnableVertexArrayAttrib(vao_, 3);
+			glVertexArrayAttribBinding(vao_, 3, 0);
+			glVertexArrayAttribFormat(vao_, 3, 2, GL_FLOAT, GL_FALSE, 0);
+
+			glVertexArrayVertexBuffer(vao_, 3, tbo_, 0, 3 * sizeof(unsigned int));
+			glVertexArrayElementBuffer(vao_, etbo_);
+
+		}*/
+
 	}
 
 	void Mesh::UpdateModelMatrix()
@@ -139,6 +164,8 @@ namespace Utlop
 		vao_ = other.vao_;
 		vbo_ = other.vbo_;
 		ebo_ = other.ebo_;
+		tbo_ = other.tbo_;
+		etbo_ = other.etbo_;
 		vertices_ = other.vertices_;
 		verticesIndices_ = other.verticesIndices_;
 		texCoords_ = other.texCoords_;
@@ -149,6 +176,7 @@ namespace Utlop
 		type_ = other.type_;
 		origin_ = other.origin_;
 		transform_ = other.transform_;
+		ModelMatrix = other.ModelMatrix;
 		//material_ = other.material_;
 
 		return *this;
@@ -160,6 +188,8 @@ namespace Utlop
 		vao_ = other->vao_;
 		vbo_ = other->vbo_;
 		ebo_ = other->ebo_;
+		tbo_ = other->tbo_;
+		etbo_ = other->etbo_;
 		vertices_ = other->vertices_;
 		verticesIndices_ = other->verticesIndices_;
 		texCoords_ = other->texCoords_;
@@ -170,6 +200,7 @@ namespace Utlop
 		type_ = other->type_;
 		origin_ = other->origin_;
 		transform_ = other->transform_;
+		ModelMatrix = other->ModelMatrix;
 	}
 
 	Mesh::Mesh(const Mesh& other)
@@ -177,6 +208,8 @@ namespace Utlop
 		vao_ = other.vao_;
 		vbo_ = other.vbo_;
 		ebo_ = other.ebo_;
+		tbo_ = other.tbo_;
+		etbo_ = other.etbo_;
 		vertices_ = other.vertices_;
 		verticesIndices_ = other.verticesIndices_;
 		texCoords_ = other.texCoords_;
@@ -187,6 +220,7 @@ namespace Utlop
 		type_ = other.type_;
 		origin_ = other.origin_;
 		transform_ = other.transform_;
+		ModelMatrix = other.ModelMatrix;
 		//material_ = material_ = other.material_;
 	}
 
@@ -195,6 +229,8 @@ namespace Utlop
 		vao_ = other.vao_;
 		vbo_ = other.vbo_;
 		ebo_ = other.ebo_;
+		tbo_ = other.tbo_;
+		etbo_ = other.etbo_;
 		vertices_ = other.vertices_;
 		verticesIndices_ = other.verticesIndices_;
 		texCoords_ = other.texCoords_;
@@ -205,6 +241,7 @@ namespace Utlop
 		type_ = other.type_;
 		origin_ = other.origin_;
 		transform_ = other.transform_;
+		ModelMatrix = other.ModelMatrix;
 
 		//material_ = other.material_;
 	}
@@ -219,7 +256,8 @@ namespace Utlop
 		std::vector <float>& out_normals,
 		std::vector <unsigned int>& out_indices,
 		std::vector <unsigned int>& out_texIndices,
-		std::vector <unsigned int>& out_normalIndices) {
+		std::vector <unsigned int>& out_normalIndices, 
+		std::vector <Vertex>& out_vertices_total) {
 
 		std::vector< float > temp_vertices;
 
@@ -239,6 +277,7 @@ namespace Utlop
 			int res = fscanf(file, "%s\n", lineHeader);
 			if (res == EOF)
 				break;
+
 
 			//printf("%s\n", lineHeader);
 			if (strcmp(&lineHeader[0], "v") == 0) {
@@ -306,9 +345,10 @@ namespace Utlop
 		std::vector <unsigned int> indices;
 		std::vector <unsigned int> texIndices;
 		std::vector <unsigned int> normalIndices;
+		std::vector<Vertex> vertices_total;
 
 		if (loadOBJ(path, vertices, texCoords, normals, indices,
-			texIndices, normalIndices)) {
+			texIndices, normalIndices, vertices_total)) {
 			Utlop::Mesh m;
 			m.vertices_ = vertices;
 			m.verticesIndices_ = indices;
