@@ -1,8 +1,7 @@
 #version 460 core
 #define VERT_POSITION   0
 #define VERT_COLOR      1
-#define MODEL_VIEW      2
-#define VERT_TEXTURE    3
+#define VERT_TEXTURE    2
 #define VERT_NORMAL     4
 
 

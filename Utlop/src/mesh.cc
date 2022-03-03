@@ -77,7 +77,7 @@ namespace Utlop
 		}
 		glBindVertexArray(vao_);
 
-		glDrawElements(GL_TRIANGLES, verticesIndices_.size() * sizeof(GLuint), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, verticesIndices_.size(), GL_UNSIGNED_INT, 0);
 		
 
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -133,11 +133,11 @@ namespace Utlop
 			glNamedBufferData(tbo_, texCoords_.size() * sizeof(float), &texCoords_[0], GL_STATIC_DRAW);
 			glNamedBufferData(etbo_, texIndices_.size() * sizeof(GLuint), &texIndices_[0], GL_STATIC_DRAW);
 
-			glEnableVertexArrayAttrib(vao_, 3);
-			glVertexArrayAttribBinding(vao_, 3, 0);
-			glVertexArrayAttribFormat(vao_, 3, 2, GL_FLOAT, GL_FALSE, 0);
+			glEnableVertexArrayAttrib(vao_, 2);
+			glVertexArrayAttribBinding(vao_, 2, 0);
+			glVertexArrayAttribFormat(vao_, 2, 2, GL_FLOAT, GL_FALSE, 0);
 
-			glVertexArrayVertexBuffer(vao_, 3, tbo_, 0, 2 * sizeof(GLuint));
+			glVertexArrayVertexBuffer(vao_, 2, tbo_, 0, 2 * sizeof(GLuint));
 			glVertexArrayElementBuffer(vao_, etbo_);
 
 		}
