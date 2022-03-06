@@ -7,6 +7,10 @@
 #include <vector>
 #include "data.h"
 
+#include "imgui.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
+
 namespace Utlop
 {
 
@@ -18,13 +22,13 @@ namespace Utlop
 
       bool init(float fps);
       void start();
-      void stop();
 
       Utlop::Window* getWindow();
 			float getDeltaTime();
 
 			void AddEntity(bool camera);
-			void AddCameraEntity();
+			
+			void MoveCamera();
 
 			void InitComponents();
 
@@ -32,7 +36,17 @@ namespace Utlop
 			void ExecSystems();
 
       static Core* Instance();
+			RenderCtx* getData();
+			float getCameraSpeed();
 			
+
+			void ImGUI();
+			void InitImGUI();
+			void DestroyImGUI();
+
+			 
+			bool polygon_;
+			vec3 bg_color_;
     protected:
 
     private:
@@ -41,11 +55,11 @@ namespace Utlop
       float _fps;
       long _frame_time_millis;
 			float deltaTime_;
+			float camera_speed_;
+
 
 			RenderCtx* data;
-
-
-  };
+	};
 
 
 }

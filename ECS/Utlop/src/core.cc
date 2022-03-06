@@ -7,10 +7,11 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "..\include\core.h"
-#include "imgui.h"
+#include "imguiStruct.h"
 #include "system.h"
 #include <time.h>
 
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 namespace Utlop
 {
@@ -22,19 +23,14 @@ namespace Utlop
     _frame_time_millis = 0;
 		data = new RenderCtx();
     _instance = this;
-		InitSystems();
-		InitComponents();
 
-		//Debug:
-		AddEntity(true);
-		AddEntity(false);
-		//AddEntity();
   }
 
   Core::~Core()
   {
 		delete data;
-    stop();
+		DestroyImGUI();
+		glfwTerminate();
   }
 
   bool Core::init(float fps)
@@ -46,6 +42,21 @@ namespace Utlop
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		polygon_ = false;
+		camera_speed_ = 10.0f;
+		InitSystems();
+		InitComponents();
+
+		//Debug:
+		AddEntity(true);
+		AddEntity(false);
+		AddEntity(false);
+		data->localtrcmp[data->entities[2]->cmp_indx_[0]].position = vec3(-3.0f, 0.0f, 0.0f);
+		//AddEntity();
+		
+		bg_color_ = vec3(0.0f);
+
+		
 
     return glfwInit();
   }
@@ -72,6 +83,7 @@ namespace Utlop
 			printf("Version: %d.%d \n", version_max, version_min);
 
 			float lastFrame = (float)glfwGetTime();
+			InitImGUI();
 
       while (!glfwWindowShouldClose(_window._window))
       {
@@ -84,8 +96,12 @@ namespace Utlop
 				deltaTime_ = (float)glfwGetTime() - lastFrame;
 				lastFrame = (float)glfwGetTime();
 
+				glfwPollEvents();
+
+				ImGUI();
 
 				ExecSystems();
+				MoveCamera();
 
         glfwSwapBuffers(_window._window);
         glfwPollEvents();
@@ -102,11 +118,6 @@ namespace Utlop
 #endif // DEBUG
       }
     }
-  }
-
-  void Core::stop()
-  {
-    glfwTerminate();
   }
 
   Utlop::Window* Core::getWindow()
@@ -178,9 +189,9 @@ namespace Utlop
 		data->entities.push_back(make_shared<Entity>(newEntity));
 	}
 
-	void Core::AddCameraEntity()
+	void Core::MoveCamera()
 	{
-
+		glfwSetKeyCallback(getWindow()->getWindow(), key_callback);
 	}
 
 	void Core::InitComponents()
@@ -215,4 +226,113 @@ namespace Utlop
   {
     return _instance;
   }
+	RenderCtx* Core::getData()
+	{
+		return data;
+	}
+	float Core::getCameraSpeed()
+	{
+		return camera_speed_;
+	}
+	void Core::ImGUI()
+	{
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		ImGui::SetNextWindowPos(ImVec2(0, 0));
+		ImGui::SetNextWindowSize(ImVec2(300, 780));
+		if (ImGui::Begin("Utlop Engine")) {
+
+			ImGui::ColorEdit4("Color", &bg_color_[0]);
+			glClearColor(bg_color_.x, bg_color_.y, bg_color_.z, 1.0f);
+
+		
+			ImGui::End();
+
+
+
+
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		}
+	}
+	void Core::InitImGUI()
+	{
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGui::StyleColorsDark();
+		ImGui_ImplGlfw_InitForOpenGL(_window.getWindow(), true);
+		ImGui_ImplOpenGL3_Init("#version 460");
+	}
+	void Core::DestroyImGUI()
+	{
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
+	}
+}
+
+
+
+
+
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_W) {
+		Utlop::Core::Instance()->getData()->localtrcmp[0].position +=
+			Utlop::Core::Instance()->getData()->cameracmp[0].front_
+			* Utlop::Core::Instance()->getCameraSpeed() * Utlop::Core::Instance()->getDeltaTime();
+	}
+	if (key == GLFW_KEY_S) {
+		Utlop::Core::Instance()->getData()->localtrcmp[0].position -=
+			Utlop::Core::Instance()->getData()->cameracmp[0].front_
+			* Utlop::Core::Instance()->getCameraSpeed() * Utlop::Core::Instance()->getDeltaTime();
+	}
+	
+	if (key == GLFW_KEY_D) {
+		Utlop::Core::Instance()->getData()->localtrcmp[0].position +=
+			Utlop::Core::Instance()->getData()->cameracmp[0].Right *
+			Utlop::Core::Instance()->getCameraSpeed() * Utlop::Core::Instance()->getDeltaTime();
+	}
+	
+	if (key == GLFW_KEY_A) {
+		Utlop::Core::Instance()->getData()->localtrcmp[0].position -=
+			Utlop::Core::Instance()->getData()->cameracmp[0].Right *
+			Utlop::Core::Instance()->getCameraSpeed() * Utlop::Core::Instance()->getDeltaTime();
+	}
+	if (key == GLFW_KEY_Q) {
+		Utlop::Core::Instance()->getData()->localtrcmp[0].position +=
+			Utlop::Core::Instance()->getData()->cameracmp[0].Up *
+			Utlop::Core::Instance()->getCameraSpeed() * Utlop::Core::Instance()->getDeltaTime();
+	}
+	if (key == GLFW_KEY_E) {
+		Utlop::Core::Instance()->getData()->localtrcmp[0].position -=
+			Utlop::Core::Instance()->getData()->cameracmp[0].Up *
+			Utlop::Core::Instance()->getCameraSpeed() * Utlop::Core::Instance()->getDeltaTime();
+	}
+	
+	if (key == GLFW_KEY_J) {
+		Utlop::Core::Instance()->getData()->cameracmp[0].yaw_ -= Utlop::Core::Instance()->getCameraSpeed() * 20.0f * Utlop::Core::Instance()->getDeltaTime();
+	}
+	if (key == GLFW_KEY_L) {
+		Utlop::Core::Instance()->getData()->cameracmp[0].yaw_ += Utlop::Core::Instance()->getCameraSpeed() * 20.0f * Utlop::Core::Instance()->getDeltaTime();
+	}
+	if (key == GLFW_KEY_I) {
+		Utlop::Core::Instance()->getData()->cameracmp[0].pitch_ += Utlop::Core::Instance()->getCameraSpeed() * 20.0f * Utlop::Core::Instance()->getDeltaTime();
+	}
+	if (key == GLFW_KEY_K) {
+		Utlop::Core::Instance()->getData()->cameracmp[0].pitch_ -= Utlop::Core::Instance()->getCameraSpeed() * 20.0f * Utlop::Core::Instance()->getDeltaTime();
+	}
+	
+	
+	if (key == GLFW_KEY_P && action == GLFW_PRESS) {
+		if (Utlop::Core::Instance()->polygon_) {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		}
+		else {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+		Utlop::Core::Instance()->polygon_ = !Utlop::Core::Instance()->polygon_;
+	}
 }

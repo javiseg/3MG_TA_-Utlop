@@ -1,5 +1,6 @@
 #pragma once
 #include "glad/glad.h"
+#include <string>
 
 namespace Utlop {
 
@@ -12,6 +13,8 @@ namespace Utlop {
 		GLint width_;
 		GLint height_;
 		GLint bpp_;
+
+		string path_;
 	};
 
 }

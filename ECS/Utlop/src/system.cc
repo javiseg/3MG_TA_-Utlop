@@ -187,15 +187,24 @@ void Utlop::RenderSystem::initGeo(Entity& entity, RenderCtx* data)
 
 }
 
-void Utlop::RenderSystem::initMat(Entity& entity, RenderCtx* data)
+bool Utlop::RenderSystem::initMat(Entity& entity, RenderCtx* data)
 {
 	stbi_set_flip_vertically_on_load(true);
 	unsigned char* text_buffer_;
 
 	Material tmpText;
 	//Debug:
-	string path = "../UtlopTests/src/textures/texture.jpg";
-	text_buffer_ = stbi_load(path.c_str(), &tmpText.width_, &tmpText.height_, &tmpText.bpp_, 4);
+	tmpText.path_ = "../UtlopTests/src/textures/texture.jpg";
+
+	for (unsigned int i = 0; i < data->material.size(); i++) {
+		if (data->material[i].path_._Equal(tmpText.path_)) {
+			data->rendercmp[entity.cmp_indx_[3]].material_idx.push_back(i);
+			return true;
+		}
+	}
+
+
+	text_buffer_ = stbi_load(tmpText.path_.c_str(), &tmpText.width_, &tmpText.height_, &tmpText.bpp_, 4);
 
 	if (text_buffer_) {
 
@@ -216,6 +225,11 @@ void Utlop::RenderSystem::initMat(Entity& entity, RenderCtx* data)
 
 		data->material.push_back(tmpText);
 		data->rendercmp[entity.cmp_indx_[3]].material_idx.push_back(data->material.size() - 1);
+
+		return true;
+	}
+	else {
+		return false;
 	}
 
 

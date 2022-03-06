@@ -152,3 +152,4 @@ void setMat4fv(GLuint shader_id, glm::mat4 value, const GLchar* name, GLboolean 
 	glUniformMatrix4fv(glGetUniformLocation(shader_id, name), 1, transpose, &value[0][0]);
 	glUseProgram(0);
 }
+
