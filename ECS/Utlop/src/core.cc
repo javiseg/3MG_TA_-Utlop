@@ -3,7 +3,6 @@
 #include <chrono>
 #include <thread>
 #include <fstream>
-
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "..\include\core.h"
@@ -12,6 +11,9 @@
 #include <time.h>
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+unsigned int loadCubemap(std::vector<std::string> faces);
+void loadVertexShader(const char* filename, Utlop::RenderComponent& rc);
+void loadFragmentShader(const char* filename, Utlop::RenderComponent& rc);
 
 namespace Utlop
 {
@@ -187,6 +189,28 @@ namespace Utlop
 		
 
 		data->entities.push_back(make_shared<Entity>(newEntity));
+	}
+
+	void Core::AddCubeMap()
+	{
+		vector<std::string> faces
+		{
+				"../UtlopTests/src/textures/cubemap/right.jpg",
+				"../UtlopTests/src/textures/cubemap/left.jpg",
+				"../UtlopTests/src/textures/cubemap/top.jpg",
+				"../UtlopTests/src/textures/cubemap/bottom.jpg",
+				"../UtlopTests/src/textures/cubemap/front.jpg",
+				"../UtlopTests/src/textures/cubemap/back.jpg"
+		};
+		data->cubemap.material_idx.push_back(loadCubemap(faces));
+
+		data->cubemap.shaderID_ = glCreateProgram();
+
+		loadVertexShader("../UtlopTests/src/shaders/vs.glsl", data->cubemap);
+		loadFragmentShader("../UtlopTests/src/shaders/fs_texture.glsl", data->cubemap);
+
+		glLinkProgram(data->cubemap.shaderID_);
+
 	}
 
 	void Core::MoveCamera()

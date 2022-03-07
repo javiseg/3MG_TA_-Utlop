@@ -6,7 +6,6 @@
 #include <list>
 #include <vector>
 #include "data.h"
-
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
@@ -27,7 +26,8 @@ namespace Utlop
 			float getDeltaTime();
 
 			void AddEntity(bool camera);
-			
+			void AddCubeMap();
+
 			void MoveCamera();
 
 			void InitComponents();

@@ -18,10 +18,10 @@ namespace Utlop {
 		vector<CameraComponent> cameracmp;
 		vector<RenderComponent> rendercmp;
 
-		CameraComponent camera;
-
 		vector<Geometry> geometry;
 		vector<Material> material;
+
+		RenderComponent cubemap;
 	};
 
 }
