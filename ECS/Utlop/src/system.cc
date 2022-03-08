@@ -12,33 +12,33 @@ void Utlop::LocalTRSystem::exec(Entity& entity, RenderCtx* data)
 
 void Utlop::LocalTRSystem::UpdateModel(Entity& entity, RenderCtx* data)
 {
-	data->localtrcmp[entity.cmp_indx_[0]].model = mat4(1.0f);
+	data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model = mat4(1.0f);
 
-	data->localtrcmp[entity.cmp_indx_[0]].model =
-		translate(data->localtrcmp[entity.cmp_indx_[0]].model, vec3(0.0f));
+	data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
+		translate(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, vec3(0.0f));
 
-	data->localtrcmp[entity.cmp_indx_[0]].model = 
-		rotate(data->localtrcmp[entity.cmp_indx_[0]].model, radians(data->localtrcmp[entity.cmp_indx_[0]].rotation.x), vec3(1.0f, 0.0f, 0.0f));
+	data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
+		rotate(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, radians(data->localtrcmp[entity.cmp_indx_[0]].rotation.x), vec3(1.0f, 0.0f, 0.0f));
 
-	data->localtrcmp[entity.cmp_indx_[0]].model = 
+	data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
 		rotate(data->localtrcmp[entity.cmp_indx_[0]].model, radians(data->localtrcmp[entity.cmp_indx_[0]].rotation.y), vec3(0.0f, 1.0f, 0.0f));
 
-	data->localtrcmp[entity.cmp_indx_[0]].model = 
-		rotate(data->localtrcmp[entity.cmp_indx_[0]].model, radians(data->localtrcmp[entity.cmp_indx_[0]].rotation.z), vec3(0.0f, 0.0f, 1.0f));
+	data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
+		rotate(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, radians(data->localtrcmp[entity.cmp_indx_[0]].rotation.z), vec3(0.0f, 0.0f, 1.0f));
 
 	
-	data->localtrcmp[entity.cmp_indx_[0]].model =
-		translate(data->localtrcmp[entity.cmp_indx_[0]].model, data->localtrcmp[entity.cmp_indx_[0]].position);
+	data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
+		translate(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, data->localtrcmp[entity.cmp_indx_[0]].position);
 
-	data->localtrcmp[entity.cmp_indx_[0]].model = 
-		glm::scale(data->localtrcmp[entity.cmp_indx_[0]].model, data->localtrcmp[entity.cmp_indx_[0]].scale);
+	data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
+		glm::scale(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, data->localtrcmp[entity.cmp_indx_[0]].scale);
 
 
 }
 
 void Utlop::CameraSystem::exec(Entity& entity, RenderCtx* data)
 {
-	if (!data->cameracmp[entity.cmp_indx_[2]].hasInit)
+	if (!data->cameracmp[entity.cmp_indx_[kCameraCompPos]].hasInit)
 		init(entity, data);
 
 	update(entity, data);
@@ -49,69 +49,69 @@ void Utlop::CameraSystem::exec(Entity& entity, RenderCtx* data)
 
 void Utlop::CameraSystem::init(Entity& entity, RenderCtx* data)
 {
-	data->cameracmp[entity.cmp_indx_[2]].near_ = 0.1f;
-	data->cameracmp[entity.cmp_indx_[2]].a_ratio_ = (float)1380 / (float)780;
-	data->cameracmp[entity.cmp_indx_[2]].fov_ = glm::radians(45.0f);
-	data->cameracmp[entity.cmp_indx_[2]].far_ = 100.0f;
-	data->cameracmp[entity.cmp_indx_[2]].rotation_angle_ = 0.0f;
-	data->cameracmp[entity.cmp_indx_[2]].projection_ =
-		glm::perspective(data->cameracmp[entity.cmp_indx_[2]].fov_, data->cameracmp[entity.cmp_indx_[2]].a_ratio_,
-			data->cameracmp[entity.cmp_indx_[2]].near_, data->cameracmp[entity.cmp_indx_[2]].far_);
-	data->cameracmp[entity.cmp_indx_[2]].yaw_ = -90.0f;
-	data->cameracmp[entity.cmp_indx_[2]].pitch_ = 0.0f;
-	data->cameracmp[entity.cmp_indx_[2]].WorldUp = vec3(0.0f, 1.0f, 0.0f);
-	data->cameracmp[entity.cmp_indx_[2]].WorldRight = vec3(1.0f, 0.0f, 0.0f);
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].near_ = 0.1f;
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].a_ratio_ = 1380.0f / 780.0f;
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].fov_ = glm::radians(45.0f);
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].far_ = 100.0f;
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].rotation_angle_ = 0.0f;
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].projection_ =
+		glm::perspective(data->cameracmp[entity.cmp_indx_[kCameraCompPos]].fov_, data->cameracmp[entity.cmp_indx_[kCameraCompPos]].a_ratio_,
+			data->cameracmp[entity.cmp_indx_[kCameraCompPos]].near_, data->cameracmp[entity.cmp_indx_[kCameraCompPos]].far_);
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].yaw_ = -90.0f;
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].pitch_ = 0.0f;
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].WorldUp = vec3(0.0f, 1.0f, 0.0f);
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].WorldRight = vec3(1.0f, 0.0f, 0.0f);
 
-	data->cameracmp[entity.cmp_indx_[2]].view_;
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].view_;
 
-	data->cameracmp[entity.cmp_indx_[2]].hasInit = true;
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].hasInit = true;
 }
 
 void Utlop::CameraSystem::update(Entity& entity, RenderCtx* data)
 {
-	data->cameracmp[entity.cmp_indx_[2]].front_.x = 
-		cos(glm::radians(data->cameracmp[entity.cmp_indx_[2]].yaw_)) * cos(glm::radians(data->cameracmp[entity.cmp_indx_[2]].pitch_));
-	data->cameracmp[entity.cmp_indx_[2]].front_.y =
-		sin(glm::radians(data->cameracmp[entity.cmp_indx_[2]].pitch_));
-	data->cameracmp[entity.cmp_indx_[2]].front_.z =
-		sin(glm::radians(data->cameracmp[entity.cmp_indx_[2]].yaw_)) * cos(glm::radians(data->cameracmp[entity.cmp_indx_[2]].pitch_));
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].front_.x = 
+		cos(glm::radians(data->cameracmp[entity.cmp_indx_[kCameraCompPos]].yaw_)) * cos(glm::radians(data->cameracmp[entity.cmp_indx_[kCameraCompPos]].pitch_));
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].front_.y =
+		sin(glm::radians(data->cameracmp[entity.cmp_indx_[kCameraCompPos]].pitch_));
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].front_.z =
+		sin(glm::radians(data->cameracmp[entity.cmp_indx_[kCameraCompPos]].yaw_)) * cos(glm::radians(data->cameracmp[entity.cmp_indx_[kCameraCompPos]].pitch_));
 	
-	data->cameracmp[entity.cmp_indx_[2]].front_ = normalize(data->cameracmp[entity.cmp_indx_[2]].front_);
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].front_ = normalize(data->cameracmp[entity.cmp_indx_[kCameraCompPos]].front_);
 
-	data->cameracmp[entity.cmp_indx_[2]].Right = 
-		normalize(glm::cross(data->cameracmp[entity.cmp_indx_[2]].front_, data->cameracmp[entity.cmp_indx_[2]].WorldUp));
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].Right = 
+		normalize(glm::cross(data->cameracmp[entity.cmp_indx_[kCameraCompPos]].front_, data->cameracmp[entity.cmp_indx_[kCameraCompPos]].WorldUp));
 	
-	data->cameracmp[entity.cmp_indx_[2]].Up = 
-		normalize(cross(data->cameracmp[entity.cmp_indx_[2]].Right, data->cameracmp[entity.cmp_indx_[2]].front_));
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].Up = 
+		normalize(cross(data->cameracmp[entity.cmp_indx_[kCameraCompPos]].Right, data->cameracmp[entity.cmp_indx_[kCameraCompPos]].front_));
 
-	data->cameracmp[entity.cmp_indx_[2]].view_ = glm::lookAt(data->localtrcmp[entity.cmp_indx_[0]].position, 
-		data->localtrcmp[entity.cmp_indx_[0]].position + data->cameracmp[entity.cmp_indx_[2]].front_, data->cameracmp[entity.cmp_indx_[2]].Up);
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].view_ = glm::lookAt(data->localtrcmp[entity.cmp_indx_[0]].position, 
+		data->localtrcmp[entity.cmp_indx_[0]].position + data->cameracmp[entity.cmp_indx_[kCameraCompPos]].front_, data->cameracmp[entity.cmp_indx_[kCameraCompPos]].Up);
 }
 
 void Utlop::RenderSystem::exec(Entity& entity, RenderCtx* data)
 {
-	if (data->rendercmp[entity.cmp_indx_[3]].geo_idx.empty())
+	if (data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.empty())
 		initGeo(entity, data);
-	if (data->rendercmp[entity.cmp_indx_[3]].material_idx.empty())
+	if (data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx.empty())
 		initMat(entity, data);
-	if (data->rendercmp[entity.cmp_indx_[3]].shaderID_ == 999)
+	if (data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_ == 999)
 		initShader(entity, data);
 
-	setMat4fv(data->rendercmp[entity.cmp_indx_[3]].shaderID_,
+	setMat4fv(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
 		data->localtrcmp[entity.cmp_indx_[0]].model,
 		"ModelMatrix");
 	
-	setMat4fv(data->rendercmp[entity.cmp_indx_[3]].shaderID_,
+	setMat4fv(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
 		data->cameracmp[0].projection_, "ProjectionMatrix");
 
-	setMat4fv(data->rendercmp[entity.cmp_indx_[3]].shaderID_,
+	setMat4fv(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
 		data->cameracmp[0].view_, "ViewMatrix");
 
-	glUseProgram(data->rendercmp[entity.cmp_indx_[3]].shaderID_);
+	glUseProgram(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_);
 
 	glBindTextureUnit(0, data->material[0].diff_);
 
-	glBindVertexArray(data->rendercmp[entity.cmp_indx_[3]].vao_);
+	glBindVertexArray(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_);
 
 	glDrawElements(GL_TRIANGLES, data->geometry[0].verticesIndices_.size(), GL_UNSIGNED_INT, 0);
 
@@ -135,53 +135,53 @@ void Utlop::RenderSystem::initGeo(Entity& entity, RenderCtx* data)
 		}
 	}
 	if (geo_index != -1) {
-		data->rendercmp[entity.cmp_indx_[3]].geo_idx.push_back(geo_index);
+		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.push_back(geo_index);
 	}
 	else {
 		Geometry geo;
 		loadOBJ("../UtlopTests/src/obj/cube.obj", geo);
 		data->geometry.push_back(geo);
-		data->rendercmp[entity.cmp_indx_[3]].geo_idx.push_back(data->geometry.size() - 1);
+		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.push_back(data->geometry.size() - 1);
 	}
-	glCreateVertexArrays(1, &data->rendercmp[entity.cmp_indx_[3]].vao_);
-	glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[3]].vbo_);
-	glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[3]].ebo_);
+	glCreateVertexArrays(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_);
+	glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_);
+	glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_);
 
-	glNamedBufferData(data->rendercmp[entity.cmp_indx_[3]].vbo_, 
-		data->geometry[data->rendercmp[entity.cmp_indx_[3]].geo_idx.back()].vertices_.size() * sizeof(float),
-		&data->geometry[data->rendercmp[entity.cmp_indx_[3]].geo_idx.back()].vertices_[0], GL_STATIC_DRAW);
+	glNamedBufferData(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_, 
+		data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].vertices_.size() * sizeof(float),
+		&data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].vertices_[0], GL_STATIC_DRAW);
 
 
-	glNamedBufferData(data->rendercmp[entity.cmp_indx_[3]].ebo_, 
-		data->geometry[data->rendercmp[entity.cmp_indx_[3]].geo_idx.back()].verticesIndices_.size() * sizeof(GLuint),
-		&data->geometry[data->rendercmp[entity.cmp_indx_[3]].geo_idx.back()].verticesIndices_[0], GL_STATIC_DRAW);
+	glNamedBufferData(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_, 
+		data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].verticesIndices_.size() * sizeof(GLuint),
+		&data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].verticesIndices_[0], GL_STATIC_DRAW);
 
-	glEnableVertexArrayAttrib(data->rendercmp[entity.cmp_indx_[3]].vao_, 0);
+	glEnableVertexArrayAttrib(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 0);
 	// Back here when applying normals etc:
-	glVertexArrayAttribFormat(data->rendercmp[entity.cmp_indx_[3]].vao_, 0, 3, GL_FLOAT, GL_FALSE, 0);
+	glVertexArrayAttribFormat(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 0, kRenderCompPos, GL_FLOAT, GL_FALSE, 0);
 	//
 
-	glVertexArrayVertexBuffer(data->rendercmp[entity.cmp_indx_[3]].vao_, 0, data->rendercmp[entity.cmp_indx_[3]].vbo_, 0, 3 * sizeof(GLuint));
+	glVertexArrayVertexBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 0, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_, 0, 3 * sizeof(GLuint));
 
-	glVertexArrayElementBuffer(data->rendercmp[entity.cmp_indx_[3]].vao_, data->rendercmp[entity.cmp_indx_[3]].ebo_);
+	glVertexArrayElementBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_);
 
 
-	glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[3]].tbo_);
-	glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[3]].etbo_);
+	glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tbo_);
+	glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].etbo_);
 
-	if (data->geometry[data->rendercmp[entity.cmp_indx_[3]].geo_idx.back()].texCoords_.size() > 0) {
+	if (data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].texCoords_.size() > 0) {
 
-		glNamedBufferData(data->rendercmp[entity.cmp_indx_[3]].tbo_, data->geometry[data->rendercmp[entity.cmp_indx_[3]].geo_idx.back()].texCoords_.size() * sizeof(float), 
-			&data->geometry[data->rendercmp[entity.cmp_indx_[3]].geo_idx.back()].texCoords_[0], GL_STATIC_DRAW);
-		glNamedBufferData(data->rendercmp[entity.cmp_indx_[3]].etbo_, data->geometry[data->rendercmp[entity.cmp_indx_[3]].geo_idx.back()].texCoordsIndices_.size() * sizeof(GLuint), 
-			&data->geometry[data->rendercmp[entity.cmp_indx_[3]].geo_idx.back()].texCoordsIndices_[0], GL_STATIC_DRAW);
+		glNamedBufferData(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tbo_, data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].texCoords_.size() * sizeof(float), 
+			&data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].texCoords_[0], GL_STATIC_DRAW);
+		glNamedBufferData(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].etbo_, data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].texCoordsIndices_.size() * sizeof(GLuint), 
+			&data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].texCoordsIndices_[0], GL_STATIC_DRAW);
 
-		glEnableVertexArrayAttrib(data->rendercmp[entity.cmp_indx_[3]].vao_, 2);
-		glVertexArrayAttribBinding(data->rendercmp[entity.cmp_indx_[3]].vao_, 2, 0);
-		glVertexArrayAttribFormat(data->rendercmp[entity.cmp_indx_[3]].vao_, 2, 2, GL_FLOAT, GL_FALSE, 0);
+		glEnableVertexArrayAttrib(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 2);
+		glVertexArrayAttribBinding(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 2, 0);
+		glVertexArrayAttribFormat(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 2, 2, GL_FLOAT, GL_FALSE, 0);
 
-		glVertexArrayVertexBuffer(data->rendercmp[entity.cmp_indx_[3]].vao_, 2, data->rendercmp[entity.cmp_indx_[3]].tbo_, 0, 2 * sizeof(GLuint));
-		glVertexArrayElementBuffer(data->rendercmp[entity.cmp_indx_[3]].vao_, data->rendercmp[entity.cmp_indx_[3]].etbo_);
+		glVertexArrayVertexBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 2, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tbo_, 0, 2 * sizeof(GLuint));
+		glVertexArrayElementBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].etbo_);
 
 	}
 
@@ -198,7 +198,7 @@ bool Utlop::RenderSystem::initMat(Entity& entity, RenderCtx* data)
 
 	for (unsigned int i = 0; i < data->material.size(); i++) {
 		if (data->material[i].path_._Equal(tmpText.path_)) {
-			data->rendercmp[entity.cmp_indx_[3]].material_idx.push_back(i);
+			data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx.push_back(i);
 			return true;
 		}
 	}
@@ -224,7 +224,7 @@ bool Utlop::RenderSystem::initMat(Entity& entity, RenderCtx* data)
 		stbi_image_free(text_buffer_);
 
 		data->material.push_back(tmpText);
-		data->rendercmp[entity.cmp_indx_[3]].material_idx.push_back(data->material.size() - 1);
+		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx.push_back(data->material.size() - 1);
 
 		return true;
 	}
@@ -237,25 +237,13 @@ bool Utlop::RenderSystem::initMat(Entity& entity, RenderCtx* data)
 
 void Utlop::RenderSystem::initShader(Entity& entity, RenderCtx* data)
 {
-	data->rendercmp[entity.cmp_indx_[3]].shaderID_ = glCreateProgram();
+	data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_ = glCreateProgram();
 
-	loadVertexShader("../UtlopTests/src/shaders/vs.glsl", data->rendercmp[entity.cmp_indx_[3]]);
-	loadFragmentShader("../UtlopTests/src/shaders/fs_texture.glsl", data->rendercmp[entity.cmp_indx_[3]]);
+	loadVertexShader("../UtlopTests/src/shaders/vs.glsl", data->rendercmp[entity.cmp_indx_[kRenderCompPos]]);
+	loadFragmentShader("../UtlopTests/src/shaders/fs_texture.glsl", data->rendercmp[entity.cmp_indx_[kRenderCompPos]]);
 
-	glLinkProgram(data->rendercmp[entity.cmp_indx_[3]].shaderID_);
+	glLinkProgram(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_);
 
-	checkCompileErrors(data->rendercmp[entity.cmp_indx_[3]].shaderID_, "PROGRAM");
-	checkCompileErrors(data->rendercmp[entity.cmp_indx_[3]].shaderID_, "LINK");
+	checkCompileErrors(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, "PROGRAM");
+	checkCompileErrors(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, "LINK");
 }
-
-
-
-
-
-
-
-
-
-
-
-

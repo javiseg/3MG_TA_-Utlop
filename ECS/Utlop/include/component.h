@@ -15,6 +15,14 @@ namespace Utlop {
 		kRenderComp = 8
 	};
 
+	enum ComponentPos {
+		kLocalTRCompPos = 0,
+		kWorldTRCompPos = 1,
+		kCameraCompPos = 2,
+		kRenderCompPos = 3
+	};
+
+
 	struct Component {
 	};
 

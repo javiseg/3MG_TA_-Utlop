@@ -10,7 +10,6 @@
 #include "system.h"
 #include <time.h>
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 unsigned int loadCubemap(std::vector<std::string> faces);
 void loadVertexShader(const char* filename, Utlop::RenderComponent& rc);
 void loadFragmentShader(const char* filename, Utlop::RenderComponent& rc);
@@ -207,16 +206,12 @@ namespace Utlop
 		data->cubemap.shaderID_ = glCreateProgram();
 
 		loadVertexShader("../UtlopTests/src/shaders/vs.glsl", data->cubemap);
-		loadFragmentShader("../UtlopTests/src/shaders/fs_texture.glsl", data->cubemap);
+		loadFragmentShader("../UtlopTests/src/shaders/fs_cubemap.glsl", data->cubemap);
 
 		glLinkProgram(data->cubemap.shaderID_);
 
 	}
 
-	void Core::MoveCamera()
-	{
-		glfwSetKeyCallback(getWindow()->getWindow(), key_callback);
-	}
 
 	void Core::InitComponents()
 	{
@@ -271,11 +266,8 @@ namespace Utlop
 			glClearColor(bg_color_.x, bg_color_.y, bg_color_.z, 1.0f);
 
 		
+
 			ImGui::End();
-
-
-
-
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		}
@@ -294,69 +286,69 @@ namespace Utlop
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 	}
-}
 
 
-
-
-
-
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	if (key == GLFW_KEY_W) {
-		Utlop::Core::Instance()->getData()->localtrcmp[0].position +=
-			Utlop::Core::Instance()->getData()->cameracmp[0].front_
-			* Utlop::Core::Instance()->getCameraSpeed() * Utlop::Core::Instance()->getDeltaTime();
-	}
-	if (key == GLFW_KEY_S) {
-		Utlop::Core::Instance()->getData()->localtrcmp[0].position -=
-			Utlop::Core::Instance()->getData()->cameracmp[0].front_
-			* Utlop::Core::Instance()->getCameraSpeed() * Utlop::Core::Instance()->getDeltaTime();
-	}
-	
-	if (key == GLFW_KEY_D) {
-		Utlop::Core::Instance()->getData()->localtrcmp[0].position +=
-			Utlop::Core::Instance()->getData()->cameracmp[0].Right *
-			Utlop::Core::Instance()->getCameraSpeed() * Utlop::Core::Instance()->getDeltaTime();
-	}
-	
-	if (key == GLFW_KEY_A) {
-		Utlop::Core::Instance()->getData()->localtrcmp[0].position -=
-			Utlop::Core::Instance()->getData()->cameracmp[0].Right *
-			Utlop::Core::Instance()->getCameraSpeed() * Utlop::Core::Instance()->getDeltaTime();
-	}
-	if (key == GLFW_KEY_Q) {
-		Utlop::Core::Instance()->getData()->localtrcmp[0].position +=
-			Utlop::Core::Instance()->getData()->cameracmp[0].Up *
-			Utlop::Core::Instance()->getCameraSpeed() * Utlop::Core::Instance()->getDeltaTime();
-	}
-	if (key == GLFW_KEY_E) {
-		Utlop::Core::Instance()->getData()->localtrcmp[0].position -=
-			Utlop::Core::Instance()->getData()->cameracmp[0].Up *
-			Utlop::Core::Instance()->getCameraSpeed() * Utlop::Core::Instance()->getDeltaTime();
-	}
-	
-	if (key == GLFW_KEY_J) {
-		Utlop::Core::Instance()->getData()->cameracmp[0].yaw_ -= Utlop::Core::Instance()->getCameraSpeed() * 20.0f * Utlop::Core::Instance()->getDeltaTime();
-	}
-	if (key == GLFW_KEY_L) {
-		Utlop::Core::Instance()->getData()->cameracmp[0].yaw_ += Utlop::Core::Instance()->getCameraSpeed() * 20.0f * Utlop::Core::Instance()->getDeltaTime();
-	}
-	if (key == GLFW_KEY_I) {
-		Utlop::Core::Instance()->getData()->cameracmp[0].pitch_ += Utlop::Core::Instance()->getCameraSpeed() * 20.0f * Utlop::Core::Instance()->getDeltaTime();
-	}
-	if (key == GLFW_KEY_K) {
-		Utlop::Core::Instance()->getData()->cameracmp[0].pitch_ -= Utlop::Core::Instance()->getCameraSpeed() * 20.0f * Utlop::Core::Instance()->getDeltaTime();
-	}
-	
-	
-	if (key == GLFW_KEY_P && action == GLFW_PRESS) {
-		if (Utlop::Core::Instance()->polygon_) {
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	void Core::MoveCamera()
+	{
+		if (glfwGetKey(_window.getWindow(), GLFW_KEY_W) == GLFW_PRESS) {
+			Utlop::Core::Instance()->getData()->localtrcmp[0].position +=
+				Utlop::Core::Instance()->getData()->cameracmp[0].front_
+				* Utlop::Core::Instance()->getCameraSpeed() * Utlop::Core::Instance()->getDeltaTime();
 		}
-		else {
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+		if (glfwGetKey(_window.getWindow(), GLFW_KEY_S) == GLFW_PRESS) {
+			Utlop::Core::Instance()->getData()->localtrcmp[0].position -=
+				Utlop::Core::Instance()->getData()->cameracmp[0].front_
+				* Utlop::Core::Instance()->getCameraSpeed() * Utlop::Core::Instance()->getDeltaTime();
 		}
-		Utlop::Core::Instance()->polygon_ = !Utlop::Core::Instance()->polygon_;
+
+		if (glfwGetKey(_window.getWindow(), GLFW_KEY_D) == GLFW_PRESS) {
+			Utlop::Core::Instance()->getData()->localtrcmp[0].position +=
+				Utlop::Core::Instance()->getData()->cameracmp[0].Right *
+				Utlop::Core::Instance()->getCameraSpeed() * Utlop::Core::Instance()->getDeltaTime();
+		}
+
+		if (glfwGetKey(_window.getWindow(), GLFW_KEY_A) == GLFW_PRESS) {
+			Utlop::Core::Instance()->getData()->localtrcmp[0].position -=
+				Utlop::Core::Instance()->getData()->cameracmp[0].Right *
+				Utlop::Core::Instance()->getCameraSpeed() * Utlop::Core::Instance()->getDeltaTime();
+		}
+		if (glfwGetKey(_window.getWindow(), GLFW_KEY_Q) == GLFW_PRESS) {
+			Utlop::Core::Instance()->getData()->localtrcmp[0].position +=
+				Utlop::Core::Instance()->getData()->cameracmp[0].Up *
+				Utlop::Core::Instance()->getCameraSpeed() * Utlop::Core::Instance()->getDeltaTime();
+		}
+		if (glfwGetKey(_window.getWindow(), GLFW_KEY_E) == GLFW_PRESS) {
+			Utlop::Core::Instance()->getData()->localtrcmp[0].position -=
+				Utlop::Core::Instance()->getData()->cameracmp[0].Up *
+				Utlop::Core::Instance()->getCameraSpeed() * Utlop::Core::Instance()->getDeltaTime();
+		}
+
+		if (glfwGetKey(_window.getWindow(), GLFW_KEY_J) == GLFW_PRESS) {
+			Utlop::Core::Instance()->getData()->cameracmp[0].yaw_ -= Utlop::Core::Instance()->getCameraSpeed() * 10.0f * Utlop::Core::Instance()->getDeltaTime();
+		}
+		if (glfwGetKey(_window.getWindow(), GLFW_KEY_L) == GLFW_PRESS) {
+			Utlop::Core::Instance()->getData()->cameracmp[0].yaw_ += Utlop::Core::Instance()->getCameraSpeed() * 10.0f * Utlop::Core::Instance()->getDeltaTime();
+		}
+		if (glfwGetKey(_window.getWindow(), GLFW_KEY_I) == GLFW_PRESS) {
+			if(Utlop::Core::Instance()->getData()->cameracmp[0].pitch_ < 85.0f)
+				Utlop::Core::Instance()->getData()->cameracmp[0].pitch_ += Utlop::Core::Instance()->getCameraSpeed() * 10.0f * Utlop::Core::Instance()->getDeltaTime();
+		}
+		if (glfwGetKey(_window.getWindow(), GLFW_KEY_K) == GLFW_PRESS) {
+			if (Utlop::Core::Instance()->getData()->cameracmp[0].pitch_ > -85.0f)
+				Utlop::Core::Instance()->getData()->cameracmp[0].pitch_ -= Utlop::Core::Instance()->getCameraSpeed() * 10.0f * Utlop::Core::Instance()->getDeltaTime();
+		}
+
+
+		if (glfwGetKey(_window.getWindow(), GLFW_KEY_P) == GLFW_PRESS) {
+			if (Utlop::Core::Instance()->polygon_) {
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			}
+			else {
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			}
+			Utlop::Core::Instance()->polygon_ = !Utlop::Core::Instance()->polygon_;
+		}
 	}
+
 }

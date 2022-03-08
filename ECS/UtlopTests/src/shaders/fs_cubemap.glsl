@@ -1,12 +1,11 @@
 #version 460 core
-layout(location = 0) out vec4 color;
-in vec3 out_color;
-in vec2 text_coords;
-in vec3 out_normals;
+out vec4 FragColor;
 
-uniform sampler2D ourTexture;
+in vec3 TexCoords;
+
+uniform samplerCube skybox;
 
 void main()
-{
-	color = texture(ourTexture, text_coords);
+{    
+    FragColor = texture(skybox, TexCoords);
 }
