@@ -49,14 +49,20 @@ namespace Utlop
 		InitComponents();
 
 		//Debug:
-		AddEntity(false);
+		AddEntity();
 		AddComponent(*data->entities[0], kCameraComp);
+		AddComponent(*data->entities[0], kLocalTRComp);
 		//AddComponent(*data->entities[0], kRenderComp);
-		AddEntity(false);
-		AddComponent(*data->entities[1], kRenderComp);
-		AddEntity(false);
-		AddComponent(*data->entities[2], kRenderComp);
-		data->localtrcmp[data->entities[2]->cmp_indx_[0]].position = vec3(-3.0f, 0.0f, 0.0f);
+		
+		for (int i = 0; i < 100; i++) {
+			for (int j = 0; j < 10; j++) {
+				int entityIdx = AddEntity();
+				AddComponent(*data->entities[entityIdx], kLocalTRComp);
+				AddComponent(*data->entities[entityIdx], kRenderComp);
+				data->localtrcmp[data->entities[entityIdx]->cmp_indx_[kLocalTRCompPos]].position -= vec3(3.0f * i, 3.0f * j, (rand()%10) - 5.0f);
+			}
+		}
+		
 		//AddEntity();
 		
 		bg_color_ = vec3(0.0f);
@@ -89,6 +95,8 @@ namespace Utlop
 
 			float lastFrame = (float)glfwGetTime();
 			InitImGUI();
+
+			PreExecSystems();
 
       while (!glfwWindowShouldClose(_window._window))
       {
@@ -135,63 +143,23 @@ namespace Utlop
 		return deltaTime_;
 	}
 
-	void Core::AddEntity(bool camera)
+	int Core::AddEntity()
 	{
 		Entity newEntity;
 
-		newEntity.AddComponent(kLocalTRComp);
-		data->localtrcmp.push_back(LocalTRComponent());
-
-		newEntity.AddComponent(kWorldTRComp);
-		data->worldtrcmp.push_back(WorldTRComponent());
-
-		if (camera) {
-
-			newEntity.AddComponent(kCameraComp);
-			data->cameracmp.push_back(CameraComponent());
-			data->localtrcmp[data->localtrcmp.size() -1].position = vec3(0.0f, 0.0f, 5.0f);
-		}
-		else {
-
-			//newEntity.AddComponent(kRenderComp);
-			//data->rendercmp.push_back(RenderComponent());
-		}
-
-
-
-		
-		if (newEntity.componentsID_ & 1) {
-			newEntity.cmp_indx_.push_back(data->localtrcmp.size() - 1);
-		}
-		else {
-			newEntity.cmp_indx_.push_back(-1);
-		}
-		if (newEntity.componentsID_ & 2) {
-			newEntity.cmp_indx_.push_back(data->worldtrcmp.size() - 1);
-		}
-		else {
-			newEntity.cmp_indx_.push_back(-1);
-		}
-		if (newEntity.componentsID_ & 4) {
-			newEntity.cmp_indx_.push_back(data->cameracmp.size() - 1);
-		}
-		else {
-			newEntity.cmp_indx_.push_back(-1);
-		}
-		if (newEntity.componentsID_ & 8) {
-			newEntity.cmp_indx_.push_back(data->rendercmp.size() - 1);
-		}
-		else {
-			newEntity.cmp_indx_.push_back(-1);
-		}
+		newEntity.componentsID_ = 0;
+		newEntity.cmp_indx_.push_back(-1);
+		newEntity.cmp_indx_.push_back(-1);
+		newEntity.cmp_indx_.push_back(-1);
+		newEntity.cmp_indx_.push_back(-1);
 		
 
 		data->entities.push_back(make_shared<Entity>(newEntity));
+		return data->entities.size() - 1;
 	}
 
 	void Core::AddComponent(Entity& entity, Utlop::ComponentID id)
 	{
-		printf("%d\n", entity.componentsID_ & id);
 		if ((entity.componentsID_ & id) == 0) {
 
 			entity.AddComponent(id);
@@ -297,6 +265,17 @@ namespace Utlop
 		data->sys.push_back(make_shared<WorldTRSystem>());
 		data->sys.push_back(make_shared<CameraSystem>());
 		data->sys.push_back(make_shared<RenderSystem>());
+	}
+
+	void Core::PreExecSystems()
+	{
+		for (unsigned int i = 0; i < data->sys.size(); i++) {
+			for (unsigned int h = 0; h < data->entities.size(); h++) {
+				int out = data->entities[h]->componentsID_ & data->sys[i]->id_;
+				if (out == data->sys[i]->id_)
+					data->sys[i]->preExec(*data->entities[h], data);
+			}
+		}
 	}
 
 	void Core::ExecSystems()

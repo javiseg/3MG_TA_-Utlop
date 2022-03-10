@@ -7,6 +7,9 @@ namespace Utlop {
 	struct RenderCtx;
 
 	struct System {
+		virtual void preExec(Entity& entity, Utlop::RenderCtx* data) {
+
+		}
 		virtual void exec(Entity& entity, Utlop::RenderCtx* data) {
 			
 		}
@@ -18,6 +21,7 @@ namespace Utlop {
 			id_ = kLocalTRComp;
 		}
 		~LocalTRSystem() {}
+		void preExec(Entity& entity, Utlop::RenderCtx* data) override;
 		void exec(Entity& entity, RenderCtx* data) override;
 		void UpdateModel(Entity& entity, RenderCtx* data);
 	};
@@ -32,6 +36,7 @@ namespace Utlop {
 			id_ = kCameraComp;
 		}
 		~CameraSystem() {}
+		void preExec(Entity& entity, Utlop::RenderCtx* data) override;
 		void exec(Entity& entity, RenderCtx* data) override;
 		void init(Entity& entity, RenderCtx* data);
 		void update(Entity& entity, RenderCtx* data);
@@ -41,11 +46,12 @@ namespace Utlop {
 			id_ = kRenderComp;
 		}
 		~RenderSystem() {}
+		void preExec(Entity& entity, Utlop::RenderCtx* data) override;
 		void exec(Entity& entity, RenderCtx* data) override;
 		void UpdateUniforms(GLuint shaderID);
 
 		void initGeo(Entity& entity, RenderCtx* data);
-		bool initMat(Entity& entity, RenderCtx* data);
+		bool initMat(Entity& entity, RenderCtx* data, const char* path);
 		void initShader(Entity& entity, RenderCtx* data);
 		
 	};

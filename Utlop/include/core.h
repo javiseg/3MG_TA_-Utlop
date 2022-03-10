@@ -25,7 +25,7 @@ namespace Utlop
       Utlop::Window* getWindow();
 			float getDeltaTime();
 
-			void AddEntity(bool camera);
+			int AddEntity();
 			void AddComponent(Entity& entity, Utlop::ComponentID id);
 			void AddCubeMap();
 
@@ -34,6 +34,7 @@ namespace Utlop
 			void InitComponents();
 
 			void InitSystems();
+			void PreExecSystems();
 			void ExecSystems();
 
       static Core* Instance();

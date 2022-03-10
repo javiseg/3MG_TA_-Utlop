@@ -4,6 +4,10 @@
 #include "material.h"
 #include "utility.h"
 
+void Utlop::LocalTRSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
+{
+}
+
 void Utlop::LocalTRSystem::exec(Entity& entity, RenderCtx* data)
 {
 	UpdateModel(entity, data);
@@ -36,15 +40,14 @@ void Utlop::LocalTRSystem::UpdateModel(Entity& entity, RenderCtx* data)
 
 }
 
+void Utlop::CameraSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
+{
+	init(entity, data);
+}
+
 void Utlop::CameraSystem::exec(Entity& entity, RenderCtx* data)
 {
-	if (!data->cameracmp[entity.cmp_indx_[kCameraCompPos]].hasInit)
-		init(entity, data);
-
 	update(entity, data);
-
-
-
 }
 
 void Utlop::CameraSystem::init(Entity& entity, RenderCtx* data)
@@ -52,7 +55,7 @@ void Utlop::CameraSystem::init(Entity& entity, RenderCtx* data)
 	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].near_ = 0.1f;
 	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].a_ratio_ = 1380.0f / 780.0f;
 	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].fov_ = glm::radians(45.0f);
-	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].far_ = 100.0f;
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].far_ = 300.0f;
 	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].rotation_angle_ = 0.0f;
 	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].projection_ =
 		glm::perspective(data->cameracmp[entity.cmp_indx_[kCameraCompPos]].fov_, data->cameracmp[entity.cmp_indx_[kCameraCompPos]].a_ratio_,
@@ -62,9 +65,6 @@ void Utlop::CameraSystem::init(Entity& entity, RenderCtx* data)
 	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].WorldUp = vec3(0.0f, 1.0f, 0.0f);
 	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].WorldRight = vec3(1.0f, 0.0f, 0.0f);
 
-	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].view_;
-
-	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].hasInit = true;
 }
 
 void Utlop::CameraSystem::update(Entity& entity, RenderCtx* data)
@@ -88,27 +88,32 @@ void Utlop::CameraSystem::update(Entity& entity, RenderCtx* data)
 		data->localtrcmp[entity.cmp_indx_[0]].position + data->cameracmp[entity.cmp_indx_[kCameraCompPos]].front_, data->cameracmp[entity.cmp_indx_[kCameraCompPos]].Up);
 }
 
-void Utlop::RenderSystem::exec(Entity& entity, RenderCtx* data)
+void Utlop::RenderSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
 	if (data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.empty())
 		initGeo(entity, data);
-	if (data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx.empty())
-		initMat(entity, data);
+	if (data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx.empty()) {
+		initMat(entity, data, "../UtlopTests/src/textures/texture.jpg");
+		initMat(entity, data, "../UtlopTests/src/textures/default.png");
+	}
 	if (data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_ == 999)
 		initShader(entity, data);
 
 	setMat4fv(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
+		data->cameracmp[0].projection_, "ProjectionMatrix");
+}
+
+void Utlop::RenderSystem::exec(Entity& entity, RenderCtx* data)
+{
+	setMat4fv(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
 		data->localtrcmp[entity.cmp_indx_[0]].model,
 		"ModelMatrix");
-	
-	setMat4fv(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
-		data->cameracmp[0].projection_, "ProjectionMatrix");
 
 	setMat4fv(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
 		data->cameracmp[0].view_, "ViewMatrix");
 
 	glUseProgram(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_);
-
+	
 	glBindTextureUnit(0, data->material[0].diff_);
 
 	glBindVertexArray(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_);
@@ -130,7 +135,7 @@ void Utlop::RenderSystem::initGeo(Entity& entity, RenderCtx* data)
 {
 	int geo_index = -1;
 	for (unsigned int i = 0; i < data->geometry.size(); i++) {
-		if (data->geometry[i].path._Equal("../UtlopTests/src/obj/cube.obj")) {
+		if (data->geometry[i].path._Equal("../UtlopTests/src/obj/triangle.obj")) {
 			geo_index = i;
 		}
 	}
@@ -139,7 +144,7 @@ void Utlop::RenderSystem::initGeo(Entity& entity, RenderCtx* data)
 	}
 	else {
 		Geometry geo;
-		loadOBJ("../UtlopTests/src/obj/cube.obj", geo);
+		loadOBJ("../UtlopTests/src/obj/triangle.obj", geo);
 		data->geometry.push_back(geo);
 		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.push_back(data->geometry.size() - 1);
 	}
@@ -187,14 +192,14 @@ void Utlop::RenderSystem::initGeo(Entity& entity, RenderCtx* data)
 
 }
 
-bool Utlop::RenderSystem::initMat(Entity& entity, RenderCtx* data)
+bool Utlop::RenderSystem::initMat(Entity& entity, RenderCtx* data, const char* path)
 {
 	stbi_set_flip_vertically_on_load(true);
 	unsigned char* text_buffer_;
 
 	Material tmpText;
 	//Debug:
-	tmpText.path_ = "../UtlopTests/src/textures/texture.jpg";
+	tmpText.path_ = path;
 
 	for (unsigned int i = 0; i < data->material.size(); i++) {
 		if (data->material[i].path_._Equal(tmpText.path_)) {
