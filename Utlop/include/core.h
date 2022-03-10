@@ -3,11 +3,12 @@
 #pragma once
 #include "window.h"
 
-#include "includes.h"
 #include <list>
 #include <vector>
-#include "TaskScheduler.h"
-#include "gameScene.h"
+#include "data.h"
+#include "imgui.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
 
 namespace Utlop
 {
@@ -20,16 +21,33 @@ namespace Utlop
 
       bool init(float fps);
       void start();
-      void stop();
 
       Utlop::Window* getWindow();
-      enki::TaskScheduler* getScheduler();
-			Utlop::Camera* getCamera();
 			float getDeltaTime();
 
+			void AddEntity(bool camera);
+			void AddComponent(Entity& entity, Utlop::ComponentID id);
+			void AddCubeMap();
+
+			void MoveCamera();
+
+			void InitComponents();
+
+			void InitSystems();
+			void ExecSystems();
 
       static Core* Instance();
+			RenderCtx* getData();
+			float getCameraSpeed();
 			
+
+			void ImGUI();
+			void InitImGUI();
+			void DestroyImGUI();
+
+			 
+			bool polygon_;
+			vec3 bg_color_;
     protected:
 
     private:
@@ -38,9 +56,11 @@ namespace Utlop
       float _fps;
       long _frame_time_millis;
 			float deltaTime_;
-      enki::TaskScheduler _scheduler;
-			std::unique_ptr<Camera> camera_;
-  };
+			float camera_speed_;
+
+
+			RenderCtx* data;
+	};
 
 
 }

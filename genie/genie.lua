@@ -94,7 +94,8 @@ solution("Utlop")
     path.join(UTLOP_DIR, "./deps/glm/include/"),
     path.join(UTLOP_DIR, "./deps/enkiTS/src/"),
     path.join(UTLOP_DIR, "./deps/math/"),
-    path.join(UTLOP_DIR, "./deps/imgui/")
+    path.join(UTLOP_DIR, "./deps/imgui/"),
+    path.join(UTLOP_DIR, "./deps/imgui/backends/")
   }
 
   --Here only the files that we want compile.

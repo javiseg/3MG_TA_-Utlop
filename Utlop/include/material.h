@@ -1,22 +1,20 @@
-#ifndef UTLOP_MATERIAL
-#define UTLOP_MATERIAL 1
+#pragma once
+#include "glad/glad.h"
+#include <string>
 
-#include <glad\glad.h>
-#include <GLFW\glfw3.h>
-#include "glm/glm.hpp"
-#include "glm/glm.hpp"
-
-namespace Utlop
-{
-	using namespace glm;
+namespace Utlop {
 
 	struct Material {
-		vec3 ambient;
-		vec3 diffuse;
-		vec3 specular;
-		float shininess;
+		GLuint diff_ = 999;
+		GLuint spec_ = 999;
+		GLuint alb_ = 999;
+
+		//Debug purposes:
+		GLint width_;
+		GLint height_;
+		GLint bpp_;
+
+		string path_;
 	};
 
 }
-
-#endif // !UTLOP_MATERIAL
