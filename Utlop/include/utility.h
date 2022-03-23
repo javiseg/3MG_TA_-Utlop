@@ -103,7 +103,7 @@ void loadVertexShader(const char* filename, Utlop::RenderComponent& rc)
 
 	glAttachShader(rc.shaderID_, _vertex_shader);
 
-	//glDeleteShader(_vertex_shader);
+	glDeleteShader(_vertex_shader);
 }
 
 void loadFragmentShader(const char* filename, Utlop::RenderComponent& rc)
@@ -119,7 +119,7 @@ void loadFragmentShader(const char* filename, Utlop::RenderComponent& rc)
 
 	glAttachShader(rc.shaderID_, _fragment_shader);
 
-	//glDeleteShader(_fragment_shader);
+	glDeleteShader(_fragment_shader);
 }
 
 void checkCompileErrors(unsigned int shader, std::string type)

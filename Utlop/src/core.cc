@@ -13,6 +13,7 @@
 unsigned int loadCubemap(std::vector<std::string> faces);
 void loadVertexShader(const char* filename, Utlop::RenderComponent& rc);
 void loadFragmentShader(const char* filename, Utlop::RenderComponent& rc);
+void setMat4fv(GLuint shader_id, glm::mat4 value, const GLchar* name, GLboolean transpose = GL_FALSE);
 
 namespace Utlop
 {
@@ -95,6 +96,7 @@ namespace Utlop
 
 			float lastFrame = (float)glfwGetTime();
 			InitImGUI();
+			AddCubeMap();
 
 			PreExecSystems();
 
@@ -111,10 +113,24 @@ namespace Utlop
 
 				glfwPollEvents();
 
-				ImGUI();
+				/*glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+				glUseProgram(data->cubemap.shaderID_);
+				glm::mat4 view = glm::mat4(glm::mat3(data->cameracmp[0].view_)); // remove translation from the view matrix
+				setMat4fv(data->cubemap.shaderID_, view, "ViewMatrix");
+				setMat4fv(data->cubemap.shaderID_, data->cameracmp[0].projection_, "ProjectionMatrix");
+				// skybox cube
+				glBindVertexArray(data->cubemap.vao_);
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_CUBE_MAP, data->cubemap.material_idx[0]);
+				glDrawArrays(GL_TRIANGLES, 0, 36);
+				glBindVertexArray(0);
+				glDepthFunc(GL_LESS); // set depth function back to default
+				*/
 
 				ExecSystems();
 				MoveCamera();
+
+				ImGUI();
 
         glfwSwapBuffers(_window._window);
         glfwPollEvents();
@@ -194,40 +210,6 @@ namespace Utlop
 	
 	}
 
-
-	/*
-
-	int offset = 0;
-	if (newEntity.componentsID_ & 1) {
-		newEntity.cmp_indx_.push_back(data->localtrcmp.size() - 1);
-		offset++;
-	}
-	else {
-		newEntity.cmp_indx_.push_back(-1);
-	}
-	if (newEntity.componentsID_ & 2) {
-		newEntity.cmp_indx_.push_back(data->worldtrcmp.size() - 1);
-		offset++;
-	}
-	else {
-		newEntity.cmp_indx_.push_back(-1);
-	}
-	if (newEntity.componentsID_ & 4) {
-		newEntity.cmp_indx_.push_back(data->cameracmp.size() - 1);
-		offset++;
-	}
-	else {
-		newEntity.cmp_indx_.push_back(-1);
-	}
-	if (newEntity.componentsID_ & 8) {
-		newEntity.cmp_indx_.push_back(data->rendercmp.size() - 1);
-		offset++;
-	}
-	else {
-		newEntity.cmp_indx_.push_back(-1);
-	}
-	}*/
-
 	void Core::AddCubeMap()
 	{
 		vector<std::string> faces
@@ -239,14 +221,69 @@ namespace Utlop
 				"../UtlopTests/src/textures/cubemap/front.jpg",
 				"../UtlopTests/src/textures/cubemap/back.jpg"
 		};
-		data->cubemap.material_idx.push_back(loadCubemap(faces));
 
 		data->cubemap.shaderID_ = glCreateProgram();
+		data->cubemap.material_idx.push_back(loadCubemap(faces));
+
+		
 
 		loadVertexShader("../UtlopTests/src/shaders/vs.glsl", data->cubemap);
 		loadFragmentShader("../UtlopTests/src/shaders/fs_cubemap.glsl", data->cubemap);
 
 		glLinkProgram(data->cubemap.shaderID_);
+		float skyboxVertices[] = {
+			// positions          
+			-1.0f,  1.0f, -1.0f,
+			-1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+
+			-1.0f, -1.0f,  1.0f,
+			-1.0f, -1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f,  1.0f,
+			-1.0f, -1.0f,  1.0f,
+
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+
+			-1.0f, -1.0f,  1.0f,
+			-1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f, -1.0f,  1.0f,
+			-1.0f, -1.0f,  1.0f,
+
+			-1.0f,  1.0f, -1.0f,
+			 1.0f,  1.0f, -1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			-1.0f,  1.0f,  1.0f,
+			-1.0f,  1.0f, -1.0f,
+
+			-1.0f, -1.0f, -1.0f,
+			-1.0f, -1.0f,  1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			-1.0f, -1.0f,  1.0f,
+			 1.0f, -1.0f,  1.0f
+		};
+
+		glGenVertexArrays(1, &data->cubemap.vao_);
+		glGenBuffers(1, &data->cubemap.vbo_);
+		glBindVertexArray(data->cubemap.vao_);
+		glBindBuffer(GL_ARRAY_BUFFER, data->cubemap.vbo_);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
 
 	}
 
