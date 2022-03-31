@@ -4,9 +4,13 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
+#include "bitmap.h"
+#include "utility_cubemap.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 
 float normalized(float value, float max) {
 	return  (value / max);
@@ -153,34 +157,35 @@ void setMat4fv(GLuint shader_id, glm::mat4 value, const GLchar* name, GLboolean 
 	glUseProgram(0);
 }
 
-unsigned int loadCubemap(std::vector<std::string> faces)
+void loadCubemap(const char* path, GLuint& texture)
 {
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+	int w, h, comp;
+	const float* img = stbi_loadf(path, &w, &h, &comp, 3);
+	Utlop::Bitmap in(w, h, comp, Utlop::eBitmapFormat_Float, img);
+	Utlop::Bitmap out = convertEquirectangularMapToVerticalCross(in);
+	stbi_image_free((void*)img);
 
-	int width, height, nrChannels;
-	for (unsigned int i = 0; i < faces.size(); i++)
+	stbi_write_hdr("screenshot.hdr", out.w_, out.h_, out.comp_, (const float*)out.data_.data());
+
+	Utlop::Bitmap cubemap = convertVerticalCrossToCubeMapFaces(out);
+
+	glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &texture);
+	glTextureParameteri(texture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTextureParameteri(texture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTextureParameteri(texture, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTextureParameteri(texture, GL_TEXTURE_BASE_LEVEL, 0);
+	glTextureParameteri(texture, GL_TEXTURE_MAX_LEVEL, 0);
+	glTextureParameteri(texture, GL_TEXTURE_MAX_LEVEL, 0);
+	glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTextureStorage2D(texture, 1, GL_RGB32F, cubemap.w_, cubemap.h_);
+	const uint8_t* data = cubemap.data_.data();
+
+	for (unsigned i = 0; i != 6; ++i)
 	{
-		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
-		if (data)
-		{
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
-			);
-			stbi_image_free(data);
-		}
-		else
-		{
-			std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
-			stbi_image_free(data);
-		}
+		glTextureSubImage3D(texture, 0, 0, 0, i, cubemap.w_, cubemap.h_, 1, GL_RGB, GL_FLOAT, data);
+		data += cubemap.w_ * cubemap.h_ * cubemap.comp_ * Utlop::Bitmap::getBytesPerComponent(cubemap.fmt_);
 	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glBindTextures(1, 1, &texture);
 
-	return textureID;
 }

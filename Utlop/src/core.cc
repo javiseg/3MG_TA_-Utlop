@@ -10,7 +10,7 @@
 #include "system.h"
 #include <time.h>
 
-unsigned int loadCubemap(std::vector<std::string> faces);
+void loadCubemap(const char* path, GLuint& texture);
 void loadVertexShader(const char* filename, Utlop::RenderComponent& rc);
 void loadFragmentShader(const char* filename, Utlop::RenderComponent& rc);
 void setMat4fv(GLuint shader_id, glm::mat4 value, const GLchar* name, GLboolean transpose = GL_FALSE);
@@ -164,11 +164,9 @@ namespace Utlop
 		Entity newEntity;
 
 		newEntity.componentsID_ = 0;
-		newEntity.cmp_indx_.push_back(-1);
-		newEntity.cmp_indx_.push_back(-1);
-		newEntity.cmp_indx_.push_back(-1);
-		newEntity.cmp_indx_.push_back(-1);
-		
+		for (int i = 0; i < kMaxComponents; i++) {
+			newEntity.cmp_indx_[i] = -1;
+		}		
 
 		data->entities.push_back(make_shared<Entity>(newEntity));
 		return data->entities.size() - 1;
@@ -222,8 +220,12 @@ namespace Utlop
 				"../UtlopTests/src/textures/cubemap/back.jpg"
 		};
 
+		const char* path = "../UtlopTests/src/textures/cubemap/plaza/piazza.hdr";
+
 		data->cubemap.shaderID_ = glCreateProgram();
-		data->cubemap.material_idx.push_back(loadCubemap(faces));
+		GLuint textureID;
+		//loadCubemap(path, textureID);
+		data->cubemap.material_idx.push_back(textureID);
 
 		
 
