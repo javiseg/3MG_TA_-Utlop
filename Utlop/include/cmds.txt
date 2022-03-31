@@ -1,0 +1,58 @@
+
+//Commands.h
+struct BaseCmd {
+  virtual void exec(RenderCtx* ctx);
+};
+
+struct WindowClearCmd : public BaseCmd {
+  virtual void exec(RenderCtx* ctx) override;
+  float r, g, b, a;
+  void (*tu_callback)(float r, g, b, a);
+};
+
+class DisplayList() {
+ public:
+  Ctr();
+  Dtr();
+  CopyCtr(); MoveCtr(); operator=()...
+
+  ...
+  void addWindowClearCmd(...);
+  ...
+  void exec(...);
+
+  std::list<std::unique_ptr<BaseCmd> > cmds;
+}
+
+
+//Commands.cc
+void WindowClearFn(...) {
+  glClear(...);
+  glClearColor(...);
+}
+
+void WindowClearCmd::exec(RenderCtx* ctx) {
+  tu_callback(r, g, b, a); //Le pasas los datos que necesita, te los habías guardado antes en el comando.
+}
+
+void DL::exec(...) {
+  for (0 ... n_cmds) {
+    cmd.exec(...);
+  }
+}
+
+void DL::addWindowClearCmd(...) {
+  WindowClearCmd cmd = make_unique...;
+  cmd.r = r;
+  ...
+  cmd.tu_callback = WindowClearFn;
+}
+
+
+//Core -> render thread
+while(engine.is_opened) {
+  
+  ...
+  dl.exec(GPUState* ...);
+  ...
+}
