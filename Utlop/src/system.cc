@@ -135,7 +135,7 @@ void Utlop::RenderSystem::initGeo(Entity& entity, RenderCtx* data)
 {
 	int geo_index = -1;
 	for (unsigned int i = 0; i < data->geometry.size(); i++) {
-		if (data->geometry[i].path._Equal("../UtlopTests/src/obj/cube.obj")) {
+		if (data->geometry[i].path._Equal("../UtlopTests/src/obj/humanoid.obj")) {
 			geo_index = i;
 		}
 	}
@@ -144,7 +144,7 @@ void Utlop::RenderSystem::initGeo(Entity& entity, RenderCtx* data)
 	}
 	else {
 		Geometry geo;
-		loadOBJ("../UtlopTests/src/obj/cube.obj", geo);
+		loadOBJ("../UtlopTests/src/obj/humanoid.obj", geo);
 		data->geometry.push_back(geo);
 		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.push_back(data->geometry.size() - 1);
 	}

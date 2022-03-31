@@ -17,6 +17,13 @@ void setMat4fv(GLuint shader_id, glm::mat4 value, const GLchar* name, GLboolean 
 
 namespace Utlop
 {
+	struct PerFrameData
+	{
+		mat4 model;
+		mat4 mvp;
+		vec4 cameraPos;
+	};
+
   Core* Core::_instance = nullptr;
 
   Core::Core()
@@ -96,7 +103,8 @@ namespace Utlop
 
 			float lastFrame = (float)glfwGetTime();
 			InitImGUI();
-			AddCubeMap();
+			
+			//AddCubeMap();
 
 			PreExecSystems();
 
@@ -113,24 +121,30 @@ namespace Utlop
 
 				glfwPollEvents();
 
-				/*glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-				glUseProgram(data->cubemap.shaderID_);
-				glm::mat4 view = glm::mat4(glm::mat3(data->cameracmp[0].view_)); // remove translation from the view matrix
-				setMat4fv(data->cubemap.shaderID_, view, "ViewMatrix");
-				setMat4fv(data->cubemap.shaderID_, data->cameracmp[0].projection_, "ProjectionMatrix");
-				// skybox cube
-				glBindVertexArray(data->cubemap.vao_);
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_CUBE_MAP, data->cubemap.material_idx[0]);
-				glDrawArrays(GL_TRIANGLES, 0, 36);
-				glBindVertexArray(0);
-				glDepthFunc(GL_LESS); // set depth function back to default
-				*/
+			
+				
 
 				ExecSystems();
 				MoveCamera();
 
+				/*const GLsizeiptr kUniformBufferSize = sizeof(PerFrameData);
+				glUseProgram(data->cubemap.shaderID_);
+				GLuint perFrameDataBuffer;
+				glCreateBuffers(1, &perFrameDataBuffer);
+				glNamedBufferStorage(perFrameDataBuffer, kUniformBufferSize, nullptr, GL_DYNAMIC_STORAGE_BIT);
+				glBindBufferRange(GL_UNIFORM_BUFFER, 0, perFrameDataBuffer, 0, kUniformBufferSize);
+
+				const mat4 m = glm::scale(mat4(1.0f), vec3(2.0f));
+				PerFrameData perFrameData = { perFrameData.model = m, perFrameData.mvp = data->cameracmp[0].view_ * data->cameracmp[0].projection_ * m, perFrameData.cameraPos = vec4(0.0f) };
+				glNamedBufferSubData(perFrameDataBuffer, 0, kUniformBufferSize, &perFrameData);
+				glUseProgram(data->cubemap.shaderID_);
+				glDrawArrays(GL_TRIANGLES, 0, 36);*/
+				
+				
+				
 				ImGUI();
+
+
 
         glfwSwapBuffers(_window._window);
         glfwPollEvents();
@@ -223,70 +237,64 @@ namespace Utlop
 		const char* path = "../UtlopTests/src/textures/cubemap/plaza/piazza.hdr";
 
 		data->cubemap.shaderID_ = glCreateProgram();
+		loadVertexShader("../UtlopTests/src/shaders/vs_cubemap.glsl", data->cubemap);
+		loadFragmentShader("../UtlopTests/src/shaders/fs_cubemap.glsl", data->cubemap);
+
 		GLuint textureID;
-		//loadCubemap(path, textureID);
+		loadCubemap(path, textureID);
 		data->cubemap.material_idx.push_back(textureID);
 
 		
 
-		loadVertexShader("../UtlopTests/src/shaders/vs.glsl", data->cubemap);
-		loadFragmentShader("../UtlopTests/src/shaders/fs_cubemap.glsl", data->cubemap);
+
 
 		glLinkProgram(data->cubemap.shaderID_);
 		float skyboxVertices[] = {
 			// positions          
-			-1.0f,  1.0f, -1.0f,
-			-1.0f, -1.0f, -1.0f,
-			 1.0f, -1.0f, -1.0f,
-			 1.0f, -1.0f, -1.0f,
-			 1.0f,  1.0f, -1.0f,
-			-1.0f,  1.0f, -1.0f,
+			-0.5f,0.5f,-0.5f,
+								-0.5f,-0.5f,-0.5f,
+								0.5f,-0.5f,-0.5f,
+								0.5f,0.5f,-0.5f,
 
-			-1.0f, -1.0f,  1.0f,
-			-1.0f, -1.0f, -1.0f,
-			-1.0f,  1.0f, -1.0f,
-			-1.0f,  1.0f, -1.0f,
-			-1.0f,  1.0f,  1.0f,
-			-1.0f, -1.0f,  1.0f,
+								-0.5f,0.5f,0.5f,
+								-0.5f,-0.5f,0.5f,
+								0.5f,-0.5f,0.5f,
+								0.5f,0.5f,0.5f,
 
-			 1.0f, -1.0f, -1.0f,
-			 1.0f, -1.0f,  1.0f,
-			 1.0f,  1.0f,  1.0f,
-			 1.0f,  1.0f,  1.0f,
-			 1.0f,  1.0f, -1.0f,
-			 1.0f, -1.0f, -1.0f,
+								0.5f,0.5f,-0.5f,
+								0.5f,-0.5f,-0.5f,
+								0.5f,-0.5f,0.5f,
+								0.5f,0.5f,0.5f,
 
-			-1.0f, -1.0f,  1.0f,
-			-1.0f,  1.0f,  1.0f,
-			 1.0f,  1.0f,  1.0f,
-			 1.0f,  1.0f,  1.0f,
-			 1.0f, -1.0f,  1.0f,
-			-1.0f, -1.0f,  1.0f,
+								-0.5f,0.5f,-0.5f,
+								-0.5f,-0.5f,-0.5f,
+								-0.5f,-0.5f,0.5f,
+								-0.5f,0.5f,0.5f,
 
-			-1.0f,  1.0f, -1.0f,
-			 1.0f,  1.0f, -1.0f,
-			 1.0f,  1.0f,  1.0f,
-			 1.0f,  1.0f,  1.0f,
-			-1.0f,  1.0f,  1.0f,
-			-1.0f,  1.0f, -1.0f,
+								-0.5f,0.5f,0.5f,
+								-0.5f,0.5f,-0.5f,
+								0.5f,0.5f,-0.5f,
+								0.5f,0.5f,0.5f,
 
-			-1.0f, -1.0f, -1.0f,
-			-1.0f, -1.0f,  1.0f,
-			 1.0f, -1.0f, -1.0f,
-			 1.0f, -1.0f, -1.0f,
-			-1.0f, -1.0f,  1.0f,
-			 1.0f, -1.0f,  1.0f
+								-0.5f,-0.5f,0.5f,
+								-0.5f,-0.5f,-0.5f,
+								0.5f,-0.5f,-0.5f,
+								0.5f,-0.5f,0.5f
 		};
+		std::vector<int> dest;
+		Geometry cubeGeo;
+		cubeGeo.vertices_.insert(cubeGeo.vertices_.begin(),std::begin(skyboxVertices), std::end(skyboxVertices));
+		data->geometry.push_back(cubeGeo);
+		data->cubemap.geo_idx.push_back(data->geometry.size() - 1);
 
 		glGenVertexArrays(1, &data->cubemap.vao_);
 		glGenBuffers(1, &data->cubemap.vbo_);
 		glBindVertexArray(data->cubemap.vao_);
 		glBindBuffer(GL_ARRAY_BUFFER, data->cubemap.vbo_);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
-		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-
+		glEnableVertexAttribArray(0);
+		
 	}
 
 
