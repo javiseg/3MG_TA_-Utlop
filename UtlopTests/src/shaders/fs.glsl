@@ -1,11 +1,7 @@
 #version 460 core
-layout(location = 0) out vec4 color;
-in vec3 out_color;
-in vec2 text_coords;
-
-uniform sampler2D ourTexture;
+varying vec4 fragmentColor;
 
 void main()
 {
-	color = vec4(out_color, 1.0f);
+    gl_FragColor = fragmentColor;
 }

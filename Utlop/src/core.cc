@@ -8,6 +8,7 @@
 #include "..\include\core.h"
 #include "imguiStruct.h"
 #include "system.h"
+#include "tiny_obj_loader.h"
 #include <time.h>
 
 void loadCubemap(const char* path, GLuint& texture);
@@ -31,6 +32,7 @@ namespace Utlop
     _fps = 0.0f;
     _frame_time_millis = 0;
 		data = new RenderCtx();
+		displayList = new DisplayList();
     _instance = this;
 
   }
@@ -38,6 +40,7 @@ namespace Utlop
   Core::~Core()
   {
 		delete data;
+		delete displayList;
 		DestroyImGUI();
 		glfwTerminate();
   }
@@ -62,12 +65,12 @@ namespace Utlop
 		AddComponent(*data->entities[0], kLocalTRComp);
 		//AddComponent(*data->entities[0], kRenderComp);
 		
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
 				int entityIdx = AddEntity();
 				AddComponent(*data->entities[entityIdx], kLocalTRComp);
 				AddComponent(*data->entities[entityIdx], kRenderComp);
-				data->localtrcmp[data->entities[entityIdx]->cmp_indx_[kLocalTRCompPos]].position -= vec3(3.0f * i, 3.0f * j, (rand()%10) - 5.0f);
+				data->localtrcmp[data->entities[entityIdx]->cmp_indx_[kLocalTRCompPos]].position -= vec3(30.0f * i, 30.0f * j, (rand()%10) - 5.0f);
 			}
 		}
 		
@@ -103,8 +106,9 @@ namespace Utlop
 
 			float lastFrame = (float)glfwGetTime();
 			InitImGUI();
+
 			
-			//AddCubeMap();
+			
 
 			PreExecSystems();
 
@@ -116,6 +120,7 @@ namespace Utlop
           glfwSetWindowShouldClose(_window._window, GL_TRUE);
 
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				
 				deltaTime_ = (float)glfwGetTime() - lastFrame;
 				lastFrame = (float)glfwGetTime();
 
@@ -139,8 +144,6 @@ namespace Utlop
 				glNamedBufferSubData(perFrameDataBuffer, 0, kUniformBufferSize, &perFrameData);
 				glUseProgram(data->cubemap.shaderID_);
 				glDrawArrays(GL_TRIANGLES, 0, 36);*/
-				
-				
 				
 				ImGUI();
 

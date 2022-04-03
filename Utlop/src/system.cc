@@ -90,14 +90,15 @@ void Utlop::CameraSystem::update(Entity& entity, RenderCtx* data)
 
 void Utlop::RenderSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
+	if (data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_ == 999)
+		initShader(entity, data);
 	if (data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.empty())
-		initGeo(entity, data);
+		initGeo(entity, data, "../UtlopTests/src/obj/robot.obj");
 	if (data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx.empty()) {
 		initMat(entity, data, "../UtlopTests/src/textures/texture.jpg");
 		initMat(entity, data, "../UtlopTests/src/textures/default.png");
 	}
-	if (data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_ == 999)
-		initShader(entity, data);
+
 
 	setMat4fv(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
 		data->cameracmp[0].projection_, "ProjectionMatrix");
@@ -131,11 +132,11 @@ void Utlop::RenderSystem::UpdateUniforms(GLuint shaderID)
 	
 }
 
-void Utlop::RenderSystem::initGeo(Entity& entity, RenderCtx* data)
+void Utlop::RenderSystem::initGeo(Entity& entity, RenderCtx* data, const char* path)
 {
 	int geo_index = -1;
 	for (unsigned int i = 0; i < data->geometry.size(); i++) {
-		if (data->geometry[i].path._Equal("../UtlopTests/src/obj/humanoid.obj")) {
+		if (data->geometry[i].path._Equal(path)) {
 			geo_index = i;
 		}
 	}
@@ -144,26 +145,30 @@ void Utlop::RenderSystem::initGeo(Entity& entity, RenderCtx* data)
 	}
 	else {
 		Geometry geo;
-		loadOBJ("../UtlopTests/src/obj/humanoid.obj", geo);
+		loadOBJ2(path, geo);
 		data->geometry.push_back(geo);
 		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.push_back(data->geometry.size() - 1);
 	}
+
+	glUseProgram(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_);
+
 	glCreateVertexArrays(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_);
+	
 	glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_);
 	glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_);
 
 	glNamedBufferData(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_, 
 		data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].vertices_.size() * sizeof(float),
-		&data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].vertices_[0], GL_STATIC_DRAW);
+		data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].vertices_.data(), GL_STATIC_DRAW);
 
 
 	glNamedBufferData(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_, 
-		data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].verticesIndices_.size() * sizeof(GLuint),
-		&data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].verticesIndices_[0], GL_STATIC_DRAW);
+		data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].verticesIndices_.size() * sizeof(uint32_t),
+		data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].verticesIndices_.data(), GL_STATIC_DRAW);
 
 	glEnableVertexArrayAttrib(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 0);
 	// Back here when applying normals etc:
-	glVertexArrayAttribFormat(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 0, kRenderCompPos, GL_FLOAT, GL_FALSE, 0);
+	glVertexArrayAttribFormat(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 0, 3, GL_FLOAT, GL_FALSE, 0);
 	//
 
 	glVertexArrayVertexBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 0, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_, 0, 3 * sizeof(GLuint));
@@ -171,25 +176,29 @@ void Utlop::RenderSystem::initGeo(Entity& entity, RenderCtx* data)
 	glVertexArrayElementBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_);
 
 
-	glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tbo_);
-	glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].etbo_);
+
 
 	if (data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].texCoords_.size() > 0) {
 
+		GLuint texlocation = 1;
+		glCreateVertexArrays(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_);
+		glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tbo_);
+		glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].etbo_);
+
 		glNamedBufferData(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tbo_, data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].texCoords_.size() * sizeof(float), 
-			&data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].texCoords_[0], GL_STATIC_DRAW);
-		glNamedBufferData(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].etbo_, data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].texCoordsIndices_.size() * sizeof(GLuint), 
-			&data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].texCoordsIndices_[0], GL_STATIC_DRAW);
+			data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].texCoords_.data(), GL_STATIC_DRAW);
+		glNamedBufferData(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].etbo_, data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].texCoordsIndices_.size() * sizeof(uint32_t),
+			data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].texCoordsIndices_.data(), GL_STATIC_DRAW);
 
-		glEnableVertexArrayAttrib(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 2);
-		glVertexArrayAttribBinding(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 2, 0);
-		glVertexArrayAttribFormat(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 2, 2, GL_FLOAT, GL_FALSE, 0);
+		glEnableVertexArrayAttrib(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_, texlocation);
+		//glVertexArrayAttribBinding(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_, texlocation, 0);
+		glVertexArrayAttribFormat(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_, texlocation, 2, GL_FLOAT, GL_FALSE, 0);
 
-		glVertexArrayVertexBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 2, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tbo_, 0, 2 * sizeof(GLuint));
-		glVertexArrayElementBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].etbo_);
+		glVertexArrayVertexBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_, texlocation, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tbo_, 0, 2 * sizeof(GLuint));
+		glVertexArrayElementBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].etbo_);
 
 	}
-
+	glUseProgram(0);
 }
 
 bool Utlop::RenderSystem::initMat(Entity& entity, RenderCtx* data, const char* path)

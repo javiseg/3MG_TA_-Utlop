@@ -50,7 +50,7 @@ namespace Utlop {
 		void exec(Entity& entity, RenderCtx* data) override;
 		void UpdateUniforms(GLuint shaderID);
 
-		void initGeo(Entity& entity, RenderCtx* data);
+		void initGeo(Entity& entity, RenderCtx* data, const char* path);
 		bool initMat(Entity& entity, RenderCtx* data, const char* path);
 		void initShader(Entity& entity, RenderCtx* data);
 		

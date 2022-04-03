@@ -6,6 +6,7 @@
 #include <list>
 #include <vector>
 #include "data.h"
+#include "displaylist.h"
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
@@ -61,6 +62,7 @@ namespace Utlop
 
 
 			RenderCtx* data;
+			DisplayList* displayList;
 
 	};
 
