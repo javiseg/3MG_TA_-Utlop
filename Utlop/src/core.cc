@@ -9,6 +9,7 @@
 #include "imguiStruct.h"
 #include "system.h"
 #include "tiny_obj_loader.h"
+#include "px_sched.h"
 #include <time.h>
 
 void loadCubemap(const char* path, GLuint& texture);
@@ -83,10 +84,20 @@ namespace Utlop
     return glfwInit();
   }
 
+
   void Core::start()
   {
     if (_window.isValid())
     {
+			//// Thread
+
+			//px_sched::Scheduler scheduler;
+			//scheduler.init();
+			//px_sched::Sync schedulerReady;
+
+			
+
+
       glfwMakeContextCurrent(_window._window);
 
       if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))

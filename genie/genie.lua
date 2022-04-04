@@ -30,7 +30,8 @@ solution("Utlop")
     path.join(UTLOP_DIR, "./deps/enkiTS/src/"),
     path.join(UTLOP_DIR, "./deps/math/"),
     path.join(UTLOP_DIR, "./deps/imgui/"),
-    path.join(UTLOP_DIR, "./deps/imgui/backends/")
+    path.join(UTLOP_DIR, "./deps/imgui/backends/"),
+    path.join(UTLOP_DIR, "./deps/sched/")
   }
 
   --Here only the files that we want compile.
@@ -95,7 +96,8 @@ solution("Utlop")
     path.join(UTLOP_DIR, "./deps/enkiTS/src/"),
     path.join(UTLOP_DIR, "./deps/math/"),
     path.join(UTLOP_DIR, "./deps/imgui/"),
-    path.join(UTLOP_DIR, "./deps/imgui/backends/")
+    path.join(UTLOP_DIR, "./deps/imgui/backends/"),
+    path.join(UTLOP_DIR, "./deps/sched/")
   }
 
   --Here only the files that we want compile.
