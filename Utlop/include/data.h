@@ -25,6 +25,9 @@ namespace Utlop {
 		vector<Geometry> geometry;
 		vector<Material> material;
 
+		unsigned int vertexShader;
+		unsigned int fragmentShader;
+
 		RenderComponent cubemap;
 	};
 

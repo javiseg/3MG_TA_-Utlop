@@ -27,6 +27,7 @@ namespace Utlop
 			float getDeltaTime();
 
 			int AddEntity();
+			void createEntities(Core* cr);
 			void AddComponent(Entity& entity, Utlop::ComponentID id);
 			void AddCubeMap();
 
@@ -37,6 +38,7 @@ namespace Utlop
 			void InitSystems();
 			void PreExecSystems();
 			void ExecSystems();
+			void ExecSystems2();
 
       static Core* Instance();
 			RenderCtx* getData();
@@ -59,7 +61,7 @@ namespace Utlop
       long _frame_time_millis;
 			float deltaTime_;
 			float camera_speed_;
-
+			uint8 preExecDone_;
 
 			RenderCtx* data;
 			DisplayList* displayList;

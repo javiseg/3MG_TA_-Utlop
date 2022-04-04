@@ -60,6 +60,7 @@ solution("Utlop")
     path.join(UTLOP_DIR, "./deps/imgui/*.cpp"),
     path.join(UTLOP_DIR, "./deps/imgui/backends/imgui_impl_glfw.cpp"),
     path.join(UTLOP_DIR, "./deps/imgui/backends/imgui_impl_opengl3.cpp"),
+    path.join(UTLOP_DIR, "./deps/sched/px_sched.h")
 
   }
 

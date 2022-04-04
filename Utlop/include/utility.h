@@ -7,6 +7,7 @@
 #include "bitmap.h"
 #include "utility_cubemap.h"
 #include "tiny_obj_loader.h"
+#include "data.h"
 #include <unordered_map>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -90,36 +91,29 @@ bool loadOBJ2(const char* path, Utlop::Geometry& geo) {
 	return true;
 }
 
-void loadVertexShader(const char* filename, Utlop::RenderComponent& rc)
+void loadVertexShader(const char* filename, Utlop::RenderCtx* data)
 {
 	std::ifstream inputVertexShader(filename);
 	std::string vertexShader((std::istreambuf_iterator<char>(inputVertexShader)), (std::istreambuf_iterator<char>()));
 	const char* vertexShaderString = vertexShader.c_str();
 
-	unsigned int _vertex_shader;
-	_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(_vertex_shader, 1, &vertexShaderString, NULL);
-	glCompileShader(_vertex_shader);
 
-	glAttachShader(rc.shaderID_, _vertex_shader);
+	data->vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(data->vertexShader, 1, &vertexShaderString, NULL);
+	glCompileShader(data->vertexShader);
 
-	glDeleteShader(_vertex_shader);
 }
 
-void loadFragmentShader(const char* filename, Utlop::RenderComponent& rc)
+void loadFragmentShader(const char* filename, Utlop::RenderCtx* data)
 {
 	std::ifstream inputFragmentShader(filename);
 	std::string fragmentShader((std::istreambuf_iterator<char>(inputFragmentShader)), (std::istreambuf_iterator<char>()));
 	const char* fragmentShaderString = fragmentShader.c_str();
 
-	unsigned int _fragment_shader;
-	_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(_fragment_shader, 1, &fragmentShaderString, NULL);
-	glCompileShader(_fragment_shader);
+	data->fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(data->fragmentShader, 1, &fragmentShaderString, NULL);
+	glCompileShader(data->fragmentShader);
 
-	glAttachShader(rc.shaderID_, _fragment_shader);
-
-	glDeleteShader(_fragment_shader);
 }
 
 void checkCompileErrors(unsigned int shader, std::string type)

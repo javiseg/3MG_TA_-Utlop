@@ -9,12 +9,13 @@
 #include "imguiStruct.h"
 #include "system.h"
 #include "tiny_obj_loader.h"
-#include "px_sched.h"
 #include <time.h>
+#define PX_SCHED_IMPLEMENTATION 1
+#include "px_sched.h"
 
 void loadCubemap(const char* path, GLuint& texture);
-void loadVertexShader(const char* filename, Utlop::RenderComponent& rc);
-void loadFragmentShader(const char* filename, Utlop::RenderComponent& rc);
+void loadVertexShader(const char* filename, Utlop::RenderCtx* data);
+void loadFragmentShader(const char* filename, Utlop::RenderCtx* data);
 void setMat4fv(GLuint shader_id, glm::mat4 value, const GLchar* name, GLboolean transpose = GL_FALSE);
 
 namespace Utlop
@@ -46,11 +47,21 @@ namespace Utlop
 		glfwTerminate();
   }
 
+	void Utlop::Core::createEntities(Core* cr) {
+		for (int i = 0; i < 100; i++) {
+			for (int j = 0; j < 100; j++) {
+				int entityIdx = cr->AddEntity();
+				cr->AddComponent(*cr->getData()->entities[entityIdx], kLocalTRComp);
+				cr->AddComponent(*cr->getData()->entities[entityIdx], kRenderComp);
+				cr->getData()->localtrcmp[cr->getData()->entities[entityIdx]->cmp_indx_[kLocalTRCompPos]].position -= vec3(30.0f * i, 30.0f * j, (rand() % 10) - 5.0f);
+			}
+		}
+	}
   bool Core::init(float fps)
   {
     _fps = fps;
     _frame_time_millis = 1000 / (long)_fps;
-
+		preExecDone_ = 0;
 		//camera_.alloc();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -60,21 +71,32 @@ namespace Utlop
 		InitSystems();
 		InitComponents();
 
+		
+
 		//Debug:
 		AddEntity();
 		AddComponent(*data->entities[0], kCameraComp);
 		AddComponent(*data->entities[0], kLocalTRComp);
+		data->localtrcmp[data->entities[0]->cmp_indx_[kCameraCompPos]].position = vec3(0.0f, 0.0f, 55.0f);
 		//AddComponent(*data->entities[0], kRenderComp);
 		
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
-				int entityIdx = AddEntity();
-				AddComponent(*data->entities[entityIdx], kLocalTRComp);
-				AddComponent(*data->entities[entityIdx], kRenderComp);
-				data->localtrcmp[data->entities[entityIdx]->cmp_indx_[kLocalTRCompPos]].position -= vec3(30.0f * i, 30.0f * j, (rand()%10) - 5.0f);
-			}
-		}
-		
+		px_sched::Scheduler scheduler1;
+		scheduler1.init();
+		px_sched::Sync schedulerReady1;
+
+
+		Core* cr = Instance();
+		auto job = [cr] {
+			cr->createEntities(cr);
+		};
+		printf("Antes\n");
+		//scheduler1.run(job, &schedulerReady1);
+		createEntities(cr);
+
+		printf("Waiting for tasks to finish...\n");
+		scheduler1.waitFor(schedulerReady1); // wait for all tasks to finish
+		printf("Waiting for tasks to finish...DONE \n");
+		printf("Despues\n");
 		//AddEntity();
 		
 		bg_color_ = vec4(0.0f);
@@ -91,11 +113,19 @@ namespace Utlop
     {
 			//// Thread
 
-			//px_sched::Scheduler scheduler;
-			//scheduler.init();
-			//px_sched::Sync schedulerReady;
-
+			px_sched::Scheduler scheduler;
+			scheduler.init();
+			px_sched::Sync schedulerReady;
 			
+			Core* cr = Instance();
+			auto preSched = [cr] {
+				//printf("Failed to execute\n");
+				cr->PreExecSystems();
+			};
+			auto sched = [cr] {
+				//printf("Failed to execute\n");
+				cr->ExecSystems();
+			};
 
 
       glfwMakeContextCurrent(_window._window);
@@ -104,8 +134,10 @@ namespace Utlop
       {
         printf("Failed to initialize GLAD");
       }
-
-
+			
+			//Add Vertex
+			loadVertexShader("../UtlopTests/src/shaders/vs.glsl", data);
+			loadFragmentShader("../UtlopTests/src/shaders/fs_texture.glsl", data);
 			/*glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       glClearColor(160.0f/255.0f, 160.0f / 255.0f, 160.0f / 255.0f, 1.0f);*/
 
@@ -122,9 +154,9 @@ namespace Utlop
 
 			float lastFrame = (float)glfwGetTime();
 			InitImGUI();
-						
-
+			
 			PreExecSystems();
+			//scheduler.run(preSched, &schedulerReady);
 
       while (!glfwWindowShouldClose(_window._window))
       {
@@ -143,7 +175,15 @@ namespace Utlop
 			
 				
 
-				ExecSystems();
+				//ExecSystems();
+				if (preExecDone_) {
+					scheduler.run(sched, &schedulerReady);
+					ExecSystems2();
+				}
+					
+				
+
+
 				MoveCamera();
 
 				/*const GLsizeiptr kUniformBufferSize = sizeof(PerFrameData);
@@ -254,8 +294,8 @@ namespace Utlop
 		const char* path = "../UtlopTests/src/textures/cubemap/plaza/piazza.hdr";
 
 		data->cubemap.shaderID_ = glCreateProgram();
-		loadVertexShader("../UtlopTests/src/shaders/vs_cubemap.glsl", data->cubemap);
-		loadFragmentShader("../UtlopTests/src/shaders/fs_cubemap.glsl", data->cubemap);
+		//loadVertexShader("../UtlopTests/src/shaders/vs_cubemap.glsl", data->cubemap);
+		//loadFragmentShader("../UtlopTests/src/shaders/fs_cubemap.glsl", data->cubemap);
 
 		GLuint textureID;
 		loadCubemap(path, textureID);
@@ -340,16 +380,26 @@ namespace Utlop
 					data->sys[i]->preExec(*data->entities[h], data);
 			}
 		}
+		preExecDone_ = 1;
 	}
 
 	void Core::ExecSystems()
 	{
-		for (unsigned int i = 0; i < data->sys.size(); i++) {
+		for (unsigned int i = 0; i < data->sys.size()-1; i++) {
 			for (unsigned int h = 0; h < data->entities.size(); h++) {
 				int out = data->entities[h]->componentsID_ & data->sys[i]->id_;
 				if (out == data->sys[i]->id_)
 					data->sys[i]->exec(*data->entities[h], data, displayList);
 			}
+		}
+	}
+
+	void Core::ExecSystems2()
+	{
+		for (unsigned int h = 0; h < data->entities.size(); h++) {
+			int out = data->entities[h]->componentsID_ & data->sys[kRenderCompPos]->id_;
+			if (out == data->sys[kRenderCompPos]->id_)
+				data->sys[kRenderCompPos]->exec(*data->entities[h], data, displayList);
 		}
 	}
 
