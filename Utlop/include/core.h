@@ -49,7 +49,7 @@ namespace Utlop
 
 			 
 			bool polygon_;
-			vec3 bg_color_;
+			vec4 bg_color_;
     protected:
 
     private:

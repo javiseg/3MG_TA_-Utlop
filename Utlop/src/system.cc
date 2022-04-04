@@ -3,12 +3,13 @@
 #include "geometry.h"
 #include "material.h"
 #include "utility.h"
+#include "displaylist.h"
 
 void Utlop::LocalTRSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
 }
 
-void Utlop::LocalTRSystem::exec(Entity& entity, RenderCtx* data)
+void Utlop::LocalTRSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 {
 	UpdateModel(entity, data);
 	//data->localtrcmp[entity.cmp_indx_[0]].position += vec3(1.0f, 0.0f, 0.0f);
@@ -45,7 +46,7 @@ void Utlop::CameraSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 	init(entity, data);
 }
 
-void Utlop::CameraSystem::exec(Entity& entity, RenderCtx* data)
+void Utlop::CameraSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 {
 	update(entity, data);
 }
@@ -104,7 +105,7 @@ void Utlop::RenderSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 		data->cameracmp[0].projection_, "ProjectionMatrix");
 }
 
-void Utlop::RenderSystem::exec(Entity& entity, RenderCtx* data)
+void Utlop::RenderSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 {
 	setMat4fv(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
 		data->localtrcmp[entity.cmp_indx_[0]].model,
@@ -113,15 +114,9 @@ void Utlop::RenderSystem::exec(Entity& entity, RenderCtx* data)
 	setMat4fv(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
 		data->cameracmp[0].view_, "ViewMatrix");
 
-	glUseProgram(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_);
-	
-	glBindTextureUnit(0, data->material[0].diff_);
-
-	glBindVertexArray(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_);
-
-	glDrawElements(GL_TRIANGLES, data->geometry[0].verticesIndices_.size(), GL_UNSIGNED_INT, 0);
-
-	glUseProgram(0);
+	addDrawCmd(dl, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
+		data->material[0].diff_, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_,
+		data->geometry[0].verticesIndices_.size());
 
 
 }

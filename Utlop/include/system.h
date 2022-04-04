@@ -3,14 +3,16 @@
 #include "entity.h"
 #include "component.h"
 
+
 namespace Utlop {
 	struct RenderCtx;
+	class DisplayList;
 
 	struct System {
 		virtual void preExec(Entity& entity, Utlop::RenderCtx* data) {
 
 		}
-		virtual void exec(Entity& entity, Utlop::RenderCtx* data) {
+		virtual void exec(Entity& entity, Utlop::RenderCtx* data, DisplayList* dl) {
 			
 		}
 		int id_ = -1;
@@ -22,7 +24,7 @@ namespace Utlop {
 		}
 		~LocalTRSystem() {}
 		void preExec(Entity& entity, Utlop::RenderCtx* data) override;
-		void exec(Entity& entity, RenderCtx* data) override;
+		void exec(Entity& entity, RenderCtx* data, DisplayList* dl) override;
 		void UpdateModel(Entity& entity, RenderCtx* data);
 	};
 	struct WorldTRSystem : public System{
@@ -37,7 +39,7 @@ namespace Utlop {
 		}
 		~CameraSystem() {}
 		void preExec(Entity& entity, Utlop::RenderCtx* data) override;
-		void exec(Entity& entity, RenderCtx* data) override;
+		void exec(Entity& entity, RenderCtx* data, DisplayList* dl) override;
 		void init(Entity& entity, RenderCtx* data);
 		void update(Entity& entity, RenderCtx* data);
 	};
@@ -47,7 +49,7 @@ namespace Utlop {
 		}
 		~RenderSystem() {}
 		void preExec(Entity& entity, Utlop::RenderCtx* data) override;
-		void exec(Entity& entity, RenderCtx* data) override;
+		void exec(Entity& entity, RenderCtx* data, DisplayList* dl) override;
 		void UpdateUniforms(GLuint shaderID);
 
 		void initGeo(Entity& entity, RenderCtx* data, const char* path);

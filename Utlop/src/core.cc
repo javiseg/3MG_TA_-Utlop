@@ -76,8 +76,8 @@ namespace Utlop
 		
 		//AddEntity();
 		
-		bg_color_ = vec3(0.0f);
-
+		bg_color_ = vec4(0.0f);
+		bg_color_.w = 1.0f;
 		
 
     return glfwInit();
@@ -95,8 +95,13 @@ namespace Utlop
       }
 
 
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      glClearColor(160.0f/255.0f, 160.0f / 255.0f, 160.0f / 255.0f, 1.0f);
+			/*glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      glClearColor(160.0f/255.0f, 160.0f / 255.0f, 160.0f / 255.0f, 1.0f);*/
+
+			addWindowClearCmd(displayList, 160.0f / 255.0f, 160.0f / 255.0f, 160.0f / 255.0f, 1.0f);
+
+			displayList->submit();
+
 			glEnable(GL_DEPTH_TEST);
 			glDepthFunc(GL_LESS);
 			GLint version_max, version_min;
@@ -106,9 +111,7 @@ namespace Utlop
 
 			float lastFrame = (float)glfwGetTime();
 			InitImGUI();
-
-			
-			
+						
 
 			PreExecSystems();
 
@@ -119,7 +122,7 @@ namespace Utlop
         if (glfwGetKey(_window._window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
           glfwSetWindowShouldClose(_window._window, GL_TRUE);
 
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
 				
 				deltaTime_ = (float)glfwGetTime() - lastFrame;
 				lastFrame = (float)glfwGetTime();
@@ -148,11 +151,11 @@ namespace Utlop
 				ImGUI();
 
 
+				displayList->submit();
 
         glfwSwapBuffers(_window._window);
         glfwPollEvents();
 
-				
 
         std::chrono::system_clock::time_point end_time = std::chrono::system_clock::now();
         std::this_thread::sleep_until(start_time + std::chrono::milliseconds(_frame_time_millis));
@@ -334,7 +337,7 @@ namespace Utlop
 			for (unsigned int h = 0; h < data->entities.size(); h++) {
 				int out = data->entities[h]->componentsID_ & data->sys[i]->id_;
 				if (out == data->sys[i]->id_)
-					data->sys[i]->exec(*data->entities[h], data);
+					data->sys[i]->exec(*data->entities[h], data, displayList);
 			}
 		}
 	}
@@ -362,9 +365,6 @@ namespace Utlop
 		if (ImGui::Begin("Utlop Engine")) {
 
 			ImGui::ColorEdit4("Color", &bg_color_[0]);
-			glClearColor(bg_color_.x, bg_color_.y, bg_color_.z, 1.0f);
-
-		
 
 			ImGui::End();
 			ImGui::Render();
@@ -441,10 +441,10 @@ namespace Utlop
 
 		if (glfwGetKey(_window.getWindow(), GLFW_KEY_P) == GLFW_PRESS) {
 			if (Utlop::Core::Instance()->polygon_) {
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				addSetPolygonCmd(displayList, 0);
 			}
 			else {
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				addSetPolygonCmd(displayList, 1);
 			}
 			Utlop::Core::Instance()->polygon_ = !Utlop::Core::Instance()->polygon_;
 		}
