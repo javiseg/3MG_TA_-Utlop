@@ -1,7 +1,8 @@
 #pragma once
-#include "command.h"
 #include <list>
 #include <memory>
+#include "glad/glad.h"
+
 namespace Utlop {
 
 	using namespace std;
@@ -46,7 +47,7 @@ namespace Utlop {
 			else
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
-		uint value;
+		uint8_t value;
 	};
 
 	void callback_WindowClearCmd(WindowClearCmd cmd);
@@ -63,6 +64,6 @@ namespace Utlop {
 	DisplayList& addWindowClearCmd(DisplayList* dl, float r, float g, float b, float a);
 	DisplayList& addInitMaterialCmd(DisplayList* dl, float r, float g, float b, float a);
 	DisplayList& addDrawCmd(DisplayList* dl, GLuint shaderId, GLuint materialID, GLuint vao, size_t size);
-	DisplayList& addSetPolygonCmd(DisplayList* dl, uint on);
+	DisplayList& addSetPolygonCmd(DisplayList* dl, uint8_t on);
 
 }

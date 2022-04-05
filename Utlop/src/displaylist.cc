@@ -1,4 +1,5 @@
 #include "displaylist.h"
+#include <memory>
 
 void Utlop::DisplayList::executeOnGPU(list<shared_ptr<Command>> cmdListToExecute)
 {
@@ -48,10 +49,10 @@ Utlop::DisplayList& Utlop::addDrawCmd(Utlop::DisplayList* dl, GLuint shaderId, G
 	return *dl;
 }
 
-Utlop::DisplayList& Utlop::addSetPolygonCmd(Utlop::DisplayList* dl, uint on)
+Utlop::DisplayList& Utlop::addSetPolygonCmd(Utlop::DisplayList* dl, uint8_t on)
 {
-	shared_ptr<SetPolygonCmd> pol;
-	pol = make_shared<SetPolygonCmd>();
+	std::shared_ptr<Utlop::SetPolygonCmd> pol;
+	pol = std::make_shared<Utlop::SetPolygonCmd>();
 	pol->value = on;
 
 	dl->cmdList.push_back(move(pol));

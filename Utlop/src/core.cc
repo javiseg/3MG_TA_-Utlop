@@ -48,8 +48,8 @@ namespace Utlop
   }
 
 	void Utlop::Core::createEntities(Core* cr) {
-		for (int i = 0; i < 100; i++) {
-			for (int j = 0; j < 100; j++) {
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
 				int entityIdx = cr->AddEntity();
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kLocalTRComp);
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kRenderComp);
@@ -176,10 +176,10 @@ namespace Utlop
 				
 
 				//ExecSystems();
-				if (preExecDone_) {
-					scheduler.run(sched, &schedulerReady);
-					ExecSystems2();
-				}
+				//if (preExecDone_) {
+				scheduler.run(sched, &schedulerReady);
+				ExecSystems2();
+				//}
 					
 				
 
@@ -199,10 +199,12 @@ namespace Utlop
 				glUseProgram(data->cubemap.shaderID_);
 				glDrawArrays(GL_TRIANGLES, 0, 36);*/
 				
-				ImGUI();
-
+		
 
 				displayList->submit();
+
+				ImGUI();
+
 
         glfwSwapBuffers(_window._window);
         glfwPollEvents();
