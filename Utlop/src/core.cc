@@ -10,6 +10,8 @@
 #include "system.h"
 #include "tiny_obj_loader.h"
 #include <time.h>
+#include "stb_image.h"
+#include "stb_image_write.h"
 #define PX_SCHED_IMPLEMENTATION 1
 #include "px_sched.h"
 
@@ -17,6 +19,7 @@ void loadCubemap(const char* path, GLuint& texture);
 void loadVertexShader(const char* filename, Utlop::RenderCtx* data);
 void loadFragmentShader(const char* filename, Utlop::RenderCtx* data);
 void setMat4fv(GLuint shader_id, glm::mat4 value, const GLchar* name, GLboolean transpose = GL_FALSE);
+bool loadOBJ2(const char* path, Utlop::Geometry& geo);
 
 namespace Utlop
 {
@@ -48,8 +51,8 @@ namespace Utlop
   }
 
 	void Utlop::Core::createEntities(Core* cr) {
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
+		for (int i = 0; i < 100; i++) {
+			for (int j = 0; j < 100; j++) {
 				int entityIdx = cr->AddEntity();
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kLocalTRComp);
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kRenderComp);
@@ -141,9 +144,6 @@ namespace Utlop
 			/*glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       glClearColor(160.0f/255.0f, 160.0f / 255.0f, 160.0f / 255.0f, 1.0f);*/
 
-			addWindowClearCmd(displayList, 160.0f / 255.0f, 160.0f / 255.0f, 160.0f / 255.0f, 1.0f);
-
-			displayList->submit();
 
 			glEnable(GL_DEPTH_TEST);
 			glDepthFunc(GL_LESS);
@@ -154,9 +154,13 @@ namespace Utlop
 
 			float lastFrame = (float)glfwGetTime();
 			InitImGUI();
-			
-			PreExecSystems();
+
+			//PreExecSystems();
+			InitMaterials(data, "../UtlopTests/src/textures/texture.jpg");
+			InitMaterials(data, "../UtlopTests/src/textures/default.png");
+			InitGeometry(data, "../UtlopTests/src/obj/robot.obj");
 			//scheduler.run(preSched, &schedulerReady);
+			PreExecSystems();
 
       while (!glfwWindowShouldClose(_window._window))
       {
@@ -172,14 +176,12 @@ namespace Utlop
 
 				glfwPollEvents();
 
-			
-				
 
 				//ExecSystems();
-				//if (preExecDone_) {
-				scheduler.run(sched, &schedulerReady);
-				ExecSystems2();
-				//}
+				if (preExecDone_) {
+					scheduler.run(sched, &schedulerReady);
+					ExecSystems2();
+				}
 					
 				
 
@@ -355,6 +357,112 @@ namespace Utlop
 		glEnableVertexAttribArray(0);
 		
 	}
+
+	void Core::InitMaterials(RenderCtx* data, const char* path)
+	{
+		Material tmpText;
+		tmpText.path_ = path;
+
+		unsigned char* text_buffer_;
+		text_buffer_ = stbi_load(tmpText.path_.c_str(), &tmpText.width_, &tmpText.height_, &tmpText.bpp_, 4);
+
+		if (text_buffer_) {
+
+
+			glCreateTextures(GL_TEXTURE_2D, 1, &tmpText.diff_);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+			glTextureStorage2D(tmpText.diff_, 1, GL_RGBA8, tmpText.width_, tmpText.height_);
+			glTextureSubImage2D(tmpText.diff_, 0, 0, 0, tmpText.width_, tmpText.height_, GL_RGBA, GL_UNSIGNED_BYTE, text_buffer_);
+			glGenerateTextureMipmap(tmpText.diff_);
+
+
+			stbi_image_free(text_buffer_);
+
+			data->material.push_back(tmpText);
+
+		}
+	}
+
+	void Core::InitGeometry(RenderCtx* data, const char* path)
+	{
+		Geometry geo;
+		loadOBJ2(path, geo);
+		data->geometry.push_back(geo);
+
+		glCreateVertexArrays(1, &data->rendercmp[0].vao_);
+		glCreateVertexArrays(1, &data->rendercmp[0].nvao_);
+
+		glCreateBuffers(1, &data->rendercmp[0].vbo_);
+		glCreateBuffers(1, &data->rendercmp[0].ebo_);
+
+		glNamedBufferData(data->rendercmp[0].vbo_,
+			geo.vertices_.size() * sizeof(float),
+			geo.vertices_.data(), GL_STATIC_DRAW);
+
+
+		glNamedBufferData(data->rendercmp[0].ebo_,
+			geo.verticesIndices_.size() * sizeof(GLuint),
+			geo.verticesIndices_.data(), GL_STATIC_DRAW);
+
+		glCreateBuffers(1, &data->rendercmp[0].nbo_);
+		glCreateBuffers(1, &data->rendercmp[0].enbo_);
+
+		glNamedBufferData(data->rendercmp[0].nbo_,
+			geo.normals_.size() * sizeof(float),
+			geo.normals_.data(), GL_STATIC_DRAW);
+
+
+		glNamedBufferData(data->rendercmp[0].enbo_,
+			geo.normalsIndices_.size() * sizeof(GLuint),
+			geo.normalsIndices_.data(), GL_STATIC_DRAW);
+
+
+		//Enable:
+
+		glEnableVertexArrayAttrib(data->rendercmp[0].vao_, 0);
+		glEnableVertexArrayAttrib(data->rendercmp[0].nvao_, 2);
+
+		glVertexArrayAttribBinding(data->rendercmp[0].vao_, 0, 0);
+		glVertexArrayAttribBinding(data->rendercmp[0].nvao_, 2, 0);
+		// Back here when applying normals etc:
+		glVertexArrayAttribFormat(data->rendercmp[0].vao_, 0, 3, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribFormat(data->rendercmp[0].nvao_, 2, 3, GL_FLOAT, GL_FALSE, 0);
+		//
+
+		glVertexArrayVertexBuffer(data->rendercmp[0].vao_, 0, data->rendercmp[0].vbo_, 0, 3 * sizeof(GLuint));
+		glVertexArrayVertexBuffer(data->rendercmp[0].nvao_, 2, data->rendercmp[0].nbo_, 0, 3 * sizeof(GLuint));
+
+		glVertexArrayElementBuffer(data->rendercmp[0].vao_, data->rendercmp[0].ebo_);
+		glVertexArrayElementBuffer(data->rendercmp[0].nvao_, data->rendercmp[0].enbo_);
+
+
+		if (geo.texCoords_.size() > 0) {
+
+			if (data->rendercmp[0].tvao_ == 999) {
+				GLuint texlocation = 1;
+				glCreateVertexArrays(1, &data->rendercmp[0].tvao_);
+				glCreateBuffers(1, &data->rendercmp[0].tbo_);
+				glCreateBuffers(1, &data->rendercmp[0].etbo_);
+
+				glNamedBufferData(data->rendercmp[0].tbo_, geo.texCoords_.size() * sizeof(float),
+					geo.texCoords_.data(), GL_STATIC_DRAW);
+				glNamedBufferData(data->rendercmp[0].etbo_, geo.texCoordsIndices_.size() * sizeof(uint32_t),
+					geo.texCoordsIndices_.data(), GL_STATIC_DRAW);
+
+				glEnableVertexArrayAttrib(data->rendercmp[0].tvao_, texlocation);
+				glVertexArrayAttribBinding(data->rendercmp[0].tvao_, texlocation, 0);
+				glVertexArrayAttribFormat(data->rendercmp[0].tvao_, texlocation, 2, GL_FLOAT, GL_FALSE, 0);
+
+			glVertexArrayVertexBuffer(data->rendercmp[0].tvao_, texlocation, data->rendercmp[0].tbo_, 0, 2 * sizeof(GLuint));
+			glVertexArrayElementBuffer(data->rendercmp[0].tvao_, data->rendercmp[0].etbo_);
+		}
+	}
+}
 
 
 	void Core::InitComponents()

@@ -28,7 +28,6 @@ namespace Utlop {
 	};
 	struct Geometry {
 		vector<float> vertices_;
-		vector<float> Totalvertex_;
 		vector<float> texCoords_;
 		vector<float> normals_;
 		vector<uint32_t> verticesIndices_;

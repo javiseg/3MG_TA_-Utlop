@@ -30,6 +30,8 @@ namespace Utlop
 			void createEntities(Core* cr);
 			void AddComponent(Entity& entity, Utlop::ComponentID id);
 			void AddCubeMap();
+			void InitMaterials(RenderCtx* data, const char* path);
+			void InitGeometry(RenderCtx* data, const char* path);
 
 			void MoveCamera();
 

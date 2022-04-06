@@ -53,7 +53,7 @@ namespace Utlop {
 		void UpdateUniforms(GLuint shaderID);
 
 		void initGeo(Entity& entity, RenderCtx* data, const char* path);
-		bool initMat(Entity& entity, RenderCtx* data, const char* path);
+		void initMat(Entity& entity, RenderCtx* data, const char* path);
 		void initShader(Entity& entity, RenderCtx* data);
 		
 	};

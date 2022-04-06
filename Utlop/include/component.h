@@ -45,6 +45,9 @@ namespace Utlop {
 		GLuint vao_ = 999;
 		GLuint vbo_ = 999;
 		GLuint ebo_ = 999;
+		GLuint nvao_ = 999;
+		GLuint nbo_ = 999;
+		GLuint enbo_ = 999;
 		GLuint tvao_ = 999;
 		GLuint tbo_ = 999;
 		GLuint etbo_ = 999;

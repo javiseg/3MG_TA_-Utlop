@@ -91,16 +91,11 @@ void Utlop::CameraSystem::update(Entity& entity, RenderCtx* data)
 
 void Utlop::RenderSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
-	if (data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_ == 999)
-		initShader(entity, data);
-	if (data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.empty())
-		initGeo(entity, data, "../UtlopTests/src/obj/robot.obj");
-	if (data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx.empty()) {
-		initMat(entity, data, "../UtlopTests/src/textures/texture.jpg");
-		initMat(entity, data, "../UtlopTests/src/textures/default.png");
-	}
-
-
+	initShader(entity, data);
+	initGeo(entity, data, "../UtlopTests/src/obj/robot.obj");
+	initMat(entity, data, "../UtlopTests/src/textures/texture.jpg");
+	initMat(entity, data, "../UtlopTests/src/textures/default.png");
+	
 	setMat4fv(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
 		data->cameracmp[0].projection_, "ProjectionMatrix");
 }
@@ -141,72 +136,14 @@ void Utlop::RenderSystem::initGeo(Entity& entity, RenderCtx* data, const char* p
 		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_ = data->rendercmp[0].vbo_;
 		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_ = data->rendercmp[0].ebo_;
 	}
-	else {
-		Geometry geo;
-		loadOBJ2(path, geo);
-		data->geometry.push_back(geo);
-		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.push_back(data->geometry.size() - 1);
-		glUseProgram(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_);
-
-		glCreateVertexArrays(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_);
-
-		glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_);
-		glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_);
-
-		glNamedBufferData(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_,
-			data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].vertices_.size() * sizeof(float),
-			data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].vertices_.data(), GL_STATIC_DRAW);
-
-
-		glNamedBufferData(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_,
-			data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].verticesIndices_.size() * sizeof(uint32_t),
-			data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].verticesIndices_.data(), GL_STATIC_DRAW);
-
-		glEnableVertexArrayAttrib(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 0);
-		// Back here when applying normals etc:
-		glVertexArrayAttribFormat(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 0, 3, GL_FLOAT, GL_FALSE, 0);
-		//
-
-		glVertexArrayVertexBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 0, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_, 0, 3 * sizeof(GLuint));
-
-		glVertexArrayElementBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_);
-
-	}
-
-	if (data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].texCoords_.size() > 0) {
-
-		if (data->rendercmp[0].tvao_ == 999) {
-			GLuint texlocation = 1;
-			glCreateVertexArrays(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_);
-			glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tbo_);
-			glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].etbo_);
-
-			glNamedBufferData(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tbo_, data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].texCoords_.size() * sizeof(float),
-				data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].texCoords_.data(), GL_STATIC_DRAW);
-			glNamedBufferData(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].etbo_, data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].texCoordsIndices_.size() * sizeof(uint32_t),
-				data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.back()].texCoordsIndices_.data(), GL_STATIC_DRAW);
-
-			glEnableVertexArrayAttrib(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_, texlocation);
-			//glVertexArrayAttribBinding(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_, texlocation, 0);
-			glVertexArrayAttribFormat(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_, texlocation, 2, GL_FLOAT, GL_FALSE, 0);
-
-			glVertexArrayVertexBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_, texlocation, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tbo_, 0, 2 * sizeof(GLuint));
-			glVertexArrayElementBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].etbo_);
-		}
-		else {
-			data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_ = data->rendercmp[0].tvao_;
-			data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tbo_ = data->rendercmp[0].tbo_;
-			data->rendercmp[entity.cmp_indx_[kRenderCompPos]].etbo_ = data->rendercmp[0].etbo_;
-		}
-		
-	}
+	
 	//glUseProgram(0);
 }
 
-bool Utlop::RenderSystem::initMat(Entity& entity, RenderCtx* data, const char* path)
+void Utlop::RenderSystem::initMat(Entity& entity, RenderCtx* data, const char* path)
 {
 	stbi_set_flip_vertically_on_load(true);
-	unsigned char* text_buffer_;
+	
 
 	Material tmpText;
 	//Debug:
@@ -215,51 +152,20 @@ bool Utlop::RenderSystem::initMat(Entity& entity, RenderCtx* data, const char* p
 	for (unsigned int i = 0; i < data->material.size(); i++) {
 		if (data->material[i].path_._Equal(tmpText.path_)) {
 			data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx.push_back(i);
-			return true;
 		}
 	}
-
-
-	text_buffer_ = stbi_load(tmpText.path_.c_str(), &tmpText.width_, &tmpText.height_, &tmpText.bpp_, 4);
-
-	if (text_buffer_) {
-
-
-		glCreateTextures(GL_TEXTURE_2D, 1, &tmpText.diff_);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-		glTextureStorage2D(tmpText.diff_, 1, GL_RGBA8, tmpText.width_, tmpText.height_);
-		glTextureSubImage2D(tmpText.diff_, 0, 0, 0, tmpText.width_, tmpText.height_, GL_RGBA, GL_UNSIGNED_BYTE, text_buffer_);
-		glGenerateTextureMipmap(tmpText.diff_);
-
-
-		stbi_image_free(text_buffer_);
-
-		data->material.push_back(tmpText);
-		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx.push_back(data->material.size() - 1);
-
-		return true;
-	}
-	else {
-		return false;
-	}
-
-
 }
 
 void Utlop::RenderSystem::initShader(Entity& entity, RenderCtx* data)
 {
 	data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_ = glCreateProgram();
 
+	glUseProgram(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_);
 	glAttachShader(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, data->vertexShader);
 	glAttachShader(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, data->fragmentShader);
 	
 	glLinkProgram(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_);
-
-	//checkCompileErrors(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, "PROGRAM");
-	//checkCompileErrors(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, "LINK");
+	glUseProgram(0);
+	checkCompileErrors(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, "PROGRAM");
+	checkCompileErrors(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, "LINK");
 }

@@ -76,6 +76,7 @@ bool loadOBJ2(const char* path, Utlop::Geometry& geo) {
 			
 			geo.verticesIndices_.push_back(shapes[i].mesh.indices[j].vertex_index);
 			geo.texCoordsIndices_.push_back(shapes[i].mesh.indices[j].texcoord_index);
+			geo.normalsIndices_.push_back(shapes[i].mesh.indices[j].normal_index);
 		}
 	}
 
@@ -84,6 +85,10 @@ bool loadOBJ2(const char* path, Utlop::Geometry& geo) {
 	}
 	for (int i = 0; i < attributes.texcoords.size(); i++) {
 		geo.texCoords_.push_back(attributes.texcoords[i]);
+	}
+
+	for (int i = 0; i < attributes.normals.size(); i++) {
+		geo.normals_.push_back(attributes.normals[i]);
 	}
 
 	geo.path = path;
