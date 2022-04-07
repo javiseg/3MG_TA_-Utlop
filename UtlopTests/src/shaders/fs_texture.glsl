@@ -1,7 +1,7 @@
 #version 460 core
 in vec2 text_coords;
 
-uniform sampler2D ourTexture;
+layout(binding = 0) uniform sampler2D ourTexture;
 
 void main()
 {

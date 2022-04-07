@@ -51,8 +51,8 @@ namespace Utlop
   }
 
 	void Utlop::Core::createEntities(Core* cr) {
-		for (int i = 0; i < 100; i++) {
-			for (int j = 0; j < 100; j++) {
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
 				int entityIdx = cr->AddEntity();
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kLocalTRComp);
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kRenderComp);
@@ -156,9 +156,9 @@ namespace Utlop
 			InitImGUI();
 
 			//PreExecSystems();
-			InitMaterials(data, "../UtlopTests/src/textures/texture.jpg");
-			InitMaterials(data, "../UtlopTests/src/textures/default.png");
-			InitGeometry(data, "../UtlopTests/src/obj/robot.obj");
+			//InitMaterials(data, "../UtlopTests/src/textures/texture.jpg");
+			//InitMaterials(data, "../UtlopTests/src/textures/default.png");
+			//InitGeometry(data, "../UtlopTests/src/obj/backpack/backpack.obj");
 			//scheduler.run(preSched, &schedulerReady);
 			PreExecSystems();
 
@@ -177,11 +177,12 @@ namespace Utlop
 				glfwPollEvents();
 
 
-				//ExecSystems();
-				if (preExecDone_) {
-					scheduler.run(sched, &schedulerReady);
-					ExecSystems2();
-				}
+				ExecSystems();
+				ExecSystems2();
+				//if (preExecDone_) {
+					//scheduler.run(sched, &schedulerReady);
+					
+				//}
 					
 				
 

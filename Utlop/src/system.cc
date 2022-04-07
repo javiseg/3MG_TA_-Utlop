@@ -92,7 +92,7 @@ void Utlop::CameraSystem::update(Entity& entity, RenderCtx* data)
 void Utlop::RenderSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
 	initShader(entity, data);
-	initGeo(entity, data, "../UtlopTests/src/obj/robot.obj");
+	initGeo(entity, data, "../UtlopTests/src/obj/backpack/backpack.obj");
 	initMat(entity, data, "../UtlopTests/src/textures/texture.jpg");
 	initMat(entity, data, "../UtlopTests/src/textures/default.png");
 	
@@ -111,7 +111,7 @@ void Utlop::RenderSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 
 	addDrawCmd(dl, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
 		data->material[0].diff_, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_,
-		data->geometry[0].verticesIndices_.size());
+		data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx[0]].verticesIndices_.size());
 
 
 }
@@ -135,16 +135,90 @@ void Utlop::RenderSystem::initGeo(Entity& entity, RenderCtx* data, const char* p
 		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_ = data->rendercmp[0].vao_;
 		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_ = data->rendercmp[0].vbo_;
 		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_ = data->rendercmp[0].ebo_;
+		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_ = data->rendercmp[0].tvao_;
+		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tbo_ = data->rendercmp[0].tbo_;
+		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].etbo_ = data->rendercmp[0].etbo_;
+	}
+	else {
+		Geometry geo;
+		loadOBJ2(path, geo);
+		data->geometry.push_back(geo);
+		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.push_back(data->geometry.size() - 1);
+		glCreateVertexArrays(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_);
+		glCreateVertexArrays(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].nvao_);
+
+		glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_);
+		glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_);
+
+		glNamedBufferData(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_,
+			geo.vertices_.size() * sizeof(float),
+			geo.vertices_.data(), GL_STATIC_DRAW);
+
+
+		glNamedBufferData(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_,
+			geo.verticesIndices_.size() * sizeof(GLuint),
+			geo.verticesIndices_.data(), GL_STATIC_DRAW);
+
+		glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].nbo_);
+		glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].enbo_);
+
+		glNamedBufferData(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].nbo_,
+			geo.normals_.size() * sizeof(float),
+			geo.normals_.data(), GL_STATIC_DRAW);
+
+
+		glNamedBufferData(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].enbo_,
+			geo.normalsIndices_.size() * sizeof(GLuint),
+			geo.normalsIndices_.data(), GL_STATIC_DRAW);
+
+
+		//Enable:
+
+		glEnableVertexArrayAttrib(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 0);
+		glEnableVertexArrayAttrib(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].nvao_, 2);
+
+		glVertexArrayAttribBinding(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 0, 0);
+		glVertexArrayAttribBinding(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].nvao_, 2, 0);
+		// Back here when applying normals etc:
+		glVertexArrayAttribFormat(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 0, 3, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribFormat(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].nvao_, 2, 3, GL_FLOAT, GL_FALSE, 0);
+		//
+
+		glVertexArrayVertexBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, 0, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_, 0, 3 * sizeof(GLuint));
+		glVertexArrayVertexBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].nvao_, 2, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].nbo_, 0, 3 * sizeof(GLuint));
+
+		glVertexArrayElementBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_);
+		glVertexArrayElementBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].nvao_, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].enbo_);
+
+
+		if (geo.texCoords_.size() > 0) {
+
+			if (data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_ == 999) {
+				GLuint texlocation = 1;
+				glCreateVertexArrays(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_);
+				glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tbo_);
+				glCreateBuffers(1, &data->rendercmp[entity.cmp_indx_[kRenderCompPos]].etbo_);
+
+				glNamedBufferData(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tbo_, geo.texCoords_.size() * sizeof(float),
+					geo.texCoords_.data(), GL_STATIC_DRAW);
+				glNamedBufferData(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].etbo_, geo.texCoordsIndices_.size() * sizeof(uint32_t),
+					geo.texCoordsIndices_.data(), GL_STATIC_DRAW);
+
+				glEnableVertexArrayAttrib(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_, texlocation);
+				glVertexArrayAttribBinding(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_, texlocation, 0);
+				glVertexArrayAttribFormat(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_, texlocation, 2, GL_FLOAT, GL_FALSE, 0);
+
+				glVertexArrayVertexBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_, texlocation, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tbo_, 0, 2 * sizeof(GLuint));
+				glVertexArrayElementBuffer(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].etbo_);
+			}
+		}
 	}
 	
 	//glUseProgram(0);
 }
 
-void Utlop::RenderSystem::initMat(Entity& entity, RenderCtx* data, const char* path)
+bool Utlop::RenderSystem::initMat(Entity& entity, RenderCtx* data, const char* path)
 {
-	stbi_set_flip_vertically_on_load(true);
-	
-
 	Material tmpText;
 	//Debug:
 	tmpText.path_ = path;
@@ -152,8 +226,39 @@ void Utlop::RenderSystem::initMat(Entity& entity, RenderCtx* data, const char* p
 	for (unsigned int i = 0; i < data->material.size(); i++) {
 		if (data->material[i].path_._Equal(tmpText.path_)) {
 			data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx.push_back(i);
+			return true;
 		}
 	}
+
+	stbi_set_flip_vertically_on_load(true);
+	unsigned char* text_buffer_;
+	text_buffer_ = stbi_load(tmpText.path_.c_str(), &tmpText.width_, &tmpText.height_, &tmpText.bpp_, 4);
+
+	if (text_buffer_) {
+
+
+		glCreateTextures(GL_TEXTURE_2D, 1, &tmpText.diff_);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		glTextureStorage2D(tmpText.diff_, 1, GL_RGBA8, tmpText.width_, tmpText.height_);
+		glTextureSubImage2D(tmpText.diff_, 0, 0, 0, tmpText.width_, tmpText.height_, GL_RGBA, GL_UNSIGNED_BYTE, text_buffer_);
+		glGenerateTextureMipmap(tmpText.diff_);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tmpText.diff_);
+		glUniform1i(glGetUniformLocation(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, "ourTexture"), 0);
+
+
+		stbi_image_free(text_buffer_);
+
+		data->material.push_back(tmpText);
+		return true;
+	}
+
+	return false;
 }
 
 void Utlop::RenderSystem::initShader(Entity& entity, RenderCtx* data)
