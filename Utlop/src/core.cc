@@ -51,12 +51,12 @@ namespace Utlop
   }
 
 	void Utlop::Core::createEntities(Core* cr) {
-		for (int i = 0; i < 2; i++) {
-			for (int j = 0; j < 2; j++) {
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
 				int entityIdx = cr->AddEntity();
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kLocalTRComp);
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kRenderComp);
-				cr->getData()->localtrcmp[cr->getData()->entities[entityIdx]->cmp_indx_[kLocalTRCompPos]].position -= vec3(10.0f * i, 10.0f * j, (rand() % 10) - 5.0f);
+				cr->getData()->localtrcmp[cr->getData()->entities[entityIdx]->cmp_indx_[kLocalTRCompPos]].position -= vec3(20.0f * i, 20.0f * j, 0.0f);
 			}
 		}
 	}
@@ -393,76 +393,8 @@ namespace Utlop
 	{
 		Geometry geo;
 		loadOBJ2(path, geo);
-		data->geometry.push_back(geo);
+		//data->geometry.push_back(geo);
 
-		glCreateVertexArrays(1, &data->rendercmp[0].vao_);
-		glCreateVertexArrays(1, &data->rendercmp[0].nvao_);
-
-		glCreateBuffers(1, &data->rendercmp[0].vbo_);
-		glCreateBuffers(1, &data->rendercmp[0].ebo_);
-
-		glNamedBufferData(data->rendercmp[0].vbo_,
-			geo.vertices_.size() * sizeof(float),
-			geo.vertices_.data(), GL_STATIC_DRAW);
-
-
-		glNamedBufferData(data->rendercmp[0].ebo_,
-			geo.verticesIndices_.size() * sizeof(GLuint),
-			geo.verticesIndices_.data(), GL_STATIC_DRAW);
-
-		glCreateBuffers(1, &data->rendercmp[0].nbo_);
-		glCreateBuffers(1, &data->rendercmp[0].enbo_);
-
-		glNamedBufferData(data->rendercmp[0].nbo_,
-			geo.normals_.size() * sizeof(float),
-			geo.normals_.data(), GL_STATIC_DRAW);
-
-
-		glNamedBufferData(data->rendercmp[0].enbo_,
-			geo.normalsIndices_.size() * sizeof(GLuint),
-			geo.normalsIndices_.data(), GL_STATIC_DRAW);
-
-
-		//Enable:
-
-		glEnableVertexArrayAttrib(data->rendercmp[0].vao_, 0);
-		glEnableVertexArrayAttrib(data->rendercmp[0].nvao_, 2);
-
-		glVertexArrayAttribBinding(data->rendercmp[0].vao_, 0, 0);
-		glVertexArrayAttribBinding(data->rendercmp[0].nvao_, 2, 0);
-		// Back here when applying normals etc:
-		glVertexArrayAttribFormat(data->rendercmp[0].vao_, 0, 3, GL_FLOAT, GL_FALSE, 0);
-		glVertexArrayAttribFormat(data->rendercmp[0].nvao_, 2, 3, GL_FLOAT, GL_FALSE, 0);
-		//
-
-		glVertexArrayVertexBuffer(data->rendercmp[0].vao_, 0, data->rendercmp[0].vbo_, 0, 3 * sizeof(GLuint));
-		glVertexArrayVertexBuffer(data->rendercmp[0].nvao_, 2, data->rendercmp[0].nbo_, 0, 3 * sizeof(GLuint));
-
-		glVertexArrayElementBuffer(data->rendercmp[0].vao_, data->rendercmp[0].ebo_);
-		glVertexArrayElementBuffer(data->rendercmp[0].nvao_, data->rendercmp[0].enbo_);
-
-
-		if (geo.texCoords_.size() > 0) {
-
-			if (data->rendercmp[0].tvao_ == 999) {
-				GLuint texlocation = 1;
-				glCreateVertexArrays(1, &data->rendercmp[0].tvao_);
-				glCreateBuffers(1, &data->rendercmp[0].tbo_);
-				glCreateBuffers(1, &data->rendercmp[0].etbo_);
-
-				glNamedBufferData(data->rendercmp[0].tbo_, geo.texCoords_.size() * sizeof(float),
-					geo.texCoords_.data(), GL_STATIC_DRAW);
-				glNamedBufferData(data->rendercmp[0].etbo_, geo.texCoordsIndices_.size() * sizeof(uint32_t),
-					geo.texCoordsIndices_.data(), GL_STATIC_DRAW);
-
-				glEnableVertexArrayAttrib(data->rendercmp[0].tvao_, texlocation);
-				glVertexArrayAttribBinding(data->rendercmp[0].tvao_, texlocation, 0);
-				glVertexArrayAttribFormat(data->rendercmp[0].tvao_, texlocation, 2, GL_FLOAT, GL_FALSE, 0);
-
-			glVertexArrayVertexBuffer(data->rendercmp[0].tvao_, texlocation, data->rendercmp[0].tbo_, 0, 2 * sizeof(GLuint));
-			glVertexArrayElementBuffer(data->rendercmp[0].tvao_, data->rendercmp[0].etbo_);
-		}
-	}
 }
 
 

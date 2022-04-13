@@ -92,8 +92,8 @@ void Utlop::CameraSystem::update(Entity& entity, RenderCtx* data)
 void Utlop::RenderSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
 	initShader(entity, data);
-	initGeo(entity, data, "../UtlopTests/src/obj/backpack/backpack.obj");
-	initMat(entity, data, "../UtlopTests/src/obj/backpack/diffuse.jpg");
+	initGeo(entity, data, "../UtlopTests/src/obj/robot/robot.obj");
+	initMat(entity, data, "../UtlopTests/src/obj/robot/diffuse.jpg");
 	initMat(entity, data, "../UtlopTests/src/textures/default.png");
 	
 	setMat4fv(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
@@ -102,11 +102,19 @@ void Utlop::RenderSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 
 void Utlop::RenderSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 {
+	/*setMat4fv(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
+		data->cameracmp[0].view_, "ViewMatrix");
+	setMat4fv(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
+		data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, "ModelMatrix");*/
+
+	addSetModelViewProjection(dl, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, 
+		data->cameracmp[0].projection_, data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model,
+		data->cameracmp[0].view_);
 
 	addDrawCmd(dl, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
 		data->material[0].diff_, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_,
 		data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx[0]].totalIndices_.size(),
-		data->localtrcmp[entity.cmp_indx_[0]].model, data->cameracmp[0].view_);
+		data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, data->cameracmp[0].view_);
 
 
 }
@@ -130,9 +138,6 @@ void Utlop::RenderSystem::initGeo(Entity& entity, RenderCtx* data, const char* p
 		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_ = data->rendercmp[0].vao_;
 		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_ = data->rendercmp[0].vbo_;
 		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_ = data->rendercmp[0].ebo_;
-		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tvao_ = data->rendercmp[0].tvao_;
-		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].tbo_ = data->rendercmp[0].tbo_;
-		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].etbo_ = data->rendercmp[0].etbo_;
 	}
 	else {
 		Geometry geo;

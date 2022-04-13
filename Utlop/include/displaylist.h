@@ -30,15 +30,14 @@ namespace Utlop {
 			glUseProgram(shaderId);
 
 			glBindVertexArray(vao);
-			glUniformMatrix4fv(glGetUniformLocation(shaderId, "ModelMatrix"), 1, false, &model[0][0]);
-			glUniformMatrix4fv(glGetUniformLocation(shaderId, "ViewMatrix"), 1, false, &view[0][0]);
+
 			
 			glBindTextureUnit(0, materialID);
 
 
 			glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, 0);
 
-			//glUseProgram(0);
+			glUseProgram(0);
 		}
 		GLuint shaderId;
 		GLuint materialID;
@@ -56,7 +55,20 @@ namespace Utlop {
 		}
 		uint8_t value;
 	};
-
+	struct SetModelViewProjectionCmd : public Command {
+		void executeOnGPU() override {
+			glUseProgram(shaderID);
+			int mem = glGetUniformLocation(shaderID, "ModelMatrix");
+			glUniformMatrix4fv(glGetUniformLocation(shaderID, "ModelMatrix"), 1, GL_FALSE, &m[0][0]);
+			glUniformMatrix4fv(glGetUniformLocation(shaderID, "ViewMatrix"), 1, GL_FALSE, &v[0][0]);
+			glUniformMatrix4fv(glGetUniformLocation(shaderID, "ProjectionMatrix"), 1, GL_FALSE, &p[0][0]);
+			glUseProgram(0);
+		}
+		glm::mat4 m;
+		glm::mat4 v;
+		glm::mat4 p;
+		GLuint shaderID;
+	};
 	void callback_WindowClearCmd(WindowClearCmd cmd);
 
 	class DisplayList {
@@ -73,5 +85,6 @@ namespace Utlop {
 	DisplayList& addDrawCmd(DisplayList* dl, GLuint shaderId, GLuint materialID, GLuint vao, size_t size,
 		glm::mat4 view, glm::mat4 model);
 	DisplayList& addSetPolygonCmd(DisplayList* dl, uint8_t on);
+	DisplayList& addSetModelViewProjection(DisplayList* dl, GLuint shaderID, glm::mat4 projection, glm::mat4 model, glm::mat4 view);
 
 }

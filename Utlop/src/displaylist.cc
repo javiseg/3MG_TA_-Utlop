@@ -63,6 +63,21 @@ Utlop::DisplayList& Utlop::addSetPolygonCmd(Utlop::DisplayList* dl, uint8_t on)
 	return *dl;
 }
 
+Utlop::DisplayList& Utlop::addSetModelViewProjection(Utlop::DisplayList* dl, GLuint shaderID, glm::mat4 projection, glm::mat4 model, glm::mat4 view)
+{
+
+	std::shared_ptr<Utlop::SetModelViewProjectionCmd> mvpCmd;
+	mvpCmd = std::make_shared<Utlop::SetModelViewProjectionCmd>();
+	mvpCmd->shaderID = shaderID;
+	mvpCmd->m = model;
+	mvpCmd->v = view;
+	mvpCmd->p = projection;
+
+	dl->cmdList.push_back(move(mvpCmd));
+
+	return *dl;
+}
+
 void Utlop::callback_WindowClearCmd(WindowClearCmd cmd)
 {
 	
