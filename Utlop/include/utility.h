@@ -69,27 +69,93 @@ bool loadOBJ2(const char* path, Utlop::Geometry& geo) {
 	std::vector<uint32_t> texIndices;
 	std::unordered_map<Utlop::Vertex, uint32_t> uniqueVertices;
 
-	for (int i = 0; i < shapes.size(); i++)
+	//for (int i = 0; i < shapes.size(); i++)
+	//{
+	//	for (int j = 0; j < shapes[i].mesh.indices.size(); j++)
+	//	{
+	//		
+	//		/*geo.verticesIndices_.push_back(shapes[i].mesh.indices[j].vertex_index);
+	//		geo.texCoordsIndices_.push_back(shapes[i].mesh.indices[j].texcoord_index);
+	//		geo.normalsIndices_.push_back(shapes[i].mesh.indices[j].normal_index);*/
+	//		geo.totalIndices_.push_back(shapes[i].mesh.indices[j].vertex_index);
+	//		geo.totalIndices_.push_back(shapes[i].mesh.indices[j].texcoord_index);
+	//		geo.totalIndices_.push_back(shapes[i].mesh.indices[j].normal_index);
+	//	}
+	//}
+	//for (int i = 0; i < attributes.GetVertices().size(); i++) {
+	//	geo.vertices_.push_back(attributes.vertices[i]);
+	//	geo.totalVertex_.push_back(attributes.vertices[i]);
+	//}
+	//for (int i = 0; i < attributes.texcoords.size(); i++) {
+	//	geo.texCoords_.push_back(attributes.texcoords[i]);
+	//	geo.totalVertex_.push_back(attributes.texcoords[i]);
+	//}
+
+	//for (int i = 0; i < attributes.normals.size(); i++) {
+	//	geo.normals_.push_back(attributes.normals[i]);
+	//	geo.totalVertex_.push_back(attributes.normals[i]);
+	//}
+
+
+
+	// Loop through all the shapes that there found.
+	for (const auto& shape : shapes)
 	{
-		for (int j = 0; j < shapes[i].mesh.indices.size(); j++)
+		// For each shape, loop through its indices.
+		for (const auto& index : shape.mesh.indices)
 		{
-			
-			geo.verticesIndices_.push_back(shapes[i].mesh.indices[j].vertex_index);
-			geo.texCoordsIndices_.push_back(shapes[i].mesh.indices[j].texcoord_index);
-			geo.normalsIndices_.push_back(shapes[i].mesh.indices[j].normal_index);
+			// Construct a new (x, y, z) position for the current mesh index.
+			glm::vec3 position{
+					attributes.vertices[3 * index.vertex_index + 0],
+					attributes.vertices[3 * index.vertex_index + 1],
+					attributes.vertices[3 * index.vertex_index + 2] };
+
+			// Construct a new (u, v) texture coordinate for the current mesh index.
+			glm::vec2 texCoord{
+					attributes.texcoords[2 * index.texcoord_index + 0],
+					1.0f - attributes.texcoords[2 * index.texcoord_index + 1] };
+
+			glm::vec3 normals{
+					attributes.normals[3 * index.normal_index + 0],
+					attributes.normals[3 * index.normal_index + 1],
+					attributes.normals[3 * index.normal_index + 2] };
+
+
+			// Construct a vertex with the extracted data.
+			Utlop::Vertex vertex{ position, texCoord, normals };
+
+			// This will help deduplicate vertices - we maintain a hash map where a
+			// vertex is used as a unique key with its value being which index can
+			// be used to locate the vertex. The vertex is only added if it has not
+			// been added before.
+			if (uniqueVertices.count(vertex) == 0)
+			{
+				uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
+				vertices.push_back(vertex);
+			}
+
+			geo.totalIndices_.push_back(uniqueVertices[vertex]);
 		}
 	}
 
-	for (int i = 0; i < attributes.GetVertices().size(); i++) {
-		geo.vertices_.push_back(attributes.vertices[i]);
-	}
-	for (int i = 0; i < attributes.texcoords.size(); i++) {
-		geo.texCoords_.push_back(attributes.texcoords[i]);
+	for (const auto& vertex : vertices)
+	{
+		// Position
+		geo.totalVertex_.push_back(vertex.positions.x);
+		geo.totalVertex_.push_back(vertex.positions.y);
+		geo.totalVertex_.push_back(vertex.positions.z);
+
+		// Texture coordinate
+		geo.totalVertex_.push_back(vertex.texCoords.x);
+		geo.totalVertex_.push_back(vertex.texCoords.y);
+
+		geo.totalVertex_.push_back(vertex.normals.x);
+		geo.totalVertex_.push_back(vertex.normals.y);
+		geo.totalVertex_.push_back(vertex.normals.z);
 	}
 
-	for (int i = 0; i < attributes.normals.size(); i++) {
-		geo.normals_.push_back(attributes.normals[i]);
-	}
+
+
 
 	geo.path = path;
 

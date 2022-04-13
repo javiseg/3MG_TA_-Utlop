@@ -51,12 +51,12 @@ namespace Utlop
   }
 
 	void Utlop::Core::createEntities(Core* cr) {
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < 2; j++) {
 				int entityIdx = cr->AddEntity();
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kLocalTRComp);
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kRenderComp);
-				cr->getData()->localtrcmp[cr->getData()->entities[entityIdx]->cmp_indx_[kLocalTRCompPos]].position -= vec3(30.0f * i, 30.0f * j, (rand() % 10) - 5.0f);
+				cr->getData()->localtrcmp[cr->getData()->entities[entityIdx]->cmp_indx_[kLocalTRCompPos]].position -= vec3(10.0f * i, 10.0f * j, (rand() % 10) - 5.0f);
 			}
 		}
 	}
@@ -178,7 +178,7 @@ namespace Utlop
 
 
 				ExecSystems();
-				ExecSystems2();
+				//ExecSystems2();
 				//if (preExecDone_) {
 					//scheduler.run(sched, &schedulerReady);
 					
@@ -496,7 +496,7 @@ namespace Utlop
 
 	void Core::ExecSystems()
 	{
-		for (unsigned int i = 0; i < data->sys.size()-1; i++) {
+		for (unsigned int i = 0; i < data->sys.size(); i++) {
 			for (unsigned int h = 0; h < data->entities.size(); h++) {
 				int out = data->entities[h]->componentsID_ & data->sys[i]->id_;
 				if (out == data->sys[i]->id_)

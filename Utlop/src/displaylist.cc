@@ -35,7 +35,8 @@ Utlop::DisplayList& Utlop::addInitMaterialCmd(DisplayList* dl, float r, float g,
 	return *dl;
 }
 
-Utlop::DisplayList& Utlop::addDrawCmd(Utlop::DisplayList* dl, GLuint shaderId, GLuint materialID, GLuint vao, size_t size)
+Utlop::DisplayList& Utlop::addDrawCmd(Utlop::DisplayList* dl, GLuint shaderId, GLuint materialID, GLuint vao, size_t size,
+	glm::mat4 view, glm::mat4 model)
 {
 	shared_ptr<DrawMaterialCmd> draw_material_cmd;
 	draw_material_cmd = make_shared<DrawMaterialCmd>();
@@ -43,6 +44,8 @@ Utlop::DisplayList& Utlop::addDrawCmd(Utlop::DisplayList* dl, GLuint shaderId, G
 	draw_material_cmd->materialID = materialID;
 	draw_material_cmd->vao = vao;
 	draw_material_cmd->size = size;
+	draw_material_cmd->view = view;
+	draw_material_cmd->model = model;
 
 	dl->cmdList.push_back(move(draw_material_cmd));
 

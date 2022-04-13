@@ -2,6 +2,8 @@
 #include <list>
 #include <memory>
 #include "glad/glad.h"
+#include "glm/glm.hpp"
+#include "glm/mat4x4.hpp"
 
 namespace Utlop {
 
@@ -27,18 +29,23 @@ namespace Utlop {
 		void executeOnGPU() override {
 			glUseProgram(shaderId);
 
+			glBindVertexArray(vao);
+			glUniformMatrix4fv(glGetUniformLocation(shaderId, "ModelMatrix"), 1, false, &model[0][0]);
+			glUniformMatrix4fv(glGetUniformLocation(shaderId, "ViewMatrix"), 1, false, &view[0][0]);
+			
 			glBindTextureUnit(0, materialID);
 
-			glBindVertexArray(vao);
 
 			glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, 0);
 
-			glUseProgram(0);
+			//glUseProgram(0);
 		}
 		GLuint shaderId;
 		GLuint materialID;
 		GLuint vao;
 		size_t size;
+		glm::mat4 view;
+		glm::mat4 model;
 	};
 	struct SetPolygonCmd : public Command {
 		void executeOnGPU() override {
@@ -63,7 +70,8 @@ namespace Utlop {
 
 	DisplayList& addWindowClearCmd(DisplayList* dl, float r, float g, float b, float a);
 	DisplayList& addInitMaterialCmd(DisplayList* dl, float r, float g, float b, float a);
-	DisplayList& addDrawCmd(DisplayList* dl, GLuint shaderId, GLuint materialID, GLuint vao, size_t size);
+	DisplayList& addDrawCmd(DisplayList* dl, GLuint shaderId, GLuint materialID, GLuint vao, size_t size,
+		glm::mat4 view, glm::mat4 model);
 	DisplayList& addSetPolygonCmd(DisplayList* dl, uint8_t on);
 
 }

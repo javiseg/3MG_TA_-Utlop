@@ -1,13 +1,20 @@
 #pragma once
 #include <string>
+#include "glm/glm.hpp"
+#include "glad/glad.h"
+#include <vector>
 
 namespace Utlop {
+
+	using namespace std;
+
 	struct Vertex {
 		glm::vec3 positions;
 		glm::vec2 texCoords;
+		glm::vec3 normals;
 		bool Vertex::operator==(const Vertex& other) const
 		{
-			return positions == other.positions && texCoords == other.texCoords;
+			return positions == other.positions && texCoords == other.texCoords && normals == other.normals;
 		}
 	};
 
@@ -30,9 +37,11 @@ namespace Utlop {
 		vector<float> vertices_;
 		vector<float> texCoords_;
 		vector<float> normals_;
-		vector<uint32_t> verticesIndices_;
+		vector<GLuint> verticesIndices_;
 		vector<GLuint> texCoordsIndices_;
 		vector<GLuint> normalsIndices_;
+		vector<float> totalVertex_;
+		vector<GLuint> totalIndices_;
 		string path;
 	};
 
