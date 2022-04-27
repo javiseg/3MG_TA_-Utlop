@@ -42,6 +42,9 @@ namespace Utlop {
 		vector<GLuint> normalsIndices_;
 		vector<float> totalVertex_;
 		vector<GLuint> totalIndices_;
+		GLuint vao_ = 999;
+		GLuint vbo_ = 999;
+		GLuint ebo_ = 999;
 		string path;
 	};
 

@@ -31,7 +31,8 @@ namespace Utlop
 			void AddComponent(Entity& entity, Utlop::ComponentID id);
 			void AddCubeMap();
 			void InitMaterials(RenderCtx* data, const char* path);
-			void InitGeometry(RenderCtx* data, const char* path);
+			void InitGeometry(Entity& entity, RenderCtx* data, const char* path);
+			void InitShaders(Entity& entity, RenderCtx* data, const char* path);
 
 			void MoveCamera();
 
@@ -39,6 +40,7 @@ namespace Utlop
 
 			void InitSystems();
 			void PreExecSystems();
+			void PreExecSystem(Entity& entity);
 			void ExecSystems();
 			void ExecSystems2();
 

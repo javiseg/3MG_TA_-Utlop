@@ -9,12 +9,8 @@ namespace Utlop {
 	class DisplayList;
 
 	struct System {
-		virtual void preExec(Entity& entity, Utlop::RenderCtx* data) {
-
-		}
-		virtual void exec(Entity& entity, Utlop::RenderCtx* data, DisplayList* dl) {
-			
-		}
+		virtual void preExec(Entity& entity, Utlop::RenderCtx* data) = 0;
+		virtual void exec(Entity& entity, Utlop::RenderCtx* data, DisplayList* dl) = 0;
 		int id_ = -1;
 	};
 
@@ -25,13 +21,14 @@ namespace Utlop {
 		~LocalTRSystem() {}
 		void preExec(Entity& entity, Utlop::RenderCtx* data) override;
 		void exec(Entity& entity, RenderCtx* data, DisplayList* dl) override;
-		void UpdateModel(Entity& entity, RenderCtx* data);
 	};
 	struct WorldTRSystem : public System{
 		WorldTRSystem() {
 			id_ = kWorldTRComp;
 		}
 		~WorldTRSystem() {}
+		void preExec(Entity& entity, Utlop::RenderCtx* data) override {}
+		void exec(Entity& entity, RenderCtx* data, DisplayList* dl) override {}
 	};
 	struct CameraSystem : public System {
 		CameraSystem() {
@@ -40,8 +37,6 @@ namespace Utlop {
 		~CameraSystem() {}
 		void preExec(Entity& entity, Utlop::RenderCtx* data) override;
 		void exec(Entity& entity, RenderCtx* data, DisplayList* dl) override;
-		void init(Entity& entity, RenderCtx* data);
-		void update(Entity& entity, RenderCtx* data);
 	};
 	struct RenderSystem : public System{
 		RenderSystem() {

@@ -10,6 +10,7 @@
 #include "system.h"
 #include "tiny_obj_loader.h"
 #include <time.h>
+#include <glm/gtc/type_ptr.hpp>
 #include "stb_image.h"
 #include "stb_image_write.h"
 #define PX_SCHED_IMPLEMENTATION 1
@@ -82,7 +83,10 @@ namespace Utlop
 		AddComponent(*data->entities[0], kLocalTRComp);
 		data->localtrcmp[data->entities[0]->cmp_indx_[kCameraCompPos]].position = vec3(0.0f, 0.0f, 55.0f);
 		//AddComponent(*data->entities[0], kRenderComp);
-		
+		//
+
+
+		//
 		px_sched::Scheduler scheduler1;
 		scheduler1.init();
 		px_sched::Sync schedulerReady1;
@@ -144,6 +148,11 @@ namespace Utlop
 			/*glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       glClearColor(160.0f/255.0f, 160.0f / 255.0f, 160.0f / 255.0f, 1.0f);*/
 
+			int ent = AddEntity();
+			//AddComponent(*data->entities[ent], kLocalTRComp);
+			//AddComponent(*data->entities[ent], kRenderComp);
+			InitGeometry(*data->entities[ent], data, "../UtlopTests/src/obj/robot/robot.obj");
+			InitMaterials(data, "../UtlopTests/src/obj/robot/diffuse.jpg");
 
 			glEnable(GL_DEPTH_TEST);
 			glDepthFunc(GL_LESS);
@@ -161,6 +170,9 @@ namespace Utlop
 			//InitGeometry(data, "../UtlopTests/src/obj/backpack/backpack.obj");
 			//scheduler.run(preSched, &schedulerReady);
 			PreExecSystems();
+			//scheduler.run(preSched, &schedulerReady);
+			//scheduler.waitFor(schedulerReady);
+
 
       while (!glfwWindowShouldClose(_window._window))
       {
@@ -176,13 +188,14 @@ namespace Utlop
 
 				glfwPollEvents();
 
-
-				ExecSystems();
+				//data->localtrcmp[1].rotation = glm::vec3(0.0f, cos(lastFrame) * 90.0f, 0.0f);
+				//ExecSystems();
+				//scheduler.run(sched, &schedulerReady);
 				//ExecSystems2();
-				//if (preExecDone_) {
-					//scheduler.run(sched, &schedulerReady);
+				if (preExecDone_) {
+					scheduler.run(sched, &schedulerReady);
 					
-				//}
+				}
 					
 				
 
@@ -203,7 +216,7 @@ namespace Utlop
 				glDrawArrays(GL_TRIANGLES, 0, 36);*/
 				
 		
-
+				scheduler.waitFor(schedulerReady);
 				displayList->submit();
 
 				ImGUI();
@@ -368,7 +381,7 @@ namespace Utlop
 		text_buffer_ = stbi_load(tmpText.path_.c_str(), &tmpText.width_, &tmpText.height_, &tmpText.bpp_, 4);
 
 		if (text_buffer_) {
-
+			stbi_set_flip_vertically_on_load(true);
 
 			glCreateTextures(GL_TEXTURE_2D, 1, &tmpText.diff_);
 
@@ -389,11 +402,52 @@ namespace Utlop
 		}
 	}
 
-	void Core::InitGeometry(RenderCtx* data, const char* path)
+	void Core::InitGeometry(Entity& entity, RenderCtx* data, const char* path)
 	{
 		Geometry geo;
 		loadOBJ2(path, geo);
-		//data->geometry.push_back(geo);
+
+		const GLuint vertexPosition = 0;
+		const GLuint texcoord = 1;
+		const GLuint normalPosition = 2;
+
+		data->geometry.push_back(geo);
+		//data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.push_back(data->geometry.size() - 1);
+
+		
+
+		glCreateVertexArrays(1, &data->geometry[data->geometry.size() - 1].vao_);
+
+		glCreateBuffers(1, &data->geometry[data->geometry.size() - 1].vbo_);
+		glCreateBuffers(1, &data->geometry[data->geometry.size() - 1].ebo_);
+
+		glNamedBufferData(data->geometry[data->geometry.size() - 1].vbo_,
+			geo.totalVertex_.size() * sizeof(float), geo.totalVertex_.data(), GL_STATIC_DRAW);
+		glNamedBufferData(data->geometry[data->geometry.size() - 1].ebo_,
+			geo.totalIndices_.size() * sizeof(GLuint), geo.totalIndices_.data(), GL_STATIC_DRAW);
+
+
+		glEnableVertexArrayAttrib(data->geometry[data->geometry.size() - 1].vao_, vertexPosition);
+		glVertexArrayAttribBinding(data->geometry[data->geometry.size() - 1].vao_, vertexPosition, 0);
+		glVertexArrayAttribFormat(data->geometry[data->geometry.size() - 1].vao_, vertexPosition, 3, GL_FLOAT, GL_FALSE, 0);
+
+
+		glEnableVertexArrayAttrib(data->geometry[data->geometry.size() - 1].vao_, texcoord);
+		glVertexArrayAttribBinding(data->geometry[data->geometry.size() - 1].vao_, texcoord, 0);
+		glVertexArrayAttribFormat(data->geometry[data->geometry.size() - 1].vao_, texcoord, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(float));
+
+		glEnableVertexArrayAttrib(data->geometry[data->geometry.size() - 1].vao_, normalPosition);
+		glVertexArrayAttribBinding(data->geometry[data->geometry.size() - 1].vao_, normalPosition, 0);
+		glVertexArrayAttribFormat(data->geometry[data->geometry.size() - 1].vao_, normalPosition, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float));
+
+
+
+		glVertexArrayVertexBuffer(data->geometry[data->geometry.size() - 1].vao_, 0,
+			data->geometry[data->geometry.size() - 1].vbo_, 0, 8 * sizeof(float));
+
+
+		glVertexArrayElementBuffer(data->geometry[data->geometry.size() - 1].vao_,
+			data->geometry[data->geometry.size() - 1].ebo_);
 
 }
 
@@ -424,6 +478,15 @@ namespace Utlop
 			}
 		}
 		preExecDone_ = 1;
+	}
+
+	void Core::PreExecSystem(Entity& entity)
+	{
+		for (unsigned int i = 0; i < data->sys.size(); i++) {	
+			int out = entity.componentsID_ & data->sys[i]->id_;
+			if (out == data->sys[i]->id_)
+				data->sys[i]->preExec(entity, data);
+		}
 	}
 
 	void Core::ExecSystems()
@@ -470,10 +533,46 @@ namespace Utlop
 
 			ImGui::ColorEdit4("Color", &bg_color_[0]);
 
+
+			if (ImGui::Button("Add Agent")) {
+				int entityIdx = AddEntity();
+				AddComponent(*data->entities[entityIdx], kLocalTRComp);
+				AddComponent(*data->entities[entityIdx], kRenderComp);
+				PreExecSystem(*data->entities[entityIdx]);
+			}
+
+			ImGui::TextColored(ImVec4(1, 1, 0, 1), "Current GameObjects");
+			ImGui::BeginChild("GameObject");
+
+			vec3 position;
+			vec3 rotation;
+			for (int n = 0; n < data->entities.size(); n++) {
+				
+				if (data->entities[n]->cmp_indx_[kLocalTRCompPos] != -1) {
+					ImGui::Text("%04d: Object", n);
+					position = data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].position;
+					rotation = data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].rotation;
+					ImGui::SetCursorPosX(100.0f);
+					std::string slidername = "Location of " + std::to_string(n);
+					ImGui::Text("Location");
+					ImGui::SliderFloat3(slidername.c_str(), &position[0], -100.0f, 100.0f);
+					data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].position = position;
+					ImGui::SetCursorPosX(100.0f);
+					std::string slidername2 = "Rotation of " + std::to_string(n);
+					ImGui::Text("Rotation");
+					ImGui::SliderFloat3(slidername2.c_str(), &rotation[0], -359.0f, 359.0f);
+					data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].rotation = rotation;
+				}
+			}
+
+			ImGui::EndChild();
+
 			ImGui::End();
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		}
+
+		
 	}
 	void Core::InitImGUI()
 	{
