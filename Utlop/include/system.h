@@ -52,6 +52,16 @@ namespace Utlop {
 		void initShader(Entity& entity, RenderCtx* data);
 		
 	};
+
+	struct HeritageSystem : public System {
+		HeritageSystem() {
+			id_ = kHeritageComp;
+		}
+		~HeritageSystem() {}
+		void preExec(Entity& entity, Utlop::RenderCtx* data) override;
+		void exec(Entity& entity, RenderCtx* data, DisplayList* dl) override;
+
+	};
 	
 
 }

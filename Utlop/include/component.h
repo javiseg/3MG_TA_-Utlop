@@ -12,14 +12,16 @@ namespace Utlop {
 		kLocalTRComp = 1,
 		kWorldTRComp = 2,
 		kCameraComp = 4,
-		kRenderComp = 8
+		kHeritageComp = 8,
+		kRenderComp = 16
 	};
 
 	enum ComponentPos {
 		kLocalTRCompPos = 0,
 		kWorldTRCompPos = 1,
 		kCameraCompPos = 2,
-		kRenderCompPos = 3
+		kHeritageCompPos = 3,
+		kRenderCompPos = 4
 	};
 
 
@@ -63,5 +65,12 @@ namespace Utlop {
 		vec3 Right;
 		vec3 front_;
 		bool hasInit = false;
+	};
+
+	struct HeritageComponent : public Component {
+		unsigned int entityID;
+		unsigned int parentID;
+		mat4 localMatrix;
+		mat4 parentMatrix;
 	};
 }

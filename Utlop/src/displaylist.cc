@@ -30,12 +30,12 @@ Utlop::DisplayList& Utlop::addWindowClearCmd(DisplayList* dl, float r, float g, 
 	return *dl;
 }
 
-Utlop::DisplayList& Utlop::addInitMaterialCmd(DisplayList* dl, float r, float g, float b, float a)
+Utlop::DisplayList& Utlop::addInitMaterialCmd(DisplayList* dl/*, float r, float g, float b, float a*/)
 {
 	return *dl;
 }
 
-Utlop::DisplayList& Utlop::addDrawCmd(Utlop::DisplayList* dl, GLuint shaderId, GLuint materialID, GLuint vao, size_t size,
+Utlop::DisplayList& Utlop::addDrawCmd(Utlop::DisplayList* dl, GLuint shaderId, GLuint materialID, GLuint vao, GLsizei size,
 	glm::mat4 view, glm::mat4 model)
 {
 	shared_ptr<DrawMaterialCmd> draw_material_cmd;
@@ -78,7 +78,7 @@ Utlop::DisplayList& Utlop::addSetModelViewProjection(Utlop::DisplayList* dl, GLu
 	return *dl;
 }
 
-void Utlop::callback_WindowClearCmd(WindowClearCmd cmd)
-{
-	
-}
+//void Utlop::callback_WindowClearCmd(WindowClearCmd cmd)
+//{
+//	
+//}

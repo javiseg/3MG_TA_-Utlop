@@ -42,7 +42,7 @@ namespace Utlop {
 		GLuint shaderId;
 		GLuint materialID;
 		GLuint vao;
-		size_t size;
+		GLsizei size;
 		glm::mat4 view;
 		glm::mat4 model;
 	};
@@ -69,7 +69,7 @@ namespace Utlop {
 		glm::mat4 p;
 		GLuint shaderID;
 	};
-	void callback_WindowClearCmd(WindowClearCmd cmd);
+	//void callback_WindowClearCmd(WindowClearCmd cmd);
 
 	class DisplayList {
 		public:
@@ -81,8 +81,8 @@ namespace Utlop {
 
 
 	DisplayList& addWindowClearCmd(DisplayList* dl, float r, float g, float b, float a);
-	DisplayList& addInitMaterialCmd(DisplayList* dl, float r, float g, float b, float a);
-	DisplayList& addDrawCmd(DisplayList* dl, GLuint shaderId, GLuint materialID, GLuint vao, size_t size,
+	DisplayList& addInitMaterialCmd(DisplayList* dl/*, float r, float g, float b, float a*/);
+	DisplayList& addDrawCmd(DisplayList* dl, GLuint shaderId, GLuint materialID, GLuint vao, GLsizei size,
 		glm::mat4 view, glm::mat4 model);
 	DisplayList& addSetPolygonCmd(DisplayList* dl, uint8_t on);
 	DisplayList& addSetModelViewProjection(DisplayList* dl, GLuint shaderID, glm::mat4 projection, glm::mat4 model, glm::mat4 view);

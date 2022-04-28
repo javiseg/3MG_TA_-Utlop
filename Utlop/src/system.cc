@@ -149,3 +149,11 @@ void Utlop::RenderSystem::initShader(Entity& entity, RenderCtx* data)
 	//checkCompileErrors(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, "PROGRAM");
 	//checkCompileErrors(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, "LINK");
 }
+
+void Utlop::HeritageSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
+{
+}
+
+void Utlop::HeritageSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
+{
+}

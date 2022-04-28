@@ -66,8 +66,8 @@ namespace Utlop
     _fps = fps;
     _frame_time_millis = 1000 / (long)_fps;
 		preExecDone_ = 0;
-		//camera_.alloc();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		polygon_ = false;
@@ -82,11 +82,9 @@ namespace Utlop
 		AddComponent(*data->entities[0], kCameraComp);
 		AddComponent(*data->entities[0], kLocalTRComp);
 		data->localtrcmp[data->entities[0]->cmp_indx_[kCameraCompPos]].position = vec3(0.0f, 0.0f, 55.0f);
-		//AddComponent(*data->entities[0], kRenderComp);
 		//
 
 
-		//
 		px_sched::Scheduler scheduler1;
 		scheduler1.init();
 		px_sched::Sync schedulerReady1;
@@ -196,24 +194,8 @@ namespace Utlop
 					scheduler.run(sched, &schedulerReady);
 					
 				}
-					
-				
-
 
 				MoveCamera();
-
-				/*const GLsizeiptr kUniformBufferSize = sizeof(PerFrameData);
-				glUseProgram(data->cubemap.shaderID_);
-				GLuint perFrameDataBuffer;
-				glCreateBuffers(1, &perFrameDataBuffer);
-				glNamedBufferStorage(perFrameDataBuffer, kUniformBufferSize, nullptr, GL_DYNAMIC_STORAGE_BIT);
-				glBindBufferRange(GL_UNIFORM_BUFFER, 0, perFrameDataBuffer, 0, kUniformBufferSize);
-
-				const mat4 m = glm::scale(mat4(1.0f), vec3(2.0f));
-				PerFrameData perFrameData = { perFrameData.model = m, perFrameData.mvp = data->cameracmp[0].view_ * data->cameracmp[0].projection_ * m, perFrameData.cameraPos = vec4(0.0f) };
-				glNamedBufferSubData(perFrameDataBuffer, 0, kUniformBufferSize, &perFrameData);
-				glUseProgram(data->cubemap.shaderID_);
-				glDrawArrays(GL_TRIANGLES, 0, 36);*/
 				
 		
 				scheduler.waitFor(schedulerReady);
@@ -256,9 +238,10 @@ namespace Utlop
 		for (int i = 0; i < kMaxComponents; i++) {
 			newEntity.cmp_indx_[i] = -1;
 		}		
-
+		newEntity.entityIdx = data->entities.size();
 		data->entities.push_back(make_shared<Entity>(newEntity));
-		return data->entities.size() - 1;
+
+		return newEntity.entityIdx;
 	}
 
 	void Core::AddComponent(Entity& entity, Utlop::ComponentID id)
@@ -270,22 +253,22 @@ namespace Utlop
 			switch (id) {
 				case kLocalTRComp: {
 						data->localtrcmp.push_back(LocalTRComponent());
-						entity.cmp_indx_[kLocalTRCompPos] = data->localtrcmp.size() - 1;
+						entity.cmp_indx_[kLocalTRCompPos] = (int)(data->localtrcmp.size() - 1);
 					break;
 				}
 				case kWorldTRComp: {
 						data->worldtrcmp.push_back(WorldTRComponent());
-						entity.cmp_indx_[kWorldTRCompPos] = data->worldtrcmp.size() - 1;
+						entity.cmp_indx_[kWorldTRCompPos] = (int)(data->worldtrcmp.size() - 1);
 					break;
 				}
 				case kCameraComp: {
 						data->cameracmp.push_back(CameraComponent());
-						entity.cmp_indx_[kCameraCompPos] = data->cameracmp.size() - 1;
+						entity.cmp_indx_[kCameraCompPos] = (int)(data->cameracmp.size() - 1);
 					break;
 				}
 				case kRenderComp: {
 						data->rendercmp.push_back(RenderComponent());
-						entity.cmp_indx_[kRenderCompPos] = data->rendercmp.size() - 1;
+						entity.cmp_indx_[kRenderCompPos] = (int)(data->rendercmp.size() - 1);
 					break;
 				}
 			}
@@ -360,7 +343,7 @@ namespace Utlop
 		Geometry cubeGeo;
 		cubeGeo.vertices_.insert(cubeGeo.vertices_.begin(),std::begin(skyboxVertices), std::end(skyboxVertices));
 		data->geometry.push_back(cubeGeo);
-		data->cubemap.geo_idx.push_back(data->geometry.size() - 1);
+		data->cubemap.geo_idx.push_back((GLuint)(data->geometry.size() - 1));
 
 		glGenVertexArrays(1, &data->cubemap.vao_);
 		glGenBuffers(1, &data->cubemap.vbo_);
@@ -458,6 +441,7 @@ namespace Utlop
 		data->kComponentMap.insert(make_pair(kWorldTRComp, WorldTRComponent()));
 		data->kComponentMap.insert(make_pair(kRenderComp, RenderComponent()));
 		data->kComponentMap.insert(make_pair(kCameraComp, CameraComponent()));
+		data->kComponentMap.insert(make_pair(kHeritageComp, HeritageComponent()));
 	}
 
 	void Core::InitSystems()
@@ -466,6 +450,7 @@ namespace Utlop
 		data->sys.push_back(make_shared<WorldTRSystem>());
 		data->sys.push_back(make_shared<CameraSystem>());
 		data->sys.push_back(make_shared<RenderSystem>());
+		data->sys.push_back(make_shared<HeritageSystem>());
 	}
 
 	void Core::PreExecSystems()
