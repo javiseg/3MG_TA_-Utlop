@@ -15,9 +15,13 @@ layout(location = VIEW_MATRIX) uniform mat4 ViewMatrix;
 layout(location = PROJ_MATRIX) uniform mat4 ProjectionMatrix;
 
 out vec2 text_coords;
+out vec3 frag_position;
+out vec3 frag_normal;
 
 void main()
 {
     text_coords = aTexCoord;
 	gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(position, 1.0f);
+	frag_position = position;
+	frag_normal = normals;
 }

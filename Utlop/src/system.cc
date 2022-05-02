@@ -146,8 +146,8 @@ void Utlop::RenderSystem::initShader(Entity& entity, RenderCtx* data)
 	
 	glLinkProgram(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_);
 	glUseProgram(0);
-	//checkCompileErrors(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, "PROGRAM");
-	//checkCompileErrors(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, "LINK");
+	checkCompileErrors(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, "PROGRAM");
+	checkCompileErrors(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, "LINK");
 }
 
 void Utlop::HeritageSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
