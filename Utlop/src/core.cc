@@ -162,6 +162,8 @@ namespace Utlop
 			InitGeometry(data, "../UtlopTests/src/obj/cube.obj");
 			InitMaterials(data, "../UtlopTests/src/obj/robot/diffuse.jpg");
 			InitMaterials(data, "../UtlopTests/src/textures/white.png");
+			InitMaterials(data, "../UtlopTests/src/obj/helmet/helmet.jpg");
+			InitMaterials(data, "../UtlopTests/src/obj/helmet/diffuse.png");
 
 			glEnable(GL_DEPTH_TEST);
 			glDepthFunc(GL_LESS);
@@ -580,6 +582,25 @@ namespace Utlop
 					ImGui::Text("Rotation");
 					ImGui::SliderFloat3(slidername2.c_str(), &rotation[0], -359.0f, 359.0f);
 					data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].rotation = rotation;
+				}
+
+				const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK", "LLLLLLL", "MMMM", "OOOOOOO", "PPPP", "QQQQQQQQQQ", "RRR", "SSSS" };
+				static const char* current_item = NULL;
+				std::string nameCombo = "##combo" + std::to_string(n);
+				if (ImGui::BeginCombo(nameCombo.c_str(), current_item)) // The second parameter is the label previewed before opening the combo.
+				{
+					for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+					{
+						bool is_selected = (current_item == items[n]); // You can store your selection however you want, outside or inside your objects
+						if (ImGui::Selectable(items[n], is_selected)) {
+							current_item = items[n];
+							
+						}
+						if (is_selected)
+							ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+
+					}
+					ImGui::EndCombo();
 				}
 			}
 
