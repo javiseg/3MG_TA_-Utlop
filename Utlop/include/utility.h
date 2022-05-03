@@ -106,19 +106,19 @@ bool loadOBJ2(const char* path, Utlop::Geometry& geo) {
 		{
 			// Construct a new (x, y, z) position for the current mesh index.
 			glm::vec3 position{
-					attributes.vertices[3 * index.vertex_index + 0],
-					attributes.vertices[3 * index.vertex_index + 1],
-					attributes.vertices[3 * index.vertex_index + 2] };
+					attributes.vertices[(int)3 * index.vertex_index + 0],
+					attributes.vertices[(int)3 * index.vertex_index + 1],
+					attributes.vertices[(int)3 * index.vertex_index + 2] };
 
 			// Construct a new (u, v) texture coordinate for the current mesh index.
 			glm::vec2 texCoord{
-					attributes.texcoords[2 * index.texcoord_index + 0],
-					1.0f - attributes.texcoords[2 * index.texcoord_index + 1] };
+					attributes.texcoords[(int)2 * index.texcoord_index + 0],
+					1.0f - attributes.texcoords[(int)2 * index.texcoord_index + 1] };
 
 			glm::vec3 normals{
-					attributes.normals[3 * index.normal_index + 0],
-					attributes.normals[3 * index.normal_index + 1],
-					attributes.normals[3 * index.normal_index + 2] };
+					attributes.normals[(int)3 * index.normal_index + 0],
+					attributes.normals[(int)3 * index.normal_index + 1],
+					attributes.normals[(int)3 * index.normal_index + 2] };
 
 
 			// Construct a vertex with the extracted data.

@@ -3,12 +3,13 @@
 #include <memory>
 #include "glad/glad.h"
 #include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include "glm/mat4x4.hpp"
 
 namespace Utlop {
 
 	using namespace std;
-
+	using namespace glm;
 
 	struct Command {
 		virtual void executeOnGPU() = 0;
@@ -31,9 +32,7 @@ namespace Utlop {
 
 			glBindVertexArray(vao);
 
-			
 			glBindTextureUnit(0, materialID);
-
 
 			glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, 0);
 
@@ -70,7 +69,25 @@ namespace Utlop {
 		GLuint shaderID;
 	};
 	//void callback_WindowClearCmd(WindowClearCmd cmd);
+	struct SetLightDataCmd : public Command {
+		void executeOnGPU() override {
+			glUseProgram(shaderID);
+			int p_dir = glGetUniformLocation(shaderID, "dirLight.direction");
+			int p_color = glGetUniformLocation(shaderID, "dirLight.color");
+			int p_intensity = glGetUniformLocation(shaderID, "dirLight.intensity");
+			int p_pos = glGetUniformLocation(shaderID, "dirLightPos");
 
+			glUniform3fv(p_color, 1, glm::value_ptr(color));
+			glUniform1fv(p_intensity, 1, &intensity);
+			glUniform3fv(p_pos, 1, glm::value_ptr(position));
+
+			glUseProgram(0);
+		}
+		vec3 color;
+		vec3 position;
+		float intensity = 0.0f;
+		GLuint shaderID;
+	};
 	class DisplayList {
 		public:
 			list<shared_ptr<Command>> cmdList;
@@ -86,5 +103,5 @@ namespace Utlop {
 		glm::mat4 view, glm::mat4 model);
 	DisplayList& addSetPolygonCmd(DisplayList* dl, uint8_t on);
 	DisplayList& addSetModelViewProjection(DisplayList* dl, GLuint shaderID, glm::mat4 projection, glm::mat4 model, glm::mat4 view);
-
+	DisplayList& addSetLightDataCmd(DisplayList* dl, glm::vec3 color, glm::vec3 position, float intensity, GLuint shaderID);
 }

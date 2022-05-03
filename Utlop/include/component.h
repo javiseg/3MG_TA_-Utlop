@@ -13,7 +13,8 @@ namespace Utlop {
 		kWorldTRComp = 2,
 		kCameraComp = 4,
 		kHeritageComp = 8,
-		kRenderComp = 16
+		kLightComp = 16,
+		kRenderComp = 32
 	};
 
 	enum ComponentPos {
@@ -21,7 +22,8 @@ namespace Utlop {
 		kWorldTRCompPos = 1,
 		kCameraCompPos = 2,
 		kHeritageCompPos = 3,
-		kRenderCompPos = 4
+		kLightCompPos = 4,
+		kRenderCompPos = 5
 	};
 
 
@@ -73,4 +75,12 @@ namespace Utlop {
 		mat4 localMatrix;
 		mat4 parentMatrix;
 	};
+
+	struct LightComponent : public Component {
+		vec3 direction;
+		vec3 color;
+		vec3 position;
+		float intensity;
+	};
+
 }

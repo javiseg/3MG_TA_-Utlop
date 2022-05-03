@@ -57,6 +57,8 @@ namespace Utlop
 				int entityIdx = cr->AddEntity();
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kLocalTRComp);
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kRenderComp);
+				cr->AddComponent(*cr->getData()->entities[entityIdx], kLightComp);
+				
 				cr->getData()->localtrcmp[cr->getData()->entities[entityIdx]->cmp_indx_[kLocalTRCompPos]].position -= vec3(20.0f * i, 20.0f * j, 0.0f);
 			}
 		}
@@ -271,6 +273,17 @@ namespace Utlop
 						entity.cmp_indx_[kRenderCompPos] = (int)(data->rendercmp.size() - 1);
 					break;
 				}
+
+				case kHeritageComp: {
+						printf("\nTO DO: Add heritage comp at Add component \n");
+					break;
+				}
+
+				case kLightComp: {
+						data->lightcmp.push_back(LightComponent());
+						entity.cmp_indx_[kLightCompPos] = (int)(data->lightcmp.size() - 1);
+					break;
+				}
 			}
 
 		}
@@ -442,6 +455,7 @@ namespace Utlop
 		data->kComponentMap.insert(make_pair(kRenderComp, RenderComponent()));
 		data->kComponentMap.insert(make_pair(kCameraComp, CameraComponent()));
 		data->kComponentMap.insert(make_pair(kHeritageComp, HeritageComponent()));
+		data->kComponentMap.insert(make_pair(kLightComp, LightComponent()));
 	}
 
 	void Core::InitSystems()
@@ -451,6 +465,7 @@ namespace Utlop
 		data->sys.push_back(make_shared<CameraSystem>());
 		data->sys.push_back(make_shared<RenderSystem>());
 		data->sys.push_back(make_shared<HeritageSystem>());
+		data->sys.push_back(make_shared<LightSystem>());
 	}
 
 	void Core::PreExecSystems()

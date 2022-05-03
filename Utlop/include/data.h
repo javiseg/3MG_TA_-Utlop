@@ -22,6 +22,7 @@ namespace Utlop {
 		vector<WorldTRComponent> worldtrcmp;
 		vector<CameraComponent> cameracmp;
 		vector<RenderComponent> rendercmp;
+		vector<LightComponent> lightcmp;
 
 
 		vector<Geometry> geometry;

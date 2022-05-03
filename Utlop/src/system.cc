@@ -4,6 +4,8 @@
 #include "material.h"
 #include "utility.h"
 #include "displaylist.h"
+#include "core.h"
+#include "GLFW/glfw3.h"
 
 void Utlop::LocalTRSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
@@ -74,7 +76,7 @@ void Utlop::RenderSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
 	initShader(entity, data);
 	initGeo(entity, data, "../UtlopTests/src/obj/robot/robot.obj");
-	initMat(entity, data, "../UtlopTests/src/obj/robot/diffuse.jpg");
+	initMat(entity, data, "..UtlopTests/src/obj/robot/diffuse.jpg");
 	//initMat(entity, data, "../UtlopTests/src/textures/default.png");
 	
 }
@@ -156,4 +158,30 @@ void Utlop::HeritageSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 
 void Utlop::HeritageSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 {
+}
+
+void Utlop::LightSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
+{
+	data->lightcmp[entity.cmp_indx_[kLightCompPos]].color = vec3(1.0f, 0.0f, 0.0f);
+	data->lightcmp[entity.cmp_indx_[kLightCompPos]].direction = vec3(1.0f, 1.0f, 1.0f);
+	data->lightcmp[entity.cmp_indx_[kLightCompPos]].intensity = 3.0f;
+	data->lightcmp[entity.cmp_indx_[kLightCompPos]].position = vec3(0.0f, 0.0f, 20.0f);
+
+}
+
+void Utlop::LightSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
+{
+	if (entity.cmp_indx_[kRenderCompPos] != -1) {
+		if (entity.cmp_indx_[kLocalTRCompPos] != -1) {
+
+
+			data->lightcmp[entity.cmp_indx_[kLightCompPos]].intensity = sin((float)glfwGetTime()) + 1;
+			data->lightcmp[entity.cmp_indx_[kLightCompPos]].color = vec3(sin((float)glfwGetTime()), sin((float)glfwGetTime()), 1.0f);
+
+			addSetLightDataCmd(dl, data->lightcmp[entity.cmp_indx_[kLightCompPos]].color,
+				data->lightcmp[entity.cmp_indx_[kLightCompPos]].position,
+				data->lightcmp[entity.cmp_indx_[kLightCompPos]].intensity,
+				data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_);
+		}
+	}
 }

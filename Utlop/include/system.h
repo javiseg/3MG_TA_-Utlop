@@ -63,5 +63,13 @@ namespace Utlop {
 
 	};
 	
+	struct LightSystem : public System {
+		LightSystem() {
+			id_ = kLightComp;
+		}
+		~LightSystem() {}
+		void preExec(Entity& entity, Utlop::RenderCtx* data) override;
+		void exec(Entity& entity, RenderCtx* data, DisplayList* dl) override;
+	};
 
 }
