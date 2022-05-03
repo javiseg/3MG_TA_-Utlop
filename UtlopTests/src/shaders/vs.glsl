@@ -31,6 +31,7 @@ out vec3 dirLightDirection;
 out vec3 dirLightColor;
 out float dirLightIntensity;
 out vec3 dirLightPosition;
+out vec3 FragPos; 
 
 void main()
 {
@@ -41,6 +42,7 @@ void main()
 
     text_coords = aTexCoord;
 	gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(position, 1.0f);
-	frag_position = position;
-	frag_normal = normals;
+	frag_position = vec3(ModelMatrix * vec4(position, 1.0));
+	frag_normal = mat3(transpose(inverse(ModelMatrix))) * normals;
+	//FragPos = ;
 }

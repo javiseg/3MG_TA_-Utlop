@@ -52,12 +52,13 @@ namespace Utlop
   }
 
 	void Utlop::Core::createEntities(Core* cr) {
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < 2; j++) {
 				int entityIdx = cr->AddEntity();
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kLocalTRComp);
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kRenderComp);
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kLightComp);
+				//cr->AddComponent(*cr->getData()->entities[entityIdx], kDirectionalLightComp);
 				
 				cr->getData()->localtrcmp[cr->getData()->entities[entityIdx]->cmp_indx_[kLocalTRCompPos]].position -= vec3(20.0f * i, 20.0f * j, 0.0f);
 			}
@@ -84,6 +85,13 @@ namespace Utlop
 		AddComponent(*data->entities[0], kCameraComp);
 		AddComponent(*data->entities[0], kLocalTRComp);
 		data->localtrcmp[data->entities[0]->cmp_indx_[kCameraCompPos]].position = vec3(0.0f, 0.0f, 55.0f);
+
+
+		//Directional Light
+		int lightEntity = AddEntity();
+		AddComponent(*data->entities[lightEntity], kLocalTRComp);
+		AddComponent(*data->entities[lightEntity], kDirectionalLightComp);
+		AddComponent(*data->entities[lightEntity], kRenderComp);
 		//
 
 
@@ -148,14 +156,16 @@ namespace Utlop
 			/*glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       glClearColor(160.0f/255.0f, 160.0f / 255.0f, 160.0f / 255.0f, 1.0f);*/
 
-			int ent = AddEntity();
 			//AddComponent(*data->entities[ent], kLocalTRComp);
 			//AddComponent(*data->entities[ent], kRenderComp);
-			InitGeometry(*data->entities[ent], data, "../UtlopTests/src/obj/robot/robot.obj");
+			InitGeometry(data, "../UtlopTests/src/obj/robot/robot.obj");
+			InitGeometry(data, "../UtlopTests/src/obj/cube.obj");
 			InitMaterials(data, "../UtlopTests/src/obj/robot/diffuse.jpg");
+			InitMaterials(data, "../UtlopTests/src/textures/white.png");
 
 			glEnable(GL_DEPTH_TEST);
 			glDepthFunc(GL_LESS);
+			glShadeModel(GL_SMOOTH);
 			GLint version_max, version_min;
 			glGetIntegerv(GL_MAJOR_VERSION, &version_max);
 			glGetIntegerv(GL_MINOR_VERSION, &version_min);
@@ -284,6 +294,12 @@ namespace Utlop
 						entity.cmp_indx_[kLightCompPos] = (int)(data->lightcmp.size() - 1);
 					break;
 				}
+
+				case kDirectionalLightComp: {
+					data->directionallightcmp.push_back(DirectionalLightComponent());
+					entity.cmp_indx_[kDirectionalLightCompPos] = (int)(data->directionallightcmp.size() - 1);
+					break;
+				}
 			}
 
 		}
@@ -398,7 +414,7 @@ namespace Utlop
 		}
 	}
 
-	void Core::InitGeometry(Entity& entity, RenderCtx* data, const char* path)
+	void Core::InitGeometry(RenderCtx* data, const char* path)
 	{
 		Geometry geo;
 		loadOBJ2(path, geo);
@@ -408,8 +424,7 @@ namespace Utlop
 		const GLuint normalPosition = 2;
 
 		data->geometry.push_back(geo);
-		//data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.push_back(data->geometry.size() - 1);
-
+	
 		
 
 		glCreateVertexArrays(1, &data->geometry[data->geometry.size() - 1].vao_);
@@ -456,6 +471,7 @@ namespace Utlop
 		data->kComponentMap.insert(make_pair(kCameraComp, CameraComponent()));
 		data->kComponentMap.insert(make_pair(kHeritageComp, HeritageComponent()));
 		data->kComponentMap.insert(make_pair(kLightComp, LightComponent()));
+		data->kComponentMap.insert(make_pair(kDirectionalLightComp, DirectionalLightComponent()));
 	}
 
 	void Core::InitSystems()
@@ -466,6 +482,7 @@ namespace Utlop
 		data->sys.push_back(make_shared<RenderSystem>());
 		data->sys.push_back(make_shared<HeritageSystem>());
 		data->sys.push_back(make_shared<LightSystem>());
+		data->sys.push_back(make_shared<DirectionalLightSystem>());
 	}
 
 	void Core::PreExecSystems()
@@ -538,6 +555,7 @@ namespace Utlop
 				int entityIdx = AddEntity();
 				AddComponent(*data->entities[entityIdx], kLocalTRComp);
 				AddComponent(*data->entities[entityIdx], kRenderComp);
+				AddComponent(*data->entities[entityIdx], kLightComp);
 				PreExecSystem(*data->entities[entityIdx]);
 			}
 

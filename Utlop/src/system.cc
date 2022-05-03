@@ -75,8 +75,13 @@ void Utlop::CameraSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 void Utlop::RenderSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
 	initShader(entity, data);
-	initGeo(entity, data, "../UtlopTests/src/obj/robot/robot.obj");
-	initMat(entity, data, "..UtlopTests/src/obj/robot/diffuse.jpg");
+	if (entity.cmp_indx_[kDirectionalLightCompPos] == -1) {
+		initGeo(entity, data, "../UtlopTests/src/obj/robot/robot.obj");
+		initMat(entity, data, "../UtlopTests/src/obj/robot/diffuse.jpg");
+	}else{
+		initGeo(entity, data, "../UtlopTests/src/obj/cube.obj");
+		initMat(entity, data, "../UtlopTests/src/textures/white.png");
+	}
 	//initMat(entity, data, "../UtlopTests/src/textures/default.png");
 	
 }
@@ -89,12 +94,14 @@ void Utlop::RenderSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 		data->cameracmp[0].view_);
 	
 	for (int i = 0; i < data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.size(); i++) {
+		for (int j = 0; j < data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx.size(); j++) {
 
-		addDrawCmd(dl, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
-			data->material[0].diff_, data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx[i]].vao_,
-			data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx[i]].totalIndices_.size(),
-			data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, data->cameracmp[0].view_);
-
+			addDrawCmd(dl, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
+				data->material[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx[j]].diff_, 
+				data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx[i]].vao_,
+				data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx[i]].totalIndices_.size(),
+				data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, data->cameracmp[0].view_);
+		}
 	}
 
 }
@@ -115,9 +122,9 @@ void Utlop::RenderSystem::initGeo(Entity& entity, RenderCtx* data, const char* p
 	}
 	if (geo_index != -1) {
 		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.push_back(geo_index);
-		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_ = data->rendercmp[0].vao_;
-		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_ = data->rendercmp[0].vbo_;
-		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_ = data->rendercmp[0].ebo_;
+		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_ = data->geometry[geo_index].vao_;
+		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_ = data->rendercmp[geo_index].vbo_;
+		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_ = data->rendercmp[geo_index].ebo_;
 	}
 }
 
@@ -162,26 +169,39 @@ void Utlop::HeritageSystem::exec(Entity& entity, RenderCtx* data, DisplayList* d
 
 void Utlop::LightSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
-	data->lightcmp[entity.cmp_indx_[kLightCompPos]].color = vec3(1.0f, 0.0f, 0.0f);
+	data->lightcmp[entity.cmp_indx_[kLightCompPos]].color = vec3(1.0f, 1.0f, 1.0f);
 	data->lightcmp[entity.cmp_indx_[kLightCompPos]].direction = vec3(1.0f, 1.0f, 1.0f);
-	data->lightcmp[entity.cmp_indx_[kLightCompPos]].intensity = 3.0f;
+	data->lightcmp[entity.cmp_indx_[kLightCompPos]].intensity = 2.0f;
 	data->lightcmp[entity.cmp_indx_[kLightCompPos]].position = vec3(0.0f, 0.0f, 20.0f);
-
 }
 
 void Utlop::LightSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 {
 	if (entity.cmp_indx_[kRenderCompPos] != -1) {
-		if (entity.cmp_indx_[kLocalTRCompPos] != -1) {
+		
+			for (int i = 0; i < data->directionallightcmp.size(); i++) {
+				addSetLightDataCmd(dl, data->directionallightcmp[i].color, data->directionallightcmp[i].position,
+					data->directionallightcmp[i].intensity, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_);
+			}
+	}
+}
 
+void Utlop::DirectionalLightSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
+{
+	if (entity.cmp_indx_[kLocalTRCompPos] != -1) {
+		data->directionallightcmp[entity.cmp_indx_[kDirectionalLightCompPos]].color = vec3(1.0f, 1.0f, 1.0f);
+		data->directionallightcmp[entity.cmp_indx_[kDirectionalLightCompPos]].direction = vec3(1.0f, 1.0f, 1.0f);
+		data->directionallightcmp[entity.cmp_indx_[kDirectionalLightCompPos]].intensity = 2.0f;
+		data->directionallightcmp[entity.cmp_indx_[kDirectionalLightCompPos]].position = data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].position;
+	}
+	else {
+		printf("\nERROR: Directional light entity without transform\n");
+	}
+}
 
-			data->lightcmp[entity.cmp_indx_[kLightCompPos]].intensity = sin((float)glfwGetTime()) + 1;
-			data->lightcmp[entity.cmp_indx_[kLightCompPos]].color = vec3(sin((float)glfwGetTime()), sin((float)glfwGetTime()), 1.0f);
-
-			addSetLightDataCmd(dl, data->lightcmp[entity.cmp_indx_[kLightCompPos]].color,
-				data->lightcmp[entity.cmp_indx_[kLightCompPos]].position,
-				data->lightcmp[entity.cmp_indx_[kLightCompPos]].intensity,
-				data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_);
-		}
+void Utlop::DirectionalLightSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
+{
+	if (entity.cmp_indx_[kLocalTRCompPos] != -1) {
+		data->directionallightcmp[entity.cmp_indx_[kDirectionalLightCompPos]].position = data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].position;
 	}
 }

@@ -2,6 +2,7 @@
 in vec2 text_coords;
 in vec3 frag_position;
 in vec3 frag_normal;
+in vec3 FragPos;
 
 in vec3 dirLightDirection;
 in vec3 dirLightColor;
@@ -35,14 +36,14 @@ void main()
 	
 	n_dirLight.direction = normalize(dirLightPosition - frag_position);
 
-
+	//float diff = normalize(dirLightPosition - frag_position);
 
 
 	vec4 textures = texture(ourTexture, text_coords);
 
 	vec3 FinalResult = textures.rgb;
 	
-	float brightness = dot(n_dirLight.direction, frag_normal) * n_dirLight.intensity;
+	float brightness = max(dot(n_dirLight.direction, frag_normal) * n_dirLight.intensity, 0.0f);
 
 	result += vec4(brightness);
 

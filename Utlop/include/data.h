@@ -23,7 +23,7 @@ namespace Utlop {
 		vector<CameraComponent> cameracmp;
 		vector<RenderComponent> rendercmp;
 		vector<LightComponent> lightcmp;
-
+		vector<DirectionalLightComponent> directionallightcmp;
 
 		vector<Geometry> geometry;
 		vector<Material> material;

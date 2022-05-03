@@ -7,6 +7,7 @@
 namespace Utlop {
 	using namespace glm;
 
+	
 
 	enum ComponentID {
 		kLocalTRComp = 1,
@@ -14,7 +15,8 @@ namespace Utlop {
 		kCameraComp = 4,
 		kHeritageComp = 8,
 		kLightComp = 16,
-		kRenderComp = 32
+		kDirectionalLightComp = 32,
+		kRenderComp = 64
 	};
 
 	enum ComponentPos {
@@ -23,7 +25,8 @@ namespace Utlop {
 		kCameraCompPos = 2,
 		kHeritageCompPos = 3,
 		kLightCompPos = 4,
-		kRenderCompPos = 5
+		kDirectionalLightCompPos = 5,
+		kRenderCompPos = 6
 	};
 
 
@@ -77,6 +80,13 @@ namespace Utlop {
 	};
 
 	struct LightComponent : public Component {
+		vec3 direction;
+		vec3 color;
+		vec3 position;
+		float intensity;
+	};
+
+	struct DirectionalLightComponent : public Component {
 		vec3 direction;
 		vec3 color;
 		vec3 position;
