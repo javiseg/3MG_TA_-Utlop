@@ -119,11 +119,83 @@ namespace Utlop
 		printf("Despues\n");
 		//AddEntity();
 		
+		
+		
 		bg_color_ = vec4(0.0f);
 		bg_color_.w = 1.0f;
-		
+		bool done = glfwInit();
 
-    return glfwInit();
+		getWindow()->init(1380, 780, "Utlop");
+
+		glfwMakeContextCurrent(_window._window);
+
+		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+		{
+			printf("Failed to initialize GLAD");
+		}
+		//Add Vertex
+		loadVertexShader("../UtlopTests/src/shaders/vs.glsl", data->vertexShader);
+		loadFragmentShader("../UtlopTests/src/shaders/fs_texture.glsl", data->fragmentShader);
+
+		framebuffer->rectangleToGPU();
+		framebuffer->initFBO(_window.width, _window.height);
+		framebuffer->errorCheck();
+		framebuffer->initShader();
+
+		std::string facesCubemap[6] =
+		{
+			"../UtlopTests/src/textures/cubemap/right.jpg",
+			"../UtlopTests/src/textures/cubemap/left.jpg",
+			"../UtlopTests/src/textures/cubemap/top.jpg",
+			"../UtlopTests/src/textures/cubemap/bottom.jpg",
+			"../UtlopTests/src/textures/cubemap/front.jpg",
+			"../UtlopTests/src/textures/cubemap/back.jpg"
+		};
+
+		cubemap->createBuffers();
+		cubemap->loadTextures(facesCubemap);
+		cubemap->loadShaders("../UtlopTests/src/shaders/skybox_vert.glsl", "../UtlopTests/src/shaders/skybox_frag.glsl");
+		glUniform1i(glGetUniformLocation(cubemap->shaderID, "skybox"), 0);
+
+
+		/*glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearColor(160.0f/255.0f, 160.0f / 255.0f, 160.0f / 255.0f, 1.0f);*/
+
+		//AddComponent(*data->entities[ent], kLocalTRComp);
+		//AddComponent(*data->entities[ent], kRenderComp);
+		/*InitGeometry(data, "../UtlopTests/src/obj/cube.obj");
+		InitGeometry(data, "../UtlopTests/src/obj/helmet/helmet.obj");
+		InitGeometry(data, "../UtlopTests/src/obj/container/container.obj");
+		InitGeometry(data, "../UtlopTests/src/obj/car/car.obj");
+		InitMaterials(data, "../UtlopTests/src/textures/white.png");
+		InitMaterials(data, "../UtlopTests/src/obj/helmet/diffuse.png");
+		InitMaterials(data, "../UtlopTests/src/obj/container/diffuse.png");
+		InitMaterials(data, "../UtlopTests/src/obj/car/diffuse.png");*/
+		vector<string> robotTextures;
+		robotTextures.push_back("../UtlopTests/src/obj/robot/diffuse.jpg");
+		InitMesh("../UtlopTests/src/obj/robot/robot.obj", robotTextures);
+
+		vector<string> cubeTextures;
+		cubeTextures.push_back("../UtlopTests/src/textures/white.png");
+		InitMesh("../UtlopTests/src/obj/cube.obj", cubeTextures);
+
+		vector<string> helmetTextures;
+		helmetTextures.push_back("../UtlopTests/src/obj/helmet/diffuse.png");
+		InitMesh("../UtlopTests/src/obj/helmet/helmet.obj", helmetTextures);
+
+		vector<string> containerTextures;
+		containerTextures.push_back("../UtlopTests/src/obj/container/diffuse.png");
+		InitMesh("../UtlopTests/src/obj/container/container.obj", containerTextures);
+
+		vector<string> carTextures;
+		carTextures.push_back("../UtlopTests/src/obj/car/diffuse.png");
+		InitMesh("../UtlopTests/src/obj/car/car.obj", carTextures);
+
+
+
+
+
+    return done;
   }
 
 
@@ -148,53 +220,9 @@ namespace Utlop
 			};
 
 
-      glfwMakeContextCurrent(_window._window);
-
-      if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-      {
-        printf("Failed to initialize GLAD");
-      }
-			
-			//Add Vertex
-			loadVertexShader("../UtlopTests/src/shaders/vs.glsl", data->vertexShader);
-			loadFragmentShader("../UtlopTests/src/shaders/fs_texture.glsl", data->fragmentShader);
-
-			framebuffer->rectangleToGPU();
-			framebuffer->initFBO(_window.width, _window.height);
-			framebuffer->errorCheck();
-			framebuffer->initShader();
-
-			std::string facesCubemap[6] =
-			{
-				"../UtlopTests/src/textures/cubemap/right.jpg",
-				"../UtlopTests/src/textures/cubemap/left.jpg",
-				"../UtlopTests/src/textures/cubemap/top.jpg",
-				"../UtlopTests/src/textures/cubemap/bottom.jpg",
-				"../UtlopTests/src/textures/cubemap/front.jpg",
-				"../UtlopTests/src/textures/cubemap/back.jpg"
-			};
-
-			cubemap->createBuffers();
-			cubemap->loadTextures(facesCubemap);
-			cubemap->loadShaders("../UtlopTests/src/shaders/skybox_vert.glsl", "../UtlopTests/src/shaders/skybox_frag.glsl");
-			glUniform1i(glGetUniformLocation(cubemap->shaderID, "skybox"), 0);
+      
 			
 			
-			/*glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      glClearColor(160.0f/255.0f, 160.0f / 255.0f, 160.0f / 255.0f, 1.0f);*/
-
-			//AddComponent(*data->entities[ent], kLocalTRComp);
-			//AddComponent(*data->entities[ent], kRenderComp);
-			InitGeometry(data, "../UtlopTests/src/obj/robot/robot.obj");
-			InitGeometry(data, "../UtlopTests/src/obj/cube.obj");
-			InitGeometry(data, "../UtlopTests/src/obj/helmet/helmet.obj");
-			InitGeometry(data, "../UtlopTests/src/obj/container/container.obj");
-			InitGeometry(data, "../UtlopTests/src/obj/car/car.obj");
-			InitMaterials(data, "../UtlopTests/src/obj/robot/diffuse.jpg");
-			InitMaterials(data, "../UtlopTests/src/textures/white.png");
-			InitMaterials(data, "../UtlopTests/src/obj/helmet/diffuse.png");
-			InitMaterials(data, "../UtlopTests/src/obj/container/diffuse.png");
-			InitMaterials(data, "../UtlopTests/src/obj/car/diffuse.png");
 
 			
 			glShadeModel(GL_SMOOTH);
@@ -438,37 +466,16 @@ namespace Utlop
 		
 	}
 
-	void Core::InitMaterials(RenderCtx* data, const char* path)
+	vector<Texture> Core::InitMaterials(RenderCtx* data, vector<string> texturePaths)
 	{
-		Material tmpText;
-		tmpText.path_ = path;
-
-		unsigned char* text_buffer_;
-		text_buffer_ = stbi_load(tmpText.path_.c_str(), &tmpText.width_, &tmpText.height_, &tmpText.bpp_, 4);
-
-		if (text_buffer_) {
-			stbi_set_flip_vertically_on_load(false);
-
-			glCreateTextures(GL_TEXTURE_2D, 1, &tmpText.diff_);
-
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-			glTextureStorage2D(tmpText.diff_, 1, GL_RGBA8, tmpText.width_, tmpText.height_);
-			glTextureSubImage2D(tmpText.diff_, 0, 0, 0, tmpText.width_, tmpText.height_, GL_RGBA, GL_UNSIGNED_BYTE, text_buffer_);
-			glGenerateTextureMipmap(tmpText.diff_);
-
-
-			stbi_image_free(text_buffer_);
-
-			data->material.push_back(tmpText);
-
+		vector<Texture> textures;
+		for each (auto & text in texturePaths) {
+			textures.push_back(Texture(text.c_str(), "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE));
 		}
+		return textures;
 	}
 
-	void Core::InitGeometry(RenderCtx* data, const char* path)
+	Geometry Core::InitGeometry(RenderCtx* data, const char* path)
 	{
 		Geometry geo;
 		loadOBJ2(path, geo);
@@ -478,8 +485,9 @@ namespace Utlop
 		const GLuint normalPosition = 2;
 
 		data->geometry.push_back(geo);
-	
-		
+
+		return geo;
+		/*
 
 		glCreateVertexArrays(1, &data->geometry[data->geometry.size() - 1].vao_);
 
@@ -512,14 +520,23 @@ namespace Utlop
 
 
 		glVertexArrayElementBuffer(data->geometry[data->geometry.size() - 1].vao_,
-			data->geometry[data->geometry.size() - 1].ebo_);
+			data->geometry[data->geometry.size() - 1].ebo_);*/
 
 	}
 
-	void Core::ChangeGeometry(Entity& entity, RenderCtx* data, int option)
+	void Core::ChangeMesh(Entity& entity, RenderCtx* data, int option)
 	{
-		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx[0] = option;
-		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx[0] = option;
+		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].mesh_idx[0] = option;
+	}
+
+	void Core::InitMesh(string geometryPath, vector<string> texturePath)
+	{
+		Geometry geo = InitGeometry(data, geometryPath.c_str());
+		InitMaterials(data, texturePath);
+
+		Mesh newMesh(geo.totalVertex_, geo.totalIndices_, InitMaterials(data, texturePath), geometryPath);
+		data->meshes.push_back(newMesh);
+
 	}
 
 
@@ -595,6 +612,10 @@ namespace Utlop
 	{
 		return data;
 	}
+	DisplayList* Core::getDisplayList()
+	{
+		return displayList;
+	}
 	float Core::getCameraSpeed()
 	{
 		return camera_speed_;
@@ -649,7 +670,7 @@ namespace Utlop
 					itoa(n, s, 10);
 					selectedType.push_back(0);
 					ImGui::ListBox(s, &selectedType[(n - 1)], obj_type, IM_ARRAYSIZE(obj_type));
-					ChangeGeometry(*data->entities[n], data, selectedType[n - 1]);
+					ChangeMesh(*data->entities[n], data, selectedType[n - 1]);
 				}
 
 				

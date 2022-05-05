@@ -47,10 +47,12 @@ void Utlop::CameraSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].pitch_ = 0.0f;
 	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].WorldUp = vec3(0.0f, 1.0f, 0.0f);
 	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].WorldRight = vec3(1.0f, 0.0f, 0.0f);
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].position_ = vec3(0.0f);
 }
 
 void Utlop::CameraSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 {
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].position_ = data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].position;
 	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].front_.x =
 		cos(glm::radians(data->cameracmp[entity.cmp_indx_[kCameraCompPos]].yaw_)) * cos(glm::radians(data->cameracmp[entity.cmp_indx_[kCameraCompPos]].pitch_));
 	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].front_.y =
@@ -66,20 +68,22 @@ void Utlop::CameraSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].Up =
 		normalize(cross(data->cameracmp[entity.cmp_indx_[kCameraCompPos]].Right, data->cameracmp[entity.cmp_indx_[kCameraCompPos]].front_));
 
-	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].view_ = glm::lookAt(data->localtrcmp[entity.cmp_indx_[0]].position,
-		data->localtrcmp[entity.cmp_indx_[0]].position + data->cameracmp[entity.cmp_indx_[kCameraCompPos]].front_, data->cameracmp[entity.cmp_indx_[kCameraCompPos]].Up);
+	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].view_ = glm::lookAt(data->cameracmp[entity.cmp_indx_[kCameraCompPos]].position_,
+		data->cameracmp[entity.cmp_indx_[kCameraCompPos]].position_ + data->cameracmp[entity.cmp_indx_[kCameraCompPos]].front_, data->cameracmp[entity.cmp_indx_[kCameraCompPos]].Up);
+
+	
 }
 
 
 void Utlop::RenderSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
 	initShader(entity, data);
+	
+	//entity.cmp_indx_[kRenderCompPos] = 0;
 	if (entity.cmp_indx_[kDirectionalLightCompPos] == -1) {
-		initGeo(entity, data, "../UtlopTests/src/obj/robot/robot.obj");
-		initMat(entity, data, "../UtlopTests/src/obj/robot/diffuse.jpg");
+		initialMesh(entity, data, "../UtlopTests/src/obj/robot/robot.obj");
 	}else{
-		initGeo(entity, data, "../UtlopTests/src/obj/cube.obj");
-		initMat(entity, data, "../UtlopTests/src/textures/white.png");
+		initialMesh(entity, data, "../UtlopTests/src/obj/cube.obj");
 	}
 	//initMat(entity, data, "../UtlopTests/src/textures/default.png");
 	
@@ -92,16 +96,8 @@ void Utlop::RenderSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 		data->cameracmp[0].projection_, data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model,
 		data->cameracmp[0].view_);
 	
-	for (int i = 0; i < data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.size(); i++) {
-		for (int j = 0; j < data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx.size(); j++) {
-
-			addDrawCmd(dl, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
-				data->material[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx[j]].diff_, 
-				data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx[i]].vao_,
-				data->geometry[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx[i]].totalIndices_.size(),
-				data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, data->cameracmp[0].view_);
-		}
-	}
+	addDrawMeshCmd(dl, data->meshes[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].mesh_idx[0]], data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
+		data->cameracmp[0], data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]]);
 
 }
 
@@ -111,37 +107,17 @@ void Utlop::RenderSystem::UpdateUniforms(GLuint shaderID)
 	
 }
 
-void Utlop::RenderSystem::initGeo(Entity& entity, RenderCtx* data, const char* path)
+void Utlop::RenderSystem::initialMesh(Entity& entity, RenderCtx* data, const char* path)
 {
-	int geo_index = -1;
-	for (unsigned int i = 0; i < data->geometry.size(); i++) {
-		if (data->geometry[i].path._Equal(path)) {
-			geo_index = i;
+	int mesh_index = -1;
+	for (unsigned int i = 0; i < data->meshes.size(); i++) {
+		if (data->meshes[i].path._Equal(path)) {
+			mesh_index = i;
 		}
 	}
-	if (geo_index != -1) {
-		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.push_back(geo_index);
-		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_ = data->geometry[geo_index].vao_;
-		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_ = data->geometry[geo_index].vbo_;
-		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_ = data->geometry[geo_index].ebo_;
+	if (mesh_index != -1) {
+		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].mesh_idx.push_back(mesh_index);
 	}
-}
-
-bool Utlop::RenderSystem::initMat(Entity& entity, RenderCtx* data, const char* path)
-{
-	Material tmpText;
-	//Debug:
-	tmpText.path_ = path;
-
-	for (unsigned int i = 0; i < data->material.size(); i++) {
-		if (data->material[i].path_._Equal(tmpText.path_)) {
-			data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx.push_back(i);
-			return true;
-		}
-	}
-
-
-	return false;
 }
 
 void Utlop::RenderSystem::initShader(Entity& entity, RenderCtx* data)

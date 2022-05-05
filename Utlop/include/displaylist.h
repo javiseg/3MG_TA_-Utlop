@@ -5,6 +5,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/mat4x4.hpp"
+#include "geometry.h"
 
 namespace Utlop {
 
@@ -45,6 +46,16 @@ namespace Utlop {
 		glm::mat4 view;
 		glm::mat4 model;
 	};
+
+	struct DrawMeshCmd : public Command {
+		void executeOnGPU() override {
+			m.Draw(shader, cameracmp);
+		}
+		Mesh m;
+		GLuint shader;
+		CameraComponent cameracmp;
+	};
+
 	struct SetPolygonCmd : public Command {
 		void executeOnGPU() override {
 			if (value)
@@ -174,6 +185,7 @@ namespace Utlop {
 	DisplayList& addInitMaterialCmd(DisplayList* dl/*, float r, float g, float b, float a*/);
 	DisplayList& addDrawCmd(DisplayList* dl, GLuint shaderId, GLuint materialID, GLuint vao, GLsizei size,
 		glm::mat4 view, glm::mat4 model);
+	DisplayList& addDrawMeshCmd(DisplayList* dl, Utlop::Mesh m, GLuint shader, Utlop::CameraComponent cameracmp, Utlop::LocalTRComponent localcmp);
 	DisplayList& addSetPolygonCmd(DisplayList* dl, uint8_t on);
 	DisplayList& addSetModelViewProjection(DisplayList* dl, GLuint shaderID, glm::mat4 projection, glm::mat4 model, glm::mat4 view);
 	DisplayList& addSetLightDataCmd(DisplayList* dl, glm::vec3 color, glm::vec3 position, float intensity, GLuint shaderID, vec3 camPosition);

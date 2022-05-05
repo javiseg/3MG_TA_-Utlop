@@ -32,6 +32,7 @@ namespace Utlop {
 		vector<Geometry> geometry;
 		vector<Material> material;
 		vector<GameObject> gObjects;
+		vector<Mesh> meshes;
 
 		GLuint vertexShader;
 		GLuint fragmentShader;

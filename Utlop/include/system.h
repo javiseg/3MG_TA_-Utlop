@@ -47,10 +47,8 @@ namespace Utlop {
 		void exec(Entity& entity, RenderCtx* data, DisplayList* dl) override;
 		void UpdateUniforms(GLuint shaderID);
 
-		void initGeo(Entity& entity, RenderCtx* data, const char* path);
-		bool initMat(Entity& entity, RenderCtx* data, const char* path);
+		void initialMesh(Entity& entity, RenderCtx* data, const char* path);
 		void initShader(Entity& entity, RenderCtx* data);
-		
 	};
 
 	struct HeritageSystem : public System {

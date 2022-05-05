@@ -3,9 +3,11 @@
 #include "glm/mat4x4.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glad/glad.h"
+#include <vector>
 
 namespace Utlop {
 	using namespace glm;
+	using namespace std;
 
 	
 
@@ -47,7 +49,9 @@ namespace Utlop {
 		vector<GLuint> geo_idx;
 		vector<GLuint> material_idx;
 		vector<GLuint> materialsettings_idx;
-		
+		vector<GLuint> mesh_idx;
+
+
 		GLuint shaderID_ = 999;
 		GLuint vao_ = 999;
 		GLuint vbo_ = 999;
@@ -70,6 +74,7 @@ namespace Utlop {
 		vec3 Right;
 		vec3 front_;
 		bool hasInit = false;
+		vec3 position_;
 	};
 
 	struct HeritageComponent : public Component {

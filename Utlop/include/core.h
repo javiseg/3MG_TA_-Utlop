@@ -30,9 +30,11 @@ namespace Utlop
 			void createEntities(Core* cr);
 			void AddComponent(Entity& entity, Utlop::ComponentID id);
 			void AddCubeMap();
-			void InitMaterials(RenderCtx* data, const char* path);
-			void InitGeometry(RenderCtx* data, const char* path);
-			void ChangeGeometry(Entity& entity, RenderCtx* data, int option);
+			vector<Texture> InitMaterials(RenderCtx* data, vector<string> texturePaths);
+			Geometry InitGeometry(RenderCtx* data, const char* path);
+			void ChangeMesh(Entity& entity, RenderCtx* data, int option);
+
+			void InitMesh(string geometryPath, vector<string> texturePath);
 
 			void MoveCamera();
 
@@ -46,6 +48,7 @@ namespace Utlop
 
       static Core* Instance();
 			RenderCtx* getData();
+			DisplayList* getDisplayList();
 			float getCameraSpeed();
 			
 

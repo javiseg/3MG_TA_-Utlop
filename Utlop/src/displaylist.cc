@@ -1,4 +1,6 @@
 #include "displaylist.h"
+#include "geometry.h"
+#include "component.h"
 #include <memory>
 
 void Utlop::DisplayList::executeOnGPU(list<shared_ptr<Command>> cmdListToExecute)
@@ -48,6 +50,20 @@ Utlop::DisplayList& Utlop::addDrawCmd(Utlop::DisplayList* dl, GLuint shaderId, G
 	draw_material_cmd->model = model;
 
 	dl->cmdList.push_back(move(draw_material_cmd));
+
+	return *dl;
+}
+
+Utlop::DisplayList& Utlop::addDrawMeshCmd(DisplayList* dl, Utlop::Mesh m, GLuint shader, Utlop::CameraComponent cameracmp, Utlop::LocalTRComponent localcmp)
+{
+	shared_ptr<DrawMeshCmd> drawMeshCmd;
+	drawMeshCmd = make_shared<DrawMeshCmd>();
+
+	drawMeshCmd->m = m;
+	drawMeshCmd->shader = shader;
+	drawMeshCmd->cameracmp = cameracmp;
+
+	dl->cmdList.push_back(move(drawMeshCmd));
 
 	return *dl;
 }

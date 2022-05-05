@@ -3,6 +3,8 @@
 #include "glm/glm.hpp"
 #include "glad/glad.h"
 #include <vector>
+#include "component.h"
+#include "material.h"
 
 namespace Utlop {
 
@@ -20,10 +22,22 @@ namespace Utlop {
 
 	struct Mesh
 	{
-		std::vector<Vertex> vertices;
+		std::vector<float> vertices;
 		std::vector<uint32_t> indices;
-		Mesh(const std::vector<Vertex> vertices_, const std::vector<uint32_t> indices_) { vertices = vertices_; indices = indices_; }
-		const std::vector<Vertex>& Mesh::getVertices() const
+		std::vector<Texture> textures;
+
+		GLuint vao;
+		
+		string path;
+
+		Mesh(const std::vector<float> vertices_, const std::vector<uint32_t> indices_,
+			std::vector<Texture> textures_, string geoPath);
+		Mesh(){
+			vao = 999;
+		}
+		~Mesh() {}
+		
+		const std::vector<float>& Mesh::getVertices() const
 		{
 			return vertices;
 		}
@@ -31,7 +45,13 @@ namespace Utlop {
 		{
 			return indices;
 		}
+		const std::vector<Texture>& Mesh::getTextures() const
+		{
+			return textures;
+		}
 
+		void Draw(GLuint& shader, CameraComponent& cameracmp);
+		void DrawMesh(Mesh m, GLuint& shader, CameraComponent& cameracmp, LocalTRComponent& localcmp);	
 	};
 	struct Geometry {
 		vector<float> vertices_;
