@@ -75,11 +75,13 @@ namespace Utlop {
 			int p_dir = glGetUniformLocation(shaderID, "dirLight.direction");
 			int p_color = glGetUniformLocation(shaderID, "dirLight.color");
 			int p_intensity = glGetUniformLocation(shaderID, "dirLight.intensity");
-			int p_pos = glGetUniformLocation(shaderID, "dirLightPos");
+			int p_pos = glGetUniformLocation(shaderID, "dirLight.dirLightPos");
+			int c_pos = glGetUniformLocation(shaderID, "camPos");
 
 			glUniform3fv(p_color, 1, glm::value_ptr(color));
 			glUniform1fv(p_intensity, 1, &intensity);
 			glUniform3fv(p_pos, 1, glm::value_ptr(position));
+			glUniform3fv(c_pos, 1, glm::value_ptr(camPosition));
 
 			glUseProgram(0);
 		}
@@ -87,6 +89,7 @@ namespace Utlop {
 		vec3 position;
 		float intensity = 0.0f;
 		GLuint shaderID;
+		vec3 camPosition;
 	};
 
 	struct EnableDepthCmd : public Command {
@@ -173,7 +176,7 @@ namespace Utlop {
 		glm::mat4 view, glm::mat4 model);
 	DisplayList& addSetPolygonCmd(DisplayList* dl, uint8_t on);
 	DisplayList& addSetModelViewProjection(DisplayList* dl, GLuint shaderID, glm::mat4 projection, glm::mat4 model, glm::mat4 view);
-	DisplayList& addSetLightDataCmd(DisplayList* dl, glm::vec3 color, glm::vec3 position, float intensity, GLuint shaderID);
+	DisplayList& addSetLightDataCmd(DisplayList* dl, glm::vec3 color, glm::vec3 position, float intensity, GLuint shaderID, vec3 camPosition);
 	DisplayList& addEnableDepthTest(DisplayList* dl);
 	DisplayList& addDisableDepthTest(DisplayList* dl);
 	DisplayList& addDoFramebuffer(DisplayList* dl, GLuint shaderID, GLuint rectVAO, GLuint texture);

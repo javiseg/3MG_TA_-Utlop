@@ -6,11 +6,14 @@
 #define VIEW_MATRIX     4
 #define PROJ_MATRIX     5
 #define DIR_LIGHT	    6
+#define CAM_POS			10
+
 
 struct Directional{
 	vec3 direction;
 	vec3 color;
 	float intensity;
+	vec3 dirLightPos;
 };
 
 layout(location = VERT_POSITION) in vec3 position;
@@ -21,7 +24,8 @@ layout(location = VIEW_MATRIX) uniform mat4 ViewMatrix;
 layout(location = PROJ_MATRIX) uniform mat4 ProjectionMatrix;
 
 layout(location = DIR_LIGHT) uniform Directional dirLight;
-layout(location = 9) uniform vec3 dirLightPos;
+layout(location = CAM_POS) uniform vec3 camPos;
+//layout(location = 9) uniform vec3 dirLightPos;
 
 
 out vec2 text_coords;
@@ -32,17 +36,20 @@ out vec3 dirLightColor;
 out float dirLightIntensity;
 out vec3 dirLightPosition;
 out vec3 FragPos; 
+out vec3 camPosition;
 
 void main()
 {
 	dirLightDirection = dirLight.direction;
 	dirLightColor = dirLight.color;
 	dirLightIntensity = dirLight.intensity;
-	dirLightPosition = dirLightPos;
+	dirLightPosition = dirLight.dirLightPos;
+
+	camPosition = camPos;
 
     text_coords = aTexCoord;
 	gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(position, 1.0f);
 	frag_position = vec3(ModelMatrix * vec4(position, 1.0));
-	frag_normal = mat3(transpose(inverse(ModelMatrix))) * normals;
+	frag_normal = mat3(transpose(inverse(ModelMatrix))) * normalize(normals);
 	//FragPos = ;
 }

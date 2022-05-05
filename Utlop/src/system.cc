@@ -181,7 +181,8 @@ void Utlop::LightSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 		
 			for (int i = 0; i < data->directionallightcmp.size(); i++) {
 				addSetLightDataCmd(dl, data->directionallightcmp[i].color, data->directionallightcmp[i].position,
-					data->directionallightcmp[i].intensity, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_);
+					data->directionallightcmp[i].intensity, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
+					data->localtrcmp[0].position);
 			}
 	}
 }
