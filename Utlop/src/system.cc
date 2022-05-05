@@ -122,8 +122,8 @@ void Utlop::RenderSystem::initGeo(Entity& entity, RenderCtx* data, const char* p
 	if (geo_index != -1) {
 		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].geo_idx.push_back(geo_index);
 		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vao_ = data->geometry[geo_index].vao_;
-		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_ = data->rendercmp[geo_index].vbo_;
-		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_ = data->rendercmp[geo_index].ebo_;
+		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].vbo_ = data->geometry[geo_index].vbo_;
+		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].ebo_ = data->geometry[geo_index].ebo_;
 	}
 }
 

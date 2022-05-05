@@ -32,7 +32,8 @@ namespace Utlop
 			void AddCubeMap();
 			void InitMaterials(RenderCtx* data, const char* path);
 			void InitGeometry(RenderCtx* data, const char* path);
-			
+			void ChangeGeometry(Entity& entity, RenderCtx* data, int option);
+
 			void MoveCamera();
 
 			void InitComponents();
