@@ -21,7 +21,10 @@ namespace Utlop
   void Window::init(int width, int height, char* title)
   {
     _window = glfwCreateWindow(width, height, title, NULL, NULL);
-    _window = _window;
+		this->width = width;
+		this->height = height;
+		_window = _window;
+
   }
 
 	GLFWwindow* Window::getWindow()

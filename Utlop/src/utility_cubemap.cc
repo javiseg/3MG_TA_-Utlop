@@ -1,11 +1,20 @@
 #include "utility_cubemap.h"
-
+#include <iostream>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include "tools.h"
+#ifndef STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
+#endif // !STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 using glm::vec3;
 using glm::vec4;
 using glm::ivec2;
+
+void loadVertexShader(const char* filename, GLuint& vertShader);
+void loadFragmentShader(const char* filename, GLuint& fragShader);
+void checkCompileErrors(unsigned int shader, std::string type);
 
 vec3 faceCoordsToXYZ(int i, int j, int faceID, int faceSize)
 {
@@ -22,146 +31,83 @@ vec3 faceCoordsToXYZ(int i, int j, int faceID, int faceSize)
 	return vec3();
 }
 
-
-Utlop::Bitmap Utlop::convertEquirectangularMapToVerticalCross(const Bitmap& b)
+void Utlop::CubeMap::createBuffers()
 {
-	if (b.type_ != Utlop::eBitmapType_2D) return Utlop::Bitmap();
 
-	const int faceSize = b.w_ / 4;
+	glGenVertexArrays(1, &vao);
+	glGenBuffers(1, &vbo);
+	glGenBuffers(1, &ebo);
+	glBindVertexArray(vao);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(skyboxIndices), &skyboxIndices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	const int w = faceSize * 3;
-	const int h = faceSize * 4;
-
-	Utlop::Bitmap result(w, h, b.comp_, b.fmt_);
-
-	const ivec2 kFaceOffsets[] =
-	{
-		ivec2(faceSize, faceSize * 3),
-		ivec2(0, faceSize),
-		ivec2(faceSize, faceSize),
-		ivec2(faceSize * 2, faceSize),
-		ivec2(faceSize, 0),
-		ivec2(faceSize, faceSize * 2)
-	};
-
-	const int clampW = b.w_ - 1;
-	const int clampH = b.h_ - 1;
-
-	for (int face = 0; face != 6; face++)
-	{
-		for (int i = 0; i != faceSize; i++)
-		{
-			for (int j = 0; j != faceSize; j++)
-			{
-				const vec3 P = faceCoordsToXYZ(i, j, face, faceSize);
-				const float R = hypot(P.x, P.y);
-				const float theta = atan2(P.y, P.x);
-				const float phi = atan2(P.z, R);
-				//	float point source coordinates
-				const float Uf = float(2.0f * faceSize * (theta + glm::pi<float>()) / glm::pi<float>());
-				const float Vf = float(2.0f * faceSize * (glm::pi<float>() / 2.0f - phi) / glm::pi<float>());
-				// 4-samples for bilinear interpolation
-				const int U1 = glm::clamp(int(floor(Uf)), 0, clampW);
-				const int V1 = glm::clamp(int(floor(Vf)), 0, clampH);
-				const int U2 = glm::clamp(U1 + 1, 0, clampW);
-				const int V2 = glm::clamp(V1 + 1, 0, clampH);
-				// fractional part
-				const float s = Uf - U1;
-				const float t = Vf - V1;
-				// fetch 4-samples
-				const vec4 A = b.getPixel(U1, V1);
-				const vec4 B = b.getPixel(U2, V1);
-				const vec4 C = b.getPixel(U1, V2);
-				const vec4 D = b.getPixel(U2, V2);
-				// bilinear interpolation
-				const vec4 color = A * (1 - s) * (1 - t) + B * (s) * (1 - t) + C * (1 - s) * t + D * (s) * (t);
-				result.setPixel(i + kFaceOffsets[face].x, j + kFaceOffsets[face].y, color);
-			}
-		};
-	}
-
-	return result;
 }
 
-Utlop::Bitmap Utlop::convertVerticalCrossToCubeMapFaces(const Bitmap& b)
+void Utlop::CubeMap::loadTextures(std::string faces[6])
 {
-	const int faceWidth = b.w_ / 3;
-	const int faceHeight = b.h_ / 4;
 
-	Utlop::Bitmap cubemap(faceWidth, faceHeight, 6, b.comp_, b.fmt_);
-	cubemap.type_ = Utlop::eBitmapType_Cube;
-
-	const uint8_t* src = b.data_.data();
-	uint8_t* dst = cubemap.data_.data();
-
-	/*
-			------
-			| +Y |
-	 ----------------
-	 | -X | -Z | +X |
-	 ----------------
-			| -Y |
-			------
-			| +Z |
-			------
-	*/
-
-	const int pixelSize = cubemap.comp_ * Utlop::Bitmap::getBytesPerComponent(cubemap.fmt_);
-
-	for (int face = 0; face != 6; ++face)
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	
+	for (unsigned int i = 0; i < 6; i++)
 	{
-		for (int j = 0; j != faceHeight; ++j)
+		int width, height, nrChannels;
+		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		if (data)
 		{
-			for (int i = 0; i != faceWidth; ++i)
-			{
-				int x = 0;
-				int y = 0;
-
-				switch (face)
-				{
-					// GL_TEXTURE_CUBE_MAP_POSITIVE_X
-				case 0:
-					x = i;
-					y = faceHeight + j;
-					break;
-
-					// GL_TEXTURE_CUBE_MAP_NEGATIVE_X
-				case 1:
-					x = 2 * faceWidth + i;
-					y = 1 * faceHeight + j;
-					break;
-
-					// GL_TEXTURE_CUBE_MAP_POSITIVE_Y
-				case 2:
-					x = 2 * faceWidth - (i + 1);
-					y = 1 * faceHeight - (j + 1);
-					break;
-
-					// GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
-				case 3:
-					x = 2 * faceWidth - (i + 1);
-					y = 3 * faceHeight - (j + 1);
-					break;
-
-					// GL_TEXTURE_CUBE_MAP_POSITIVE_Z
-				case 4:
-					x = 2 * faceWidth - (i + 1);
-					y = b.h_ - (j + 1);
-					break;
-
-					// GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
-				case 5:
-					x = faceWidth + i;
-					y = faceHeight + j;
-					break;
-				}
-
-				memcpy(dst, src + (y * b.w_ + x) * pixelSize, pixelSize);
-
-				dst += pixelSize;
-			}
+			stbi_set_flip_vertically_on_load(false);
+			glTexImage2D
+			(
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0,
+				GL_RGB,
+				width,
+				height,
+				0,
+				GL_RGB,
+				GL_UNSIGNED_BYTE,
+				data
+			);
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "Failed to load texture: " << faces[i] << std::endl;
+			stbi_image_free(data);
 		}
 	}
-
-	return cubemap;
 }
+
+void Utlop::CubeMap::loadShaders(const char* vertPath, const char* fragPath)
+{
+	shaderID = glCreateProgram();
+	
+	GLuint vert, frag;
+	loadVertexShader(vertPath, vert);
+	loadFragmentShader(fragPath, frag);
+
+	glUseProgram(shaderID);
+	glAttachShader(shaderID, vert);
+	glAttachShader(shaderID, frag);
+
+	glLinkProgram(shaderID);
+	checkCompileErrors(shaderID, "PROGRAM");
+	checkCompileErrors(shaderID, "LINK");
+	
+	glUseProgram(0);
+
+
+}
+

@@ -88,6 +88,76 @@ namespace Utlop {
 		float intensity = 0.0f;
 		GLuint shaderID;
 	};
+
+	struct EnableDepthCmd : public Command {
+		void executeOnGPU() override {
+			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_LESS);
+		}
+	};
+
+	struct DisableDepthCmd : public Command {
+		void executeOnGPU() override {
+			glDisable(GL_DEPTH_TEST);
+		}
+	};
+
+	struct DoFrameBufferCmd : public Command {
+		void executeOnGPU() override {
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glUseProgram(shaderID);
+			glBindVertexArray(rectVAO);
+			glBindTexture(GL_TEXTURE_2D, fbTexture);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+		}
+		GLuint shaderID;
+		GLuint rectVAO;
+		GLuint fbTexture;
+
+	};
+
+	struct BindFramebufferCmd : public Command {
+		void executeOnGPU() override {
+			glBindFramebuffer(GL_FRAMEBUFFER, fboID);
+		}
+		GLuint fboID;
+	};
+
+	struct SkyboxCmd : public Command {
+		void executeOnGPU() override {
+			glUseProgram(shaderID);
+			glDepthFunc(GL_ALWAYS);
+			glDepthMask(GL_FALSE);
+			// We make the mat4 into a mat3 and then a mat4 again in order to get rid of the last row and column
+			// The last row and column affect the translation of the skybox (which we don't want to affect)
+			view = glm::mat4(glm::mat3(glm::lookAt(position, position
+				+ front, Up)));
+			glUniformMatrix4fv(glGetUniformLocation(shaderID, "view"), 1, GL_FALSE, glm::value_ptr(view));
+			glUniformMatrix4fv(glGetUniformLocation(shaderID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+			// Draws the cubemap as the last object so we can save a bit of performance by discarding all fragments
+			// where an object is present (a depth of 1.0f will always fail against any object's depth value)
+			glBindVertexArray(vao);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+
+			// Switch back to the normal depth function
+			glDepthFunc(GL_LESS);
+			glDepthMask(GL_TRUE);
+			glUseProgram(0);
+		}
+		GLuint shaderID;
+		glm::vec3 position;
+		glm::vec3 front;
+		glm::vec3 Up;
+		glm::mat4 projection;
+		glm::mat4 view;
+		GLuint vao;
+		GLuint texture;
+	};
+
 	class DisplayList {
 		public:
 			list<shared_ptr<Command>> cmdList;
@@ -104,4 +174,11 @@ namespace Utlop {
 	DisplayList& addSetPolygonCmd(DisplayList* dl, uint8_t on);
 	DisplayList& addSetModelViewProjection(DisplayList* dl, GLuint shaderID, glm::mat4 projection, glm::mat4 model, glm::mat4 view);
 	DisplayList& addSetLightDataCmd(DisplayList* dl, glm::vec3 color, glm::vec3 position, float intensity, GLuint shaderID);
+	DisplayList& addEnableDepthTest(DisplayList* dl);
+	DisplayList& addDisableDepthTest(DisplayList* dl);
+	DisplayList& addDoFramebuffer(DisplayList* dl, GLuint shaderID, GLuint rectVAO, GLuint texture);
+	DisplayList& addBindFramebuffer(DisplayList* dl, GLuint fboID);
+	DisplayList& addDrawSkybox(DisplayList* dl, GLuint shaderID,
+		glm::vec3 position, glm::vec3 front, glm::vec3 Up, glm::mat4 projection,
+		glm::mat4 view, GLuint vao, GLuint texture);
 }

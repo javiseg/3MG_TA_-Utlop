@@ -11,14 +11,14 @@
 #include "tiny_obj_loader.h"
 #include <time.h>
 #include <glm/gtc/type_ptr.hpp>
+#include "tools.h"
 #include "stb_image.h"
-#include "stb_image_write.h"
 #define PX_SCHED_IMPLEMENTATION 1
 #include "px_sched.h"
 
 void loadCubemap(const char* path, GLuint& texture);
-void loadVertexShader(const char* filename, Utlop::RenderCtx* data);
-void loadFragmentShader(const char* filename, Utlop::RenderCtx* data);
+void loadVertexShader(const char* filename, GLuint& vertShader);
+void loadFragmentShader(const char* filename, GLuint& fragShader);
 void setMat4fv(GLuint shader_id, glm::mat4 value, const GLchar* name, GLboolean transpose = GL_FALSE);
 bool loadOBJ2(const char* path, Utlop::Geometry& geo);
 
@@ -40,7 +40,8 @@ namespace Utlop
 		data = new RenderCtx();
 		displayList = new DisplayList();
     _instance = this;
-
+		framebuffer = make_unique<RenderToTexture>();
+		cubemap = make_unique<CubeMap>();
   }
 
   Core::~Core()
@@ -52,8 +53,8 @@ namespace Utlop
   }
 
 	void Utlop::Core::createEntities(Core* cr) {
-		for (int i = 0; i < 2; i++) {
-			for (int j = 0; j < 2; j++) {
+		for (int i = 0; i < 1; i++) {
+			for (int j = 0; j < 1; j++) {
 				int entityIdx = cr->AddEntity();
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kLocalTRComp);
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kRenderComp);
@@ -92,6 +93,10 @@ namespace Utlop
 		AddComponent(*data->entities[lightEntity], kLocalTRComp);
 		AddComponent(*data->entities[lightEntity], kDirectionalLightComp);
 		AddComponent(*data->entities[lightEntity], kRenderComp);
+		/*int lightEntity2 = AddEntity();
+		AddComponent(*data->entities[lightEntity2], kLocalTRComp);
+		AddComponent(*data->entities[lightEntity2], kDirectionalLightComp);
+		AddComponent(*data->entities[lightEntity2], kRenderComp);*/
 		//
 
 
@@ -151,8 +156,30 @@ namespace Utlop
       }
 			
 			//Add Vertex
-			loadVertexShader("../UtlopTests/src/shaders/vs.glsl", data);
-			loadFragmentShader("../UtlopTests/src/shaders/fs_texture.glsl", data);
+			loadVertexShader("../UtlopTests/src/shaders/vs.glsl", data->vertexShader);
+			loadFragmentShader("../UtlopTests/src/shaders/fs_texture.glsl", data->fragmentShader);
+
+			framebuffer->rectangleToGPU();
+			framebuffer->initFBO(_window.width, _window.height);
+			framebuffer->errorCheck();
+			framebuffer->initShader();
+
+			std::string facesCubemap[6] =
+			{
+				"../UtlopTests/src/textures/cubemap/right.jpg",
+				"../UtlopTests/src/textures/cubemap/left.jpg",
+				"../UtlopTests/src/textures/cubemap/top.jpg",
+				"../UtlopTests/src/textures/cubemap/bottom.jpg",
+				"../UtlopTests/src/textures/cubemap/front.jpg",
+				"../UtlopTests/src/textures/cubemap/back.jpg"
+			};
+
+			cubemap->createBuffers();
+			cubemap->loadTextures(facesCubemap);
+			cubemap->loadShaders("../UtlopTests/src/shaders/skybox_vert.glsl", "../UtlopTests/src/shaders/skybox_frag.glsl");
+			glUniform1i(glGetUniformLocation(cubemap->shaderID, "skybox"), 0);
+			
+			
 			/*glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       glClearColor(160.0f/255.0f, 160.0f / 255.0f, 160.0f / 255.0f, 1.0f);*/
 
@@ -165,13 +192,14 @@ namespace Utlop
 			InitMaterials(data, "../UtlopTests/src/obj/helmet/helmet.jpg");
 			InitMaterials(data, "../UtlopTests/src/obj/helmet/diffuse.png");
 
-			glEnable(GL_DEPTH_TEST);
-			glDepthFunc(GL_LESS);
+			
 			glShadeModel(GL_SMOOTH);
 			GLint version_max, version_min;
 			glGetIntegerv(GL_MAJOR_VERSION, &version_max);
 			glGetIntegerv(GL_MINOR_VERSION, &version_min);
 			printf("Version: %d.%d \n", version_max, version_min);
+
+
 
 			float lastFrame = (float)glfwGetTime();
 			InitImGUI();
@@ -192,6 +220,9 @@ namespace Utlop
 
         if (glfwGetKey(_window._window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
           glfwSetWindowShouldClose(_window._window, GL_TRUE);
+				
+				addEnableDepthTest(displayList);
+				addBindFramebuffer(displayList, framebuffer->FBOid);
 
 				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
 				
@@ -199,6 +230,8 @@ namespace Utlop
 				lastFrame = (float)glfwGetTime();
 
 				glfwPollEvents();
+
+				
 
 				//data->localtrcmp[1].rotation = glm::vec3(0.0f, cos(lastFrame) * 90.0f, 0.0f);
 				//ExecSystems();
@@ -208,15 +241,30 @@ namespace Utlop
 					scheduler.run(sched, &schedulerReady);
 					
 				}
-
+				addDrawSkybox(displayList, cubemap->shaderID, data->localtrcmp[0].position,
+					data->cameracmp[0].front_, data->cameracmp[0].Up,
+					data->cameracmp[0].projection_, data->cameracmp[0].view_,
+					cubemap->vao, cubemap->texture);
 				MoveCamera();
 				
 		
 				scheduler.waitFor(schedulerReady);
+
+				
+				addDisableDepthTest(displayList);
+				addDoFramebuffer(displayList, framebuffer->shaderID, framebuffer->rectVAO, framebuffer->FBtexture);
+				
+				
 				displayList->submit();
+
+				
+
+
 
 				ImGUI();
 
+
+				
 
         glfwSwapBuffers(_window._window);
         glfwPollEvents();
@@ -462,7 +510,7 @@ namespace Utlop
 		glVertexArrayElementBuffer(data->geometry[data->geometry.size() - 1].vao_,
 			data->geometry[data->geometry.size() - 1].ebo_);
 
-}
+	}
 
 
 	void Core::InitComponents()
@@ -586,7 +634,7 @@ namespace Utlop
 
 				const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK", "LLLLLLL", "MMMM", "OOOOOOO", "PPPP", "QQQQQQQQQQ", "RRR", "SSSS" };
 				static const char* current_item = NULL;
-				std::string nameCombo = "##combo" + std::to_string(n);
+				std::string nameCombo = "##combo " + std::to_string(n);
 				if (ImGui::BeginCombo(nameCombo.c_str(), current_item)) // The second parameter is the label previewed before opening the combo.
 				{
 					for (int n = 0; n < IM_ARRAYSIZE(items); n++)

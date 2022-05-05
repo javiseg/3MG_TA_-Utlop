@@ -93,6 +93,71 @@ Utlop::DisplayList& Utlop::addSetLightDataCmd(Utlop::DisplayList* dl, glm::vec3 
 	return *dl;
 }
 
+Utlop::DisplayList& Utlop::addEnableDepthTest(DisplayList* dl)
+{
+	std::unique_ptr<Utlop::EnableDepthCmd> depthCmd;
+	depthCmd = std::make_unique<Utlop::EnableDepthCmd>();
+
+	dl->cmdList.push_back(move(depthCmd));
+
+	return *dl;
+}
+
+Utlop::DisplayList& Utlop::addDisableDepthTest(DisplayList* dl)
+{
+	std::unique_ptr<Utlop::DisableDepthCmd> depthCmd;
+	depthCmd = std::make_unique<Utlop::DisableDepthCmd>();
+
+	dl->cmdList.push_back(move(depthCmd));
+
+	return *dl;
+}
+
+Utlop::DisplayList& Utlop::addDoFramebuffer(DisplayList* dl, GLuint shaderID, GLuint rectVAO, GLuint texture)
+{
+	std::unique_ptr<Utlop::DoFrameBufferCmd> fbcmd;
+	fbcmd = std::make_unique<Utlop::DoFrameBufferCmd>();
+
+	fbcmd->shaderID = shaderID;
+	fbcmd->rectVAO = rectVAO;
+	fbcmd->fbTexture = texture;
+
+	dl->cmdList.push_back(move(fbcmd));
+
+	return *dl;
+}
+
+Utlop::DisplayList& Utlop::addBindFramebuffer(DisplayList* dl, GLuint fboID)
+{
+	std::unique_ptr<Utlop::BindFramebufferCmd> fbcmd;
+	fbcmd = std::make_unique<Utlop::BindFramebufferCmd>();
+
+	fbcmd->fboID = fboID;
+
+	dl->cmdList.push_back(move(fbcmd));
+
+	return *dl;
+}
+
+Utlop::DisplayList& Utlop::addDrawSkybox(DisplayList* dl, GLuint shaderID, glm::vec3 position, glm::vec3 front, glm::vec3 Up, glm::mat4 projection, glm::mat4 view, GLuint vao, GLuint texture)
+{
+	std::unique_ptr<Utlop::SkyboxCmd> skycmd;
+	skycmd = std::make_unique<Utlop::SkyboxCmd>();
+
+	skycmd->shaderID = shaderID;
+	skycmd->position = position;
+	skycmd->front = front;
+	skycmd->Up = Up;
+	skycmd->projection = projection;
+	skycmd->view = view;
+	skycmd->vao = vao;
+	skycmd->texture = texture;
+
+	dl->cmdList.push_back(move(skycmd));
+
+	return *dl;
+}
+
 //void Utlop::callback_WindowClearCmd(WindowClearCmd cmd)
 //{
 //	

@@ -2,7 +2,6 @@
 #define UTLOP_CORE 1
 #pragma once
 #include "window.h"
-
 #include <list>
 #include <vector>
 #include "data.h"
@@ -10,6 +9,7 @@
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
+#include "utility_cubemap.h"
 
 namespace Utlop
 {
@@ -32,8 +32,7 @@ namespace Utlop
 			void AddCubeMap();
 			void InitMaterials(RenderCtx* data, const char* path);
 			void InitGeometry(RenderCtx* data, const char* path);
-			void InitShaders(Entity& entity, RenderCtx* data, const char* path);
-
+			
 			void MoveCamera();
 
 			void InitComponents();
@@ -69,6 +68,8 @@ namespace Utlop
 
 			RenderCtx* data;
 			DisplayList* displayList;
+			unique_ptr<RenderToTexture> framebuffer;
+			unique_ptr<CubeMap> cubemap;
 
 	};
 

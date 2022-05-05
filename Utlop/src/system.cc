@@ -2,7 +2,6 @@
 #include "data.h"
 #include "geometry.h"
 #include "material.h"
-#include "utility.h"
 #include "displaylist.h"
 #include "core.h"
 #include "GLFW/glfw3.h"
@@ -154,11 +153,12 @@ void Utlop::RenderSystem::initShader(Entity& entity, RenderCtx* data)
 	glAttachShader(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, data->fragmentShader);
 	
 	glLinkProgram(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_);
-	glUseProgram(0);
+
 	checkCompileErrors(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, "PROGRAM");
 	checkCompileErrors(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, "LINK");
-}
 
+	glUseProgram(0);
+}
 void Utlop::HeritageSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
 }

@@ -14,11 +14,15 @@ namespace Utlop
       void init(int width, int height, char* title);
 			GLFWwindow* getWindow();
       friend class Core;
+
+			int width;
+			int height;
     protected:
 
     private:
       Window();
       ~Window();
+
 
       bool isValid();
 
