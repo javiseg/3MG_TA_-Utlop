@@ -130,7 +130,7 @@ Utlop::DisplayList& Utlop::addDisableDepthTest(DisplayList* dl)
 	return *dl;
 }
 
-Utlop::DisplayList& Utlop::addDoFramebuffer(DisplayList* dl, GLuint shaderID, GLuint rectVAO, GLuint texture)
+Utlop::DisplayList& Utlop::addDoFramebuffer(DisplayList* dl, GLuint shaderID, GLuint rectVAO, GLuint texture, GLuint fbo)
 {
 	std::unique_ptr<Utlop::DoFrameBufferCmd> fbcmd;
 	fbcmd = std::make_unique<Utlop::DoFrameBufferCmd>();
@@ -138,6 +138,7 @@ Utlop::DisplayList& Utlop::addDoFramebuffer(DisplayList* dl, GLuint shaderID, GL
 	fbcmd->shaderID = shaderID;
 	fbcmd->rectVAO = rectVAO;
 	fbcmd->fbTexture = texture;
+	fbcmd->fbo = fbo;
 
 	dl->cmdList.push_back(move(fbcmd));
 

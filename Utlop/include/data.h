@@ -5,6 +5,7 @@
 #include "gameObject.h"
 #include <memory>
 #include <map>
+#include <iostream>
 
 void checkCompileErrors(unsigned int shader, std::string type);
 void loadVertexShader(const char* filename, GLuint& vertShader);
@@ -63,12 +64,16 @@ namespace Utlop {
 
 		void initFBO(int width, int height) {
 
+			/**/
 			glGenFramebuffers(1, &FBOid);
 			glBindFramebuffer(GL_FRAMEBUFFER, FBOid);
-
+			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
+				printf("\nFramebuffer binded\n");
+			}
 			glGenTextures(1, &FBtexture);
 			glBindTexture(GL_TEXTURE_2D, FBtexture);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+			
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -80,13 +85,36 @@ namespace Utlop {
 			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
 
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBOid);
+			glUseProgram(0);
+
+			/**/
+			/*
+			glCreateFramebuffers(1, &FBOid);
+
+			glCreateTextures(GL_TEXTURE_2D, 1, &FBtexture);
+			glTextureParameteri(FBtexture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTextureParameteri(FBtexture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTextureParameteri(FBtexture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTextureParameteri(FBtexture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTextureStorage2D(FBtexture, 1, GL_RGB8, width, height);
+			glNamedFramebufferTexture(FBOid, GL_COLOR_ATTACHMENT0, FBtexture, 0);
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBOid);
+
+
+			auto fboStatus = glCheckNamedFramebufferStatus(FBOid, GL_FRAMEBUFFER);
+			if (fboStatus != GL_FRAMEBUFFER_COMPLETE) {
+				std::cout << "Framebuffer error: " << fboStatus << "\n";
+			}
+			*/
 		}
 
 		void errorCheck() {
+			glUseProgram(FBOid);
 			auto fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 			if (fboStatus != GL_FRAMEBUFFER_COMPLETE) {
 				printf("\nFrameBuffer error: %s\n", fboStatus);
 			}
+			//glUseProgram(0);
 		}
 
 		void rectangleToGPU() {
@@ -122,7 +150,7 @@ namespace Utlop {
 			checkCompileErrors(shaderID, "PROGRAM");
 			checkCompileErrors(shaderID, "LINK");
 			glUniform1i(glGetUniformLocation(shaderID, "screenTexture"), 0);
-			glUseProgram(0);
+			
 		}
 
 	};

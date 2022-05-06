@@ -136,11 +136,14 @@ namespace Utlop
 		//Add Vertex
 		loadVertexShader("../UtlopTests/src/shaders/vs.glsl", data->vertexShader);
 		loadFragmentShader("../UtlopTests/src/shaders/fs_texture.glsl", data->fragmentShader);
+		Geometry quadGeo = InitGeometry(getData(), "../UtlopTests/src/obj/quad.obj");
 
+		
+		framebuffer->initShader();
 		framebuffer->rectangleToGPU();
 		framebuffer->initFBO(_window.width, _window.height);
 		framebuffer->errorCheck();
-		framebuffer->initShader();
+	
 
 		std::string facesCubemap[6] =
 		{
@@ -158,19 +161,6 @@ namespace Utlop
 		glUniform1i(glGetUniformLocation(cubemap->shaderID, "skybox"), 0);
 
 
-		/*glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearColor(160.0f/255.0f, 160.0f / 255.0f, 160.0f / 255.0f, 1.0f);*/
-
-		//AddComponent(*data->entities[ent], kLocalTRComp);
-		//AddComponent(*data->entities[ent], kRenderComp);
-		/*InitGeometry(data, "../UtlopTests/src/obj/cube.obj");
-		InitGeometry(data, "../UtlopTests/src/obj/helmet/helmet.obj");
-		InitGeometry(data, "../UtlopTests/src/obj/container/container.obj");
-		InitGeometry(data, "../UtlopTests/src/obj/car/car.obj");
-		InitMaterials(data, "../UtlopTests/src/textures/white.png");
-		InitMaterials(data, "../UtlopTests/src/obj/helmet/diffuse.png");
-		InitMaterials(data, "../UtlopTests/src/obj/container/diffuse.png");
-		InitMaterials(data, "../UtlopTests/src/obj/car/diffuse.png");*/
 		vector<string> robotTextures;
 		robotTextures.push_back("../UtlopTests/src/obj/robot/diffuse.jpg");
 		InitMesh("../UtlopTests/src/obj/robot/robot.obj", robotTextures);
@@ -233,13 +223,13 @@ namespace Utlop
 			
 
 			
-			glShadeModel(GL_SMOOTH);
+			//glShadeModel(GL_SMOOTH);
 			GLint version_max, version_min;
 			glGetIntegerv(GL_MAJOR_VERSION, &version_max);
 			glGetIntegerv(GL_MINOR_VERSION, &version_min);
 			printf("Version: %d.%d \n", version_max, version_min);
-
-
+			//glEnable(GL_CULL_FACE);
+			//glCullFace(GL_FRONT);
 
 			float lastFrame = (float)glfwGetTime();
 			InitImGUI();
@@ -261,11 +251,11 @@ namespace Utlop
         if (glfwGetKey(_window._window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
           glfwSetWindowShouldClose(_window._window, GL_TRUE);
 				
-				addEnableDepthTest(displayList);
-				addBindFramebuffer(displayList, framebuffer->FBOid);
-
-				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
 				
+				addBindFramebuffer(displayList, framebuffer->FBOid);
+				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
+				addEnableDepthTest(displayList);
+
 				deltaTime_ = (float)glfwGetTime() - lastFrame;
 				lastFrame = (float)glfwGetTime();
 
@@ -290,9 +280,9 @@ namespace Utlop
 		
 				scheduler.waitFor(schedulerReady);
 
-				
+				addBindFramebuffer(displayList, 0);
 				addDisableDepthTest(displayList);
-				addDoFramebuffer(displayList, framebuffer->shaderID, framebuffer->rectVAO, framebuffer->FBtexture);
+				addDoFramebuffer(displayList, framebuffer->shaderID, framebuffer->rectVAO, framebuffer->FBtexture, framebuffer->FBOid);
 				
 				
 				displayList->submit();
@@ -545,6 +535,7 @@ namespace Utlop
 
 			vec3 position;
 			vec3 rotation;
+			vec3 scale;
 			static std::vector<int> selectedType;
 			const char* obj_type[]{ "Robot", "White Cube", "Helmet", "Container", "Car", "Cube"};
 
@@ -554,6 +545,7 @@ namespace Utlop
 					ImGui::Text("%04d: Object", n);
 					position = data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].position;
 					rotation = data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].rotation;
+					scale = data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].scale;
 					ImGui::SetCursorPosX(100.0f);
 					std::string slidername = "Location of " + std::to_string(n);
 					ImGui::Text("Location");
@@ -564,6 +556,11 @@ namespace Utlop
 					ImGui::Text("Rotation");
 					ImGui::SliderFloat3(slidername2.c_str(), &rotation[0], -359.0f, 359.0f);
 					data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].rotation = rotation;
+					ImGui::SetCursorPosX(100.0f);
+					std::string slidername3 = "Scale of " + std::to_string(n);
+					ImGui::Text("Scale");
+					ImGui::SliderFloat3(slidername3.c_str(), &scale[0], 0.0f, 10.0f);
+					data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].scale = scale;
 				}
 				if (data->entities[n]->cmp_indx_[kRenderCompPos] != -1 && data->entities[n]->cmp_indx_[kDirectionalLightCompPos] == -1) {
 					char s[10];

@@ -119,15 +119,19 @@ namespace Utlop {
 	struct DoFrameBufferCmd : public Command {
 		void executeOnGPU() override {
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			//GLfloat backgroundColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+			//glClearNamedFramebufferfv(fbo, GL_COLOR, 0, backgroundColor);
+			
 			glUseProgram(shaderID);
+			/**/glBindTextureUnit(0, fbTexture);
+			glUniform1i(glGetUniformLocation(shaderID, "screenTexture"), 0);
 			glBindVertexArray(rectVAO);
-			glBindTexture(GL_TEXTURE_2D, fbTexture);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 		}
 		GLuint shaderID;
 		GLuint rectVAO;
 		GLuint fbTexture;
-
+		GLuint fbo;
 	};
 
 	struct BindFramebufferCmd : public Command {
@@ -191,7 +195,7 @@ namespace Utlop {
 	DisplayList& addSetLightDataCmd(DisplayList* dl, glm::vec3 color, glm::vec3 position, float intensity, GLuint shaderID, vec3 camPosition);
 	DisplayList& addEnableDepthTest(DisplayList* dl);
 	DisplayList& addDisableDepthTest(DisplayList* dl);
-	DisplayList& addDoFramebuffer(DisplayList* dl, GLuint shaderID, GLuint rectVAO, GLuint texture);
+	DisplayList& addDoFramebuffer(DisplayList* dl, GLuint shaderID, GLuint rectVAO, GLuint texture, GLuint fbo);
 	DisplayList& addBindFramebuffer(DisplayList* dl, GLuint fboID);
 	DisplayList& addDrawSkybox(DisplayList* dl, GLuint shaderID,
 		glm::vec3 position, glm::vec3 front, glm::vec3 Up, glm::mat4 projection,
