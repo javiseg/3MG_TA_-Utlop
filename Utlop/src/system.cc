@@ -81,9 +81,9 @@ void Utlop::RenderSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 	
 	//entity.cmp_indx_[kRenderCompPos] = 0;
 	if (entity.cmp_indx_[kDirectionalLightCompPos] == -1) {
-		initialMesh(entity, data, "../UtlopTests/src/obj/robot/robot.obj");
+		initialMesh(entity, data, "../UtlopTests/src/obj/cube/cube.obj");
 	}else{
-		initialMesh(entity, data, "../UtlopTests/src/obj/cube.obj");
+		initialMesh(entity, data, "../UtlopTests/src/obj/lightcube.obj");
 	}
 	//initMat(entity, data, "../UtlopTests/src/textures/default.png");
 	

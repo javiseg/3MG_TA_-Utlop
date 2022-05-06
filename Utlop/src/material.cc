@@ -4,7 +4,7 @@
 Utlop::Texture::Texture(const char* path, const char* texType, GLenum slot, GLenum format, GLenum pixelType)
 {
 	type = texType;
-
+	unit = slot;
 	// Stores the width, height, and the number of color channels of the image
 	int widthImg, heightImg, numColCh;
 	unsigned char* text_buffer_;
@@ -16,7 +16,7 @@ Utlop::Texture::Texture(const char* path, const char* texType, GLenum slot, GLen
 		glCreateTextures(GL_TEXTURE_2D, 1, &id);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
@@ -42,6 +42,7 @@ void Utlop::Texture::texUnit(GLuint shader, const char* uniform, GLuint unit)
 	glUseProgram(shader);
 	// Sets the value of the uniform
 	glUniform1i(texUni, unit);
+	//glUseProgram(0);
 }
 
 void Utlop::Texture::bind()

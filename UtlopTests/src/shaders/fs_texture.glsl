@@ -11,7 +11,8 @@ in vec3 dirLightPosition;
 
 in vec3 camPosition;
 
-layout(binding = 0) uniform sampler2D ourTexture;
+uniform sampler2D diffuse0;
+uniform sampler2D specular0;
 //vec3 lightColor;
 //vec3 lightPos;
 
@@ -35,23 +36,24 @@ void main()
 	
 	n_dirLight.direction = normalize(dirLightPosition - frag_position);
 
-	vec4 textures = texture(ourTexture, text_coords);
+	vec4 textures = texture(diffuse0, text_coords);
 
 	vec3 FinalResult = textures.rgb;
 	
-	float diffuse = max(dot(n_dirLight.direction, frag_normal) * n_dirLight.intensity, 0.0f);
+	float diffuse = max(dot(n_dirLight.direction, frag_normal) * 1 /*n_dirLight.intensity*/, 0.0f);
 
 	float specularLight = 0.50f;
 	vec3 viewDirection = normalize(camPosition - frag_position);
 	vec3 reflectionDirection = reflect(-n_dirLight.direction, frag_normal);
-	float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 8);
+	float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 16);
 	float specular = specAmount * specularLight;
 
 
 	if(n_dirLight.intensity == 0){
 		gl_FragColor = vec4(FinalResult,1.0f);
 	}else{
-		gl_FragColor = texture(ourTexture, text_coords) * vec4(n_dirLight.color,1.0f) * (diffuse + ambient + specular);
+	
+		gl_FragColor = (texture(diffuse0, text_coords) * (diffuse + ambient) + texture(specular0, text_coords).r * specular) * vec4(n_dirLight.color,1.0f);;
 	}
 	
 }

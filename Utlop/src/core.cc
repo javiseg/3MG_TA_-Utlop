@@ -177,7 +177,7 @@ namespace Utlop
 
 		vector<string> cubeTextures;
 		cubeTextures.push_back("../UtlopTests/src/textures/white.png");
-		InitMesh("../UtlopTests/src/obj/cube.obj", cubeTextures);
+		InitMesh("../UtlopTests/src/obj/lightcube.obj", cubeTextures);
 
 		vector<string> helmetTextures;
 		helmetTextures.push_back("../UtlopTests/src/obj/helmet/diffuse.png");
@@ -192,8 +192,16 @@ namespace Utlop
 		InitMesh("../UtlopTests/src/obj/car/car.obj", carTextures);
 
 
+		vector<string> newCubeTextures;
+		newCubeTextures.push_back("../UtlopTests/src/obj/cube/diffuse.png");
+		newCubeTextures.push_back("../UtlopTests/src/obj/cube/specular.png");
+		InitMesh("../UtlopTests/src/obj/cube/cube.obj", newCubeTextures);
 
 
+		//vector<string> floorTextures;
+		//floorTextures.push_back("../UtlopTests/src/obj/cube/cube.png");
+		//floorTextures.push_back("../UtlopTests/src/obj/floor/specular.png");
+		//InitMesh("../UtlopTests/src/obj/cube/cube.obj", floorTextures);
 
     return done;
   }
@@ -391,86 +399,13 @@ namespace Utlop
 	
 	}
 
-	void Core::AddCubeMap()
-	{
-		vector<std::string> faces
-		{
-				"../UtlopTests/src/textures/cubemap/right.jpg",
-				"../UtlopTests/src/textures/cubemap/left.jpg",
-				"../UtlopTests/src/textures/cubemap/top.jpg",
-				"../UtlopTests/src/textures/cubemap/bottom.jpg",
-				"../UtlopTests/src/textures/cubemap/front.jpg",
-				"../UtlopTests/src/textures/cubemap/back.jpg"
-		};
-
-		const char* path = "../UtlopTests/src/textures/cubemap/plaza/piazza.hdr";
-
-		data->cubemap.shaderID_ = glCreateProgram();
-		//loadVertexShader("../UtlopTests/src/shaders/vs_cubemap.glsl", data->cubemap);
-		//loadFragmentShader("../UtlopTests/src/shaders/fs_cubemap.glsl", data->cubemap);
-
-		GLuint textureID;
-		loadCubemap(path, textureID);
-		data->cubemap.material_idx.push_back(textureID);
-
-		
-
-
-
-		glLinkProgram(data->cubemap.shaderID_);
-		float skyboxVertices[] = {
-			// positions          
-			-0.5f,0.5f,-0.5f,
-								-0.5f,-0.5f,-0.5f,
-								0.5f,-0.5f,-0.5f,
-								0.5f,0.5f,-0.5f,
-
-								-0.5f,0.5f,0.5f,
-								-0.5f,-0.5f,0.5f,
-								0.5f,-0.5f,0.5f,
-								0.5f,0.5f,0.5f,
-
-								0.5f,0.5f,-0.5f,
-								0.5f,-0.5f,-0.5f,
-								0.5f,-0.5f,0.5f,
-								0.5f,0.5f,0.5f,
-
-								-0.5f,0.5f,-0.5f,
-								-0.5f,-0.5f,-0.5f,
-								-0.5f,-0.5f,0.5f,
-								-0.5f,0.5f,0.5f,
-
-								-0.5f,0.5f,0.5f,
-								-0.5f,0.5f,-0.5f,
-								0.5f,0.5f,-0.5f,
-								0.5f,0.5f,0.5f,
-
-								-0.5f,-0.5f,0.5f,
-								-0.5f,-0.5f,-0.5f,
-								0.5f,-0.5f,-0.5f,
-								0.5f,-0.5f,0.5f
-		};
-		std::vector<int> dest;
-		Geometry cubeGeo;
-		cubeGeo.vertices_.insert(cubeGeo.vertices_.begin(),std::begin(skyboxVertices), std::end(skyboxVertices));
-		data->geometry.push_back(cubeGeo);
-		data->cubemap.geo_idx.push_back((GLuint)(data->geometry.size() - 1));
-
-		glGenVertexArrays(1, &data->cubemap.vao_);
-		glGenBuffers(1, &data->cubemap.vbo_);
-		glBindVertexArray(data->cubemap.vao_);
-		glBindBuffer(GL_ARRAY_BUFFER, data->cubemap.vbo_);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-		
-	}
 
 	vector<Texture> Core::InitMaterials(RenderCtx* data, vector<string> texturePaths)
 	{
 		vector<Texture> textures;
-		for each (auto & text in texturePaths) {
-			textures.push_back(Texture(text.c_str(), "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE));
+		textures.push_back(Texture(texturePaths[0].c_str(), "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE));
+		if (texturePaths.size() >= 2) {
+			textures.push_back(Texture(texturePaths[1].c_str(), "specular", 1, GL_RED, GL_UNSIGNED_BYTE));
 		}
 		return textures;
 	}
@@ -487,41 +422,6 @@ namespace Utlop
 		data->geometry.push_back(geo);
 
 		return geo;
-		/*
-
-		glCreateVertexArrays(1, &data->geometry[data->geometry.size() - 1].vao_);
-
-		glCreateBuffers(1, &data->geometry[data->geometry.size() - 1].vbo_);
-		glCreateBuffers(1, &data->geometry[data->geometry.size() - 1].ebo_);
-
-		glNamedBufferData(data->geometry[data->geometry.size() - 1].vbo_,
-			geo.totalVertex_.size() * sizeof(float), geo.totalVertex_.data(), GL_STATIC_DRAW);
-		glNamedBufferData(data->geometry[data->geometry.size() - 1].ebo_,
-			geo.totalIndices_.size() * sizeof(GLuint), geo.totalIndices_.data(), GL_STATIC_DRAW);
-
-
-		glEnableVertexArrayAttrib(data->geometry[data->geometry.size() - 1].vao_, vertexPosition);
-		glVertexArrayAttribBinding(data->geometry[data->geometry.size() - 1].vao_, vertexPosition, 0);
-		glVertexArrayAttribFormat(data->geometry[data->geometry.size() - 1].vao_, vertexPosition, 3, GL_FLOAT, GL_FALSE, 0);
-
-
-		glEnableVertexArrayAttrib(data->geometry[data->geometry.size() - 1].vao_, texcoord);
-		glVertexArrayAttribBinding(data->geometry[data->geometry.size() - 1].vao_, texcoord, 0);
-		glVertexArrayAttribFormat(data->geometry[data->geometry.size() - 1].vao_, texcoord, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(float));
-
-		glEnableVertexArrayAttrib(data->geometry[data->geometry.size() - 1].vao_, normalPosition);
-		glVertexArrayAttribBinding(data->geometry[data->geometry.size() - 1].vao_, normalPosition, 0);
-		glVertexArrayAttribFormat(data->geometry[data->geometry.size() - 1].vao_, normalPosition, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float));
-
-
-
-		glVertexArrayVertexBuffer(data->geometry[data->geometry.size() - 1].vao_, 0,
-			data->geometry[data->geometry.size() - 1].vbo_, 0, 8 * sizeof(float));
-
-
-		glVertexArrayElementBuffer(data->geometry[data->geometry.size() - 1].vao_,
-			data->geometry[data->geometry.size() - 1].ebo_);*/
-
 	}
 
 	void Core::ChangeMesh(Entity& entity, RenderCtx* data, int option)
@@ -532,7 +432,7 @@ namespace Utlop
 	void Core::InitMesh(string geometryPath, vector<string> texturePath)
 	{
 		Geometry geo = InitGeometry(data, geometryPath.c_str());
-		InitMaterials(data, texturePath);
+		//InitMaterials(data, texturePath);
 
 		Mesh newMesh(geo.totalVertex_, geo.totalIndices_, InitMaterials(data, texturePath), geometryPath);
 		data->meshes.push_back(newMesh);
@@ -646,7 +546,7 @@ namespace Utlop
 			vec3 position;
 			vec3 rotation;
 			static std::vector<int> selectedType;
-			const char* obj_type[]{ "Robot", "White Cube", "Helmet", "Container", "Car"};
+			const char* obj_type[]{ "Robot", "White Cube", "Helmet", "Container", "Car", "Cube"};
 
 			for (int n = 0; n < data->entities.size(); n++) {
 				
@@ -665,12 +565,12 @@ namespace Utlop
 					ImGui::SliderFloat3(slidername2.c_str(), &rotation[0], -359.0f, 359.0f);
 					data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].rotation = rotation;
 				}
-				if (data->entities[n]->cmp_indx_[kRenderCompPos] != -1) {
+				if (data->entities[n]->cmp_indx_[kRenderCompPos] != -1 && data->entities[n]->cmp_indx_[kDirectionalLightCompPos] == -1) {
 					char s[10];
 					itoa(n, s, 10);
 					selectedType.push_back(0);
-					ImGui::ListBox(s, &selectedType[(n - 1)], obj_type, IM_ARRAYSIZE(obj_type));
-					ChangeMesh(*data->entities[n], data, selectedType[n - 1]);
+					ImGui::ListBox(s, &selectedType[0], obj_type, IM_ARRAYSIZE(obj_type));
+					ChangeMesh(*data->entities[n], data, selectedType[0]);
 				}
 
 				
