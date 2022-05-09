@@ -164,31 +164,51 @@ namespace Utlop
 		vector<string> robotTextures;
 		robotTextures.push_back("../UtlopTests/src/obj/robot/diffuse.jpg");
 		InitMesh("../UtlopTests/src/obj/robot/robot.obj", robotTextures);
+		data->obj_str_type.push_back("Robot");
 
 		vector<string> cubeTextures;
 		cubeTextures.push_back("../UtlopTests/src/textures/white.png");
 		InitMesh("../UtlopTests/src/obj/lightcube.obj", cubeTextures);
+		data->obj_str_type.push_back("White cube");
 
 		vector<string> helmetTextures;
 		helmetTextures.push_back("../UtlopTests/src/obj/helmet/diffuse.png");
 		helmetTextures.push_back("../UtlopTests/src/obj/helmet/specular.png");
 		helmetTextures.push_back("../UtlopTests/src/obj/helmet/normal.png");
 		InitMesh("../UtlopTests/src/obj/helmet/helmet.obj", helmetTextures);
+		data->obj_str_type.push_back("Helmet");
 
 		vector<string> containerTextures;
 		containerTextures.push_back("../UtlopTests/src/obj/helmet/diffuse.png");
 		containerTextures.push_back("../UtlopTests/src/obj/helmet/specular.png");
 		InitMesh("../UtlopTests/src/obj/helmet/helmet.obj", containerTextures);
-
-		vector<string> carTextures;
+		data->obj_str_type.push_back("cutre helmet");
+		/*vector<string> carTextures;
 		carTextures.push_back("../UtlopTests/src/obj/car/diffuse.png");
-		InitMesh("../UtlopTests/src/obj/car/car.obj", carTextures);
+		InitMesh("../UtlopTests/src/obj/car/car.obj", carTextures);*/
 
 
 		vector<string> newCubeTextures;
-		newCubeTextures.push_back("../UtlopTests/src/obj/cube/diffuse.png");
-		newCubeTextures.push_back("../UtlopTests/src/obj/cube/specular.png");
+		newCubeTextures.push_back("../UtlopTests/src/obj/cube/diffuse1.jpg");
+		//newCubeTextures.push_back("../UtlopTests/src/obj/cube/specular.png");
+		newCubeTextures.push_back("../UtlopTests/src/obj/cube/normal.jpg");
 		InitMesh("../UtlopTests/src/obj/cube/cube.obj", newCubeTextures);
+		data->obj_str_type.push_back("Wood cube");
+
+		vector<string> newCubeTextures2;
+		newCubeTextures2.push_back("../UtlopTests/src/obj/cube/diffuse.png");
+		newCubeTextures2.push_back("../UtlopTests/src/obj/cube/specular.png");
+		//newCubeTextures2.push_back("../UtlopTests/src/obj/cube/normal.jpg");
+		InitMesh("../UtlopTests/src/obj/cube/cube.obj", newCubeTextures2);
+		data->obj_str_type.push_back("Testing wood cube");
+
+		vector<string> newSphereTextures;
+		newSphereTextures.push_back("../UtlopTests/src/obj/sphere/diffuse.png");
+		newSphereTextures.push_back("../UtlopTests/src/obj/sphere/specular.png");
+		newSphereTextures.push_back("../UtlopTests/src/obj/sphere/normal.png");
+		InitMesh("../UtlopTests/src/obj/sphere/sphere.obj", newSphereTextures);
+		data->obj_str_type.push_back("Sphere");
+
 
 
 		//vector<string> floorTextures;
@@ -543,11 +563,13 @@ namespace Utlop
 			vec3 position;
 			vec3 rotation;
 			vec3 scale;
-			static std::vector<int> selectedType;
+			static vector<std::vector<int>> selectedType;
 			const char* obj_type[]{ "Robot", "White Cube", "Helmet", "Container", "Car", "Cube"};
+			
 
 			for (int n = 0; n < data->entities.size(); n++) {
-				
+				if (selectedType.size()<= n)
+					selectedType.push_back(vector<int>(0));
 				if (data->entities[n]->cmp_indx_[kLocalTRCompPos] != -1) {
 					ImGui::Text("%04d: Object", n);
 					position = data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].position;
@@ -572,9 +594,9 @@ namespace Utlop
 				if (data->entities[n]->cmp_indx_[kRenderCompPos] != -1 && data->entities[n]->cmp_indx_[kDirectionalLightCompPos] == -1) {
 					char s[10];
 					itoa(n, s, 10);
-					selectedType.push_back(0);
-					ImGui::ListBox(s, &selectedType[0], obj_type, IM_ARRAYSIZE(obj_type));
-					ChangeMesh(*data->entities[n], data, selectedType[0]);
+					selectedType[n].push_back(0);
+					ImGui::ListBox(s, &selectedType[n][0], &data->obj_str_type[0], data->obj_str_type.size());
+					ChangeMesh(*data->entities[n], data, selectedType[n][0]);
 				}
 
 				

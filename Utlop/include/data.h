@@ -39,6 +39,10 @@ namespace Utlop {
 		GLuint fragmentShader;
 
 		RenderComponent cubemap;
+
+
+		vector<const char*> obj_str_type;
+
 	};
 
 	struct RenderToTexture {

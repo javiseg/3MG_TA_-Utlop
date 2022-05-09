@@ -26,6 +26,7 @@ namespace Utlop {
 		std::vector<uint32_t> indices;
 		std::vector<Texture> textures;
 
+		GLuint normalMap;
 		GLuint vao;
 		
 		string path;

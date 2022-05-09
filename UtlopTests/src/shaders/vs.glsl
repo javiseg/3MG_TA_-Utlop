@@ -25,6 +25,7 @@ layout(location = PROJ_MATRIX) uniform mat4 ProjectionMatrix;
 
 layout(location = DIR_LIGHT) uniform Directional dirLight;
 layout(location = CAM_POS) uniform vec3 camPos;
+uniform int hasNormalMap;
 //layout(location = 9) uniform vec3 dirLightPos;
 
 
@@ -37,6 +38,7 @@ out float dirLightIntensity;
 out vec3 dirLightPosition;
 out vec3 FragPos; 
 out vec3 camPosition;
+flat out int doesHasNormalMap;
 
 void main()
 {
@@ -44,7 +46,7 @@ void main()
 	dirLightColor = dirLight.color;
 	dirLightIntensity = dirLight.intensity;
 	dirLightPosition = dirLight.dirLightPos;
-
+	doesHasNormalMap = hasNormalMap;
 	camPosition = camPos;
 
     text_coords = aTexCoord;

@@ -9,6 +9,7 @@ Utlop::Mesh::Mesh(const std::vector<float> vertices_, const std::vector<uint32_t
 	indices = indices_;
 	textures = textures_;
 	path = geoPath;
+	normalMap = 0;
 
 	glCreateVertexArrays(1, &vao);
 	GLuint vbo;
@@ -73,6 +74,9 @@ void Utlop::Mesh::Draw(GLuint& shader, CameraComponent& cameracmp)
 		textures[i].texUnit(shader, (type + num).c_str(), i);
 		textures[i].bind();
 	}
+	
+	glUniform1i(glGetUniformLocation(shader, "hasNormalMap"), numNormal);
+
 	// Take care of the camera Matrix
 	glUniform3f(glGetUniformLocation(shader, "camPosition"), cameracmp.position_.x, cameracmp.position_.y, cameracmp.position_.z);
 	//camera.Matrix(shader, "camMatrix");
