@@ -55,18 +55,20 @@ void Utlop::Mesh::Draw(GLuint& shader, CameraComponent& cameracmp)
 
 	unsigned int numDiffuse = 0;
 	unsigned int numSpecular = 0;
+	unsigned int numNormal = 0;
 
 	for (unsigned int i = 0; i < textures.size(); i++)
 	{
 		std::string num;
 		std::string type = textures[i].type;
-		if (type == "diffuse")
-		{
+		if (type == "diffuse"){
 			num = std::to_string(numDiffuse++);
 		}
-		else if (type == "specular")
-		{
+		else if (type == "specular"){
 			num = std::to_string(numSpecular++);
+		}
+		else if (type == "normal") {
+			num = std::to_string(numNormal++);
 		}
 		textures[i].texUnit(shader, (type + num).c_str(), i);
 		textures[i].bind();

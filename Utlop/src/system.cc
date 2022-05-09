@@ -1,7 +1,7 @@
 #include "system.h"
 #include "data.h"
 #include "geometry.h"
-#include "material.h"
+#include "texture.h"
 #include "displaylist.h"
 #include "core.h"
 #include "GLFW/glfw3.h"

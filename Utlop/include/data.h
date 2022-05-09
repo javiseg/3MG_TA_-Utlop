@@ -1,7 +1,7 @@
 #pragma once
 #include "system.h"
 #include "geometry.h"
-#include "material.h"
+#include "texture.h"
 #include "gameObject.h"
 #include <memory>
 #include <map>

@@ -13,6 +13,7 @@ in vec3 camPosition;
 
 uniform sampler2D diffuse0;
 uniform sampler2D specular0;
+uniform sampler2D normal0;
 //vec3 lightColor;
 //vec3 lightPos;
 
@@ -40,6 +41,8 @@ void main()
 
 	vec3 FinalResult = textures.rgb;
 	
+	vec3 normal = normalize(texture(normal0, text_coords).xyz * 2.0f - 1.0f);
+
 	float diffuse = max(dot(n_dirLight.direction, frag_normal) * 1 /*n_dirLight.intensity*/, 0.0f);
 
 	float specularLight = 0.50f;

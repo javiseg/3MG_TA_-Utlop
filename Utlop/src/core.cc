@@ -171,6 +171,8 @@ namespace Utlop
 
 		vector<string> helmetTextures;
 		helmetTextures.push_back("../UtlopTests/src/obj/helmet/diffuse.png");
+		helmetTextures.push_back("../UtlopTests/src/obj/helmet/specular.png");
+		helmetTextures.push_back("../UtlopTests/src/obj/helmet/normal.png");
 		InitMesh("../UtlopTests/src/obj/helmet/helmet.obj", helmetTextures);
 
 		vector<string> containerTextures;
@@ -393,9 +395,13 @@ namespace Utlop
 	vector<Texture> Core::InitMaterials(RenderCtx* data, vector<string> texturePaths)
 	{
 		vector<Texture> textures;
-		textures.push_back(Texture(texturePaths[0].c_str(), "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE));
-		if (texturePaths.size() >= 2) {
-			textures.push_back(Texture(texturePaths[1].c_str(), "specular", 1, GL_RED, GL_UNSIGNED_BYTE));
+		for (int i = 0; i < texturePaths.size(); i++) {
+			if(i == 0)
+				textures.push_back(Texture(texturePaths[i].c_str(), "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE));
+			else if(i == 1)
+				textures.push_back(Texture(texturePaths[i].c_str(), "specular", 1, GL_RED, GL_UNSIGNED_BYTE));
+			else if(i  == 2)
+				textures.push_back(Texture(texturePaths[i].c_str(), "normal", 1, GL_RGB, GL_UNSIGNED_BYTE));
 		}
 		return textures;
 	}

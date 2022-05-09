@@ -1,4 +1,4 @@
-#include "..\include\material.h"
+#include "..\include\texture.h"
 #include "stb_image.h"
 
 Utlop::Texture::Texture(const char* path, const char* texType, GLenum slot, GLenum format, GLenum pixelType)
@@ -22,6 +22,20 @@ Utlop::Texture::Texture(const char* path, const char* texType, GLenum slot, GLen
 
 		glTextureStorage2D(id, 1, GL_RGBA8, widthImg, heightImg);
 		glTextureSubImage2D(id, 0, 0, 0, widthImg, heightImg, GL_RGBA, GL_UNSIGNED_BYTE, text_buffer_);
+		
+		
+		if (type == "normal") {
+			glTextureStorage2D(id, 1, GL_RGB, widthImg, heightImg);
+			glTextureSubImage2D(id, 0, 0, 0, widthImg, heightImg, GL_RGBA, GL_UNSIGNED_BYTE, text_buffer_);
+		}
+		else {
+			glTextureStorage2D(id, 1, GL_RGBA8, widthImg, heightImg);
+			glTextureSubImage2D(id, 0, 0, 0, widthImg, heightImg, GL_RGBA, GL_UNSIGNED_BYTE, text_buffer_);
+		}
+		
+		
+		
+		
 		glGenerateTextureMipmap(id);
 
 

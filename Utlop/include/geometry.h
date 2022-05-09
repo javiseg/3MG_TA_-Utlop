@@ -4,7 +4,7 @@
 #include "glad/glad.h"
 #include <vector>
 #include "component.h"
-#include "material.h"
+#include "texture.h"
 
 namespace Utlop {
 
