@@ -26,37 +26,51 @@ struct Directional{
 
 out vec4 gl_FragColor; 
 
-void main()
-{
-	Directional n_dirLight;
-	n_dirLight.direction = dirLightDirection;
-	n_dirLight.color = dirLightColor;
-	n_dirLight.intensity = dirLightIntensity;
+
+vec4 PointLight(){
+
+	vec3 lightVec = dirLightPosition - frag_position;
+
+	// intensity of light with respect to distance
+	float dist = length(lightVec);
+	float a = 0.20f;
+	float b = 0.70f;
+	float inten = 1.0f / (a * dist * dist + b * dist + 1.0f);
+
 
 	float ambient = 0.20f;
+	vec3 normal = normalize(frag_normal);
+	vec3 lightDirection = normalize(lightVec);
+	float diffuse = max(dot(normal,lightDirection), 0.0f);
 	
-	n_dirLight.direction = normalize(dirLightPosition - frag_position);
+	float specular = 0.0f;
+	if(diffuse != 0){
+		float specularLight = 0.50f;
+		vec3 viewDirection = normalize(camPosition - frag_position);
+		vec3 halfwayVec = normalize(viewDirection + lightDirection);
+		vec3 reflectionDirection = reflect(-lightDirection, frag_normal);
+		float specAmount = pow(max(dot(normal, halfwayVec), 0.0f), 16);
+		specular = specAmount * specularLight;
+	}
 
-	vec4 textures = texture(diffuse0, text_coords);
+	return (texture(diffuse0, text_coords) * (diffuse * inten + ambient) + texture(specular0, text_coords).r * specular * inten) * vec4(dirLightColor,1.0f);
+}
 
-	vec3 FinalResult = textures.rgb;
+
+
+void main()
+{
+
 	
-	vec3 normal = normalize(texture(normal0, text_coords).xyz * 2.0f - 1.0f);
+	
+	if(dirLightIntensity == 0){
+		vec4 textures = texture(diffuse0, text_coords);
 
-	float diffuse = max(dot(n_dirLight.direction, frag_normal) * 1 /*n_dirLight.intensity*/, 0.0f);
-
-	float specularLight = 0.50f;
-	vec3 viewDirection = normalize(camPosition - frag_position);
-	vec3 reflectionDirection = reflect(-n_dirLight.direction, frag_normal);
-	float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 16);
-	float specular = specAmount * specularLight;
-
-
-	if(n_dirLight.intensity == 0){
+		vec3 FinalResult = textures.rgb;
 		gl_FragColor = vec4(FinalResult,1.0f);
 	}else{
 	
-		gl_FragColor = (texture(diffuse0, text_coords) * (diffuse + ambient) + texture(specular0, text_coords).r * specular) * vec4(n_dirLight.color,1.0f);;
+		gl_FragColor = PointLight();
 	}
 	
 }

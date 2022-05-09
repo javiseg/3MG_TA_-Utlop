@@ -176,8 +176,9 @@ namespace Utlop
 		InitMesh("../UtlopTests/src/obj/helmet/helmet.obj", helmetTextures);
 
 		vector<string> containerTextures;
-		containerTextures.push_back("../UtlopTests/src/obj/container/diffuse.png");
-		InitMesh("../UtlopTests/src/obj/container/container.obj", containerTextures);
+		containerTextures.push_back("../UtlopTests/src/obj/helmet/diffuse.png");
+		containerTextures.push_back("../UtlopTests/src/obj/helmet/specular.png");
+		InitMesh("../UtlopTests/src/obj/helmet/helmet.obj", containerTextures);
 
 		vector<string> carTextures;
 		carTextures.push_back("../UtlopTests/src/obj/car/diffuse.png");
