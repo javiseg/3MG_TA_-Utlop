@@ -59,7 +59,7 @@ namespace Utlop
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kLocalTRComp);
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kRenderComp);
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kLightComp);
-				//cr->AddComponent(*cr->getData()->entities[entityIdx], kPointLightComp);
+				//cr->AddComponent(*cr->getData()->entities[entityIdx], kTypeLightComp);
 				
 				cr->getData()->localtrcmp[cr->getData()->entities[entityIdx]->cmp_indx_[kLocalTRCompPos]].position -= vec3(20.0f * i, 20.0f * j, 0.0f);
 			}
@@ -92,21 +92,20 @@ namespace Utlop
 		/*
 		int lightEntity = AddEntity();
 		AddComponent(*data->entities[lightEntity], kLocalTRComp);
-		AddComponent(*data->entities[lightEntity], kPointLightComp);
+		AddComponent(*data->entities[lightEntity], kTypeLightComp);
 		AddComponent(*data->entities[lightEntity], kRenderComp);
 		*/
 		//Directional Light
 		int dirLightEntity = AddEntity();
 		AddComponent(*data->entities[dirLightEntity], kLocalTRComp);
-		AddComponent(*data->entities[dirLightEntity], kDirectionalLightComp);
+		AddComponent(*data->entities[dirLightEntity], kTypeLightComp);
 		AddComponent(*data->entities[dirLightEntity], kRenderComp);
-
-
-
+		data->typelighcmp[data->entities[dirLightEntity]->cmp_indx_[kTypeLightCompPos]].type = 0;
+		
 
 		/*int lightEntity2 = AddEntity();
 		AddComponent(*data->entities[lightEntity2], kLocalTRComp);
-		AddComponent(*data->entities[lightEntity2], kPointLightComp);
+		AddComponent(*data->entities[lightEntity2], kTypeLightComp);
 		AddComponent(*data->entities[lightEntity2], kRenderComp);*/
 		//
 
@@ -147,7 +146,7 @@ namespace Utlop
 		//Add Vertex
 		loadVertexShader("../UtlopTests/src/shaders/vs.glsl", data->vertexShader);
 		loadFragmentShader("../UtlopTests/src/shaders/fs_texture.glsl", data->fragmentShader);
-		Geometry quadGeo = InitGeometry(getData(), "../UtlopTests/src/obj/quad.obj");
+		//Geometry quadGeo = InitGeometry(getData(), "../UtlopTests/src/obj/quad.obj");
 
 		
 		framebuffer->initShader();
@@ -198,27 +197,31 @@ namespace Utlop
 		carTextures.push_back("../UtlopTests/src/obj/car/diffuse.png");
 		InitMesh("../UtlopTests/src/obj/car/car.obj", carTextures);*/
 
+		vector<string> floorTextures;
+		floorTextures.push_back("../UtlopTests/src/obj/floor/diffuse.png");
+		InitMesh("../UtlopTests/src/obj/floor/floor.obj", floorTextures);
+		data->obj_str_type.push_back("Floor");
 
 		vector<string> newCubeTextures;
 		newCubeTextures.push_back("../UtlopTests/src/obj/cube/diffuse1.jpg");
-		//newCubeTextures.push_back("../UtlopTests/src/obj/cube/specular.png");
-		newCubeTextures.push_back("../UtlopTests/src/obj/cube/normal.jpg");
+		newCubeTextures.push_back("../UtlopTests/src/obj/cube/specular.png");
+		//newCubeTextures.push_back("../UtlopTests/src/obj/cube/normal.jpg");
 		InitMesh("../UtlopTests/src/obj/cube/cube.obj", newCubeTextures);
 		data->obj_str_type.push_back("Wood cube");
 
-		vector<string> newCubeTextures2;
-		newCubeTextures2.push_back("../UtlopTests/src/obj/cube/diffuse.png");
-		newCubeTextures2.push_back("../UtlopTests/src/obj/cube/specular.png");
-		//newCubeTextures2.push_back("../UtlopTests/src/obj/cube/normal.jpg");
-		InitMesh("../UtlopTests/src/obj/cube/cube.obj", newCubeTextures2);
-		data->obj_str_type.push_back("Testing wood cube");
+		//vector<string> newCubeTextures2;
+		//newCubeTextures2.push_back("../UtlopTests/src/obj/cube/diffuse.png");
+		//newCubeTextures2.push_back("../UtlopTests/src/obj/cube/specular.png");
+		////newCubeTextures2.push_back("../UtlopTests/src/obj/cube/normal.jpg");
+		//InitMesh("../UtlopTests/src/obj/cube/cube.obj", newCubeTextures2);
+		//data->obj_str_type.push_back("Testing wood cube");
 
-		vector<string> newSphereTextures;
-		newSphereTextures.push_back("../UtlopTests/src/obj/sphere/diffuse.png");
-		newSphereTextures.push_back("../UtlopTests/src/obj/sphere/specular.png");
-		//newSphereTextures.push_back("../UtlopTests/src/obj/sphere/normal.png");
-		InitMesh("../UtlopTests/src/obj/sphere/sphere.obj", newSphereTextures);
-		data->obj_str_type.push_back("Sphere");
+		//vector<string> newSphereTextures;
+		//newSphereTextures.push_back("../UtlopTests/src/obj/sphere/diffuse.png");
+		//newSphereTextures.push_back("../UtlopTests/src/obj/sphere/specular.png");
+		////newSphereTextures.push_back("../UtlopTests/src/obj/sphere/normal.png");
+		//InitMesh("../UtlopTests/src/obj/sphere/sphere.obj", newSphereTextures);
+		//data->obj_str_type.push_back("Sphere");
 
 
 
@@ -226,6 +229,7 @@ namespace Utlop
 		//floorTextures.push_back("../UtlopTests/src/obj/cube/cube.png");
 		//floorTextures.push_back("../UtlopTests/src/obj/floor/specular.png");
 		//InitMesh("../UtlopTests/src/obj/cube/cube.obj", floorTextures);
+
 
     return done;
   }
@@ -409,15 +413,9 @@ namespace Utlop
 					break;
 				}
 
-				case kPointLightComp: {
-					data->Pointlightcmp.push_back(PointLightComponent());
-					entity.cmp_indx_[kPointLightCompPos] = (int)(data->Pointlightcmp.size() - 1);
-					break;
-				}
-
-				case kDirectionalLightComp: {
-					data->Directionallightcmp.push_back(DirectionalLightComponent());
-					entity.cmp_indx_[kDirectionalLightCompPos] = (int)(data->Directionallightcmp.size() - 1);
+				case kTypeLightComp: {
+					data->typelighcmp.push_back(TypeLightComponent());
+					entity.cmp_indx_[kTypeLightCompPos] = (int)(data->typelighcmp.size() - 1);
 					break;
 				}
 			}
@@ -482,8 +480,7 @@ namespace Utlop
 		data->kComponentMap.insert(make_pair(kCameraComp, CameraComponent()));
 		data->kComponentMap.insert(make_pair(kHeritageComp, HeritageComponent()));
 		data->kComponentMap.insert(make_pair(kLightComp, LightComponent()));
-		data->kComponentMap.insert(make_pair(kPointLightComp, PointLightComponent()));
-		data->kComponentMap.insert(make_pair(kDirectionalLightComp, DirectionalLightComponent()));
+		data->kComponentMap.insert(make_pair(kTypeLightComp, TypeLightComponent()));
 	}
 
 	void Core::InitSystems()
@@ -494,8 +491,7 @@ namespace Utlop
 		data->sys.push_back(make_shared<RenderSystem>());
 		data->sys.push_back(make_shared<HeritageSystem>());
 		data->sys.push_back(make_shared<LightSystem>());
-		data->sys.push_back(make_shared<PointLightSystem>());
-		data->sys.push_back(make_shared<DirectionalLightSystem>());
+		data->sys.push_back(make_shared<TypeLightSystem>());
 	}
 
 	void Core::PreExecSystems()
@@ -610,13 +606,18 @@ namespace Utlop
 					ImGui::SliderFloat3(slidername3.c_str(), &scale[0], 0.0f, 10.0f);
 					data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].scale = scale;
 				}
-				if (data->entities[n]->cmp_indx_[kRenderCompPos] != -1 && data->entities[n]->cmp_indx_[kPointLightCompPos] == -1
-					&& data->entities[n]->cmp_indx_[kDirectionalLightCompPos] == -1) {
+				if (data->entities[n]->cmp_indx_[kRenderCompPos] != -1 && data->entities[n]->cmp_indx_[kTypeLightCompPos] == -1) {
 					char s[10];
 					itoa(n, s, 10);
 					selectedType[n].push_back(0);
 					ImGui::ListBox(s, &selectedType[n][0], &data->obj_str_type[0], data->obj_str_type.size());
 					ChangeMesh(*data->entities[n], data, selectedType[n][0]);
+				}
+				else if(data->entities[n]->cmp_indx_[kTypeLightCompPos] != -1){
+					static int e = 0;
+					ImGui::RadioButton("PointLight", &e, 0); ImGui::SameLine();
+					ImGui::RadioButton("Directional Light", &e, 1); 
+					data->typelighcmp[data->entities[n]->cmp_indx_[kTypeLightCompPos]].type = (float)e;
 				}
 
 				

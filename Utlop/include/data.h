@@ -28,9 +28,8 @@ namespace Utlop {
 		vector<CameraComponent> cameracmp;
 		vector<RenderComponent> rendercmp;
 		vector<LightComponent> lightcmp;
-		vector<PointLightComponent> Pointlightcmp;
-		vector<DirectionalLightComponent> Directionallightcmp;
-
+		vector<TypeLightComponent> typelighcmp;
+		
 		vector<Geometry> geometry;
 		vector<Material> material;
 		vector<GameObject> gObjects;

@@ -3,6 +3,7 @@ in vec2 text_coords;
 in vec3 frag_position;
 in vec3 frag_normal;
 in vec3 FragPos;
+in  flat int lightType;
 
 flat in int doesHasNormalMap;
 in vec3 camPosition;
@@ -61,7 +62,8 @@ vec4 DirectionalLight(){
 
 	float ambient = 0.20f;
 	
-	vec3 lightDirection = normalize(-pointLightSTR.direction);
+	vec3 lightDirection = normalize(pointLightSTR.direction);
+		
 	float diffuse = max(dot(normal,lightDirection), 0.0f);
 	
 	float specular = 0.0f;
@@ -87,7 +89,11 @@ void main()
 		vec3 FinalResult = textures.rgb;
 		gl_FragColor = vec4(FinalResult,1.0f);
 	}else{
-		gl_FragColor = DirectionalLight(); //PointLight();
+		if(lightType == 0){
+			gl_FragColor = PointLight();
+		}else if(lightType == 1){
+			gl_FragColor = DirectionalLight();
+		}
 	}
 	
 }

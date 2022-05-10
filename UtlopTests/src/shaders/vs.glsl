@@ -6,7 +6,7 @@
 #define VIEW_MATRIX     4
 #define PROJ_MATRIX     5
 #define DIR_LIGHT	    6
-#define CAM_POS			10
+#define CAM_POS			11
 
 
 struct PointLightStr{
@@ -26,21 +26,21 @@ layout(location = PROJ_MATRIX) uniform mat4 ProjectionMatrix;
 layout(location = DIR_LIGHT) uniform PointLightStr pointLight;
 layout(location = CAM_POS) uniform vec3 camPos;
 uniform int hasNormalMap;
-//layout(location = 9) uniform vec3 dirLightPos;
-//layout(location = 9) uniform vec3 dirLightPos;
-
+uniform int l_type;
 
 out vec2 text_coords;
 out vec3 frag_position;
 out vec3 frag_normal;
 out vec3 FragPos; 
 out vec3 camPosition;
+out flat int lightType;
 flat out int doesHasNormalMap;
 out PointLightStr pointLightSTR;
 
 void main()
 {
 	pointLightSTR = pointLight;
+	lightType = l_type;
 	doesHasNormalMap = hasNormalMap;
 	camPosition = camPos;
 
