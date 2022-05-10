@@ -9,7 +9,7 @@
 #define CAM_POS			10
 
 
-struct Directional{
+struct PointLightStr{
 	vec3 direction;
 	vec3 color;
 	float intensity;
@@ -23,29 +23,24 @@ layout(location = MODEL_MATRIX) uniform mat4 ModelMatrix;
 layout(location = VIEW_MATRIX) uniform mat4 ViewMatrix;
 layout(location = PROJ_MATRIX) uniform mat4 ProjectionMatrix;
 
-layout(location = DIR_LIGHT) uniform Directional dirLight;
+layout(location = DIR_LIGHT) uniform PointLightStr pointLight;
 layout(location = CAM_POS) uniform vec3 camPos;
 uniform int hasNormalMap;
+//layout(location = 9) uniform vec3 dirLightPos;
 //layout(location = 9) uniform vec3 dirLightPos;
 
 
 out vec2 text_coords;
 out vec3 frag_position;
 out vec3 frag_normal;
-out vec3 dirLightDirection;
-out vec3 dirLightColor;
-out float dirLightIntensity;
-out vec3 dirLightPosition;
 out vec3 FragPos; 
 out vec3 camPosition;
 flat out int doesHasNormalMap;
+out PointLightStr pointLightSTR;
 
 void main()
 {
-	dirLightDirection = dirLight.direction;
-	dirLightColor = dirLight.color;
-	dirLightIntensity = dirLight.intensity;
-	dirLightPosition = dirLight.dirLightPos;
+	pointLightSTR = pointLight;
 	doesHasNormalMap = hasNormalMap;
 	camPosition = camPos;
 

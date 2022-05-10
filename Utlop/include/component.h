@@ -17,8 +17,9 @@ namespace Utlop {
 		kCameraComp = 4,
 		kHeritageComp = 8,
 		kLightComp = 16,
-		kDirectionalLightComp = 32,
-		kRenderComp = 64
+		kPointLightComp = 32,
+		kDirectionalLightComp = 64,
+		kRenderComp = 128
 	};
 
 	enum ComponentPos {
@@ -27,8 +28,9 @@ namespace Utlop {
 		kCameraCompPos = 2,
 		kHeritageCompPos = 3,
 		kLightCompPos = 4,
-		kDirectionalLightCompPos = 5,
-		kRenderCompPos = 6
+		kPointLightCompPos = 5,
+		kDirectionalLightCompPos = 6,
+		kRenderCompPos = 7
 	};
 
 
@@ -91,11 +93,17 @@ namespace Utlop {
 		float intensity;
 	};
 
-	struct DirectionalLightComponent : public Component {
+	struct PointLightComponent : public Component {
 		vec3 direction;
 		vec3 color;
 		vec3 position;
 		float intensity;
 	};
 
+	struct DirectionalLightComponent : public Component {
+		vec3 direction;
+		vec3 color;
+		vec3 position;
+		float intensity;
+	};
 }

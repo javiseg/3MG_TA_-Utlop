@@ -70,6 +70,15 @@ namespace Utlop {
 		void exec(Entity& entity, RenderCtx* data, DisplayList* dl) override;
 	};
 
+	struct PointLightSystem : public System {
+		PointLightSystem() {
+			id_ = kPointLightComp;
+		}
+		~PointLightSystem() {}
+		void preExec(Entity& entity, Utlop::RenderCtx* data) override;
+		void exec(Entity& entity, RenderCtx* data, DisplayList* dl) override;
+	};
+
 	struct DirectionalLightSystem : public System {
 		DirectionalLightSystem() {
 			id_ = kDirectionalLightComp;

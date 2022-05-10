@@ -4,7 +4,7 @@
 namespace Utlop {
 	using namespace std;
 
-	static const int kMaxComponents = 7;
+	static const int kMaxComponents = 8;
 
 	struct Entity {
 		

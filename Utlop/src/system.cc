@@ -80,9 +80,10 @@ void Utlop::RenderSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 	initShader(entity, data);
 	
 	//entity.cmp_indx_[kRenderCompPos] = 0;
-	if (entity.cmp_indx_[kDirectionalLightCompPos] == -1) {
+	if (entity.cmp_indx_[kPointLightCompPos] == -1 && entity.cmp_indx_[kDirectionalLightCompPos] == -1) {
 		initialMesh(entity, data, "../UtlopTests/src/obj/cube/cube.obj");
-	}else{
+	}
+	else {
 		initialMesh(entity, data, "../UtlopTests/src/obj/lightcube.obj");
 	}
 	//initMat(entity, data, "../UtlopTests/src/textures/default.png");
@@ -155,30 +156,57 @@ void Utlop::LightSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 {
 	if (entity.cmp_indx_[kRenderCompPos] != -1) {
 		
-			for (int i = 0; i < data->directionallightcmp.size(); i++) {
-				addSetLightDataCmd(dl, data->directionallightcmp[i].color, data->directionallightcmp[i].position,
-					data->directionallightcmp[i].intensity, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
-					data->localtrcmp[0].position);
-			}
+			// Point Lights
+		/*for (int i = 0; i < data->Pointlightcmp.size(); i++) {
+			addSetLightDataCmd(dl, data->Pointlightcmp[i].color, data->Pointlightcmp[i].position,
+				data->Pointlightcmp[i].intensity, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
+				data->localtrcmp[0].position, data->Pointlightcmp[i].direction);
+		}*/
+
+			// Directional Lights
+		for (int i = 0; i < data->Directionallightcmp.size(); i++) {
+			addSetLightDataCmd(dl, data->Directionallightcmp[i].color, data->Directionallightcmp[i].position,
+				data->Directionallightcmp[i].intensity, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
+				data->localtrcmp[0].position, data->Directionallightcmp[i].direction);
+		}
+	}
+}
+
+void Utlop::PointLightSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
+{
+	if (entity.cmp_indx_[kLocalTRCompPos] != -1) {
+		data->Pointlightcmp[entity.cmp_indx_[kPointLightCompPos]].color = vec3(1.0f, 1.0f, 1.0f);
+		data->Pointlightcmp[entity.cmp_indx_[kPointLightCompPos]].direction = vec3(1.0f, 1.0f, 1.0f);
+		data->Pointlightcmp[entity.cmp_indx_[kPointLightCompPos]].intensity = 2.0f;
+		data->Pointlightcmp[entity.cmp_indx_[kPointLightCompPos]].position = data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].position;
+	}
+	else {
+		printf("\nERROR: Point light entity without transform\n");
+	}
+}
+
+void Utlop::PointLightSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
+{
+	if (entity.cmp_indx_[kLocalTRCompPos] != -1) {
+		data->Pointlightcmp[entity.cmp_indx_[kPointLightCompPos]].position = data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].position;
 	}
 }
 
 void Utlop::DirectionalLightSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
 	if (entity.cmp_indx_[kLocalTRCompPos] != -1) {
-		data->directionallightcmp[entity.cmp_indx_[kDirectionalLightCompPos]].color = vec3(1.0f, 1.0f, 1.0f);
-		data->directionallightcmp[entity.cmp_indx_[kDirectionalLightCompPos]].direction = vec3(1.0f, 1.0f, 1.0f);
-		data->directionallightcmp[entity.cmp_indx_[kDirectionalLightCompPos]].intensity = 2.0f;
-		data->directionallightcmp[entity.cmp_indx_[kDirectionalLightCompPos]].position = data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].position;
-	}
-	else {
-		printf("\nERROR: Directional light entity without transform\n");
+		data->Directionallightcmp[entity.cmp_indx_[kDirectionalLightCompPos]].position = data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].position;
+		data->Directionallightcmp[entity.cmp_indx_[kDirectionalLightCompPos]].direction = vec3(0.0f, -1.0f, 0.0f);
+		data->Directionallightcmp[entity.cmp_indx_[kDirectionalLightCompPos]].color = vec3(1.0f);
+		data->Directionallightcmp[entity.cmp_indx_[kDirectionalLightCompPos]].intensity = 1.0f;
+
 	}
 }
 
 void Utlop::DirectionalLightSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 {
 	if (entity.cmp_indx_[kLocalTRCompPos] != -1) {
-		data->directionallightcmp[entity.cmp_indx_[kDirectionalLightCompPos]].position = data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].position;
+		data->Directionallightcmp[entity.cmp_indx_[kDirectionalLightCompPos]].position = data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].position;
+		data->Directionallightcmp[entity.cmp_indx_[kDirectionalLightCompPos]].direction = data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation;
 	}
 }

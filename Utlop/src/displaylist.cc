@@ -94,7 +94,7 @@ Utlop::DisplayList& Utlop::addSetModelViewProjection(Utlop::DisplayList* dl, GLu
 	return *dl;
 }
 
-Utlop::DisplayList& Utlop::addSetLightDataCmd(Utlop::DisplayList* dl, glm::vec3 color, glm::vec3 position, float intensity, GLuint shaderID, vec3 camPosition)
+Utlop::DisplayList& Utlop::addSetLightDataCmd(Utlop::DisplayList* dl, glm::vec3 color, glm::vec3 position, float intensity, GLuint shaderID, vec3 camPosition, vec3 direction)
 {
 	std::shared_ptr<Utlop::SetLightDataCmd> lightCmd;
 	lightCmd = std::make_shared<Utlop::SetLightDataCmd>();
@@ -104,6 +104,7 @@ Utlop::DisplayList& Utlop::addSetLightDataCmd(Utlop::DisplayList* dl, glm::vec3 
 	lightCmd->intensity = intensity;
 	lightCmd->shaderID = shaderID;
 	lightCmd->camPosition = camPosition;
+	lightCmd->direction = direction;
 
 	dl->cmdList.push_back(move(lightCmd));
 

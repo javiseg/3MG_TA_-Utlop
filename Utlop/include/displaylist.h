@@ -83,16 +83,17 @@ namespace Utlop {
 	struct SetLightDataCmd : public Command {
 		void executeOnGPU() override {
 			glUseProgram(shaderID);
-			int p_dir = glGetUniformLocation(shaderID, "dirLight.direction");
-			int p_color = glGetUniformLocation(shaderID, "dirLight.color");
-			int p_intensity = glGetUniformLocation(shaderID, "dirLight.intensity");
-			int p_pos = glGetUniformLocation(shaderID, "dirLight.dirLightPos");
+			int p_dir = glGetUniformLocation(shaderID, "pointLight.direction");
+			int p_color = glGetUniformLocation(shaderID, "pointLight.color");
+			int p_intensity = glGetUniformLocation(shaderID, "pointLight.intensity");
+			int p_pos = glGetUniformLocation(shaderID, "pointLight.dirLightPos");
 			int c_pos = glGetUniformLocation(shaderID, "camPos");
 
 			glUniform3fv(p_color, 1, glm::value_ptr(color));
 			glUniform1fv(p_intensity, 1, &intensity);
 			glUniform3fv(p_pos, 1, glm::value_ptr(position));
 			glUniform3fv(c_pos, 1, glm::value_ptr(camPosition));
+			glUniform3fv(p_dir, 1, glm::value_ptr(direction));
 
 			glUseProgram(0);
 		}
@@ -100,6 +101,7 @@ namespace Utlop {
 		vec3 position;
 		float intensity = 0.0f;
 		GLuint shaderID;
+		vec3 direction;
 		vec3 camPosition;
 	};
 
@@ -192,7 +194,7 @@ namespace Utlop {
 	DisplayList& addDrawMeshCmd(DisplayList* dl, Utlop::Mesh m, GLuint shader, Utlop::CameraComponent cameracmp, Utlop::LocalTRComponent localcmp);
 	DisplayList& addSetPolygonCmd(DisplayList* dl, uint8_t on);
 	DisplayList& addSetModelViewProjection(DisplayList* dl, GLuint shaderID, glm::mat4 projection, glm::mat4 model, glm::mat4 view);
-	DisplayList& addSetLightDataCmd(DisplayList* dl, glm::vec3 color, glm::vec3 position, float intensity, GLuint shaderID, vec3 camPosition);
+	DisplayList& addSetLightDataCmd(DisplayList* dl, glm::vec3 color, glm::vec3 position, float intensity, GLuint shaderID, vec3 camPosition, vec3 direction);
 	DisplayList& addEnableDepthTest(DisplayList* dl);
 	DisplayList& addDisableDepthTest(DisplayList* dl);
 	DisplayList& addDoFramebuffer(DisplayList* dl, GLuint shaderID, GLuint rectVAO, GLuint texture, GLuint fbo);
