@@ -40,7 +40,8 @@ namespace Utlop
 		data = new RenderCtx();
 		displayList = new DisplayList();
     _instance = this;
-		framebuffer = make_unique<RenderToTexture>();
+		data->framebuffer = make_unique<RenderToTexture>();
+		data->shadowframebuffer = make_unique<RenderToTexture>();
 		cubemap = make_unique<CubeMap>();
   }
 
@@ -149,11 +150,15 @@ namespace Utlop
 		//Geometry quadGeo = InitGeometry(getData(), "../UtlopTests/src/obj/quad.obj");
 
 		
-		framebuffer->initShader();
-		framebuffer->rectangleToGPU();
-		framebuffer->initFBO(_window.width, _window.height);
-		framebuffer->errorCheck();
+		data->framebuffer->initShader("../UtlopTests/src/shaders/fb_vert.glsl", "../UtlopTests/src/shaders/fb_frag.glsl");
+		data->framebuffer->rectangleToGPU();
+		data->framebuffer->initFBO(_window.width, _window.height);
+		data->framebuffer->errorCheck();
 	
+		data->shadowframebuffer->initShader("../UtlopTests/src/shaders/shadowfb_vert.glsl", "../UtlopTests/src/shaders/shadowfb_frag.glsl");
+		data->shadowframebuffer->initShadowFBO(_window.width, _window.height);
+		data->shadowframebuffer->setLightPerspective(vec3(0.0f));
+		data->shadowframebuffer->errorCheck();
 
 		std::string facesCubemap[6] =
 		{
@@ -290,7 +295,7 @@ namespace Utlop
           glfwSetWindowShouldClose(_window._window, GL_TRUE);
 				
 				
-				addBindFramebuffer(displayList, framebuffer->FBOid);
+				addBindFramebuffer(displayList, data->framebuffer->FBOid);
 				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
 				addEnableDepthTest(displayList);
 
@@ -320,7 +325,7 @@ namespace Utlop
 
 				addBindFramebuffer(displayList, 0);
 				addDisableDepthTest(displayList);
-				addDoFramebuffer(displayList, framebuffer->shaderID, framebuffer->rectVAO, framebuffer->FBtexture, framebuffer->FBOid);
+				addDoFramebuffer(displayList, data->framebuffer->shaderID, data->framebuffer->rectVAO, data->framebuffer->FBtexture, data->framebuffer->FBOid);
 				
 				
 				displayList->submit();

@@ -71,7 +71,6 @@ namespace Utlop
 
 			RenderCtx* data;
 			DisplayList* displayList;
-			unique_ptr<RenderToTexture> framebuffer;
 			unique_ptr<CubeMap> cubemap;
 
 	};
