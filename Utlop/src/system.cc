@@ -156,19 +156,11 @@ void Utlop::LightSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 {
 	if (entity.cmp_indx_[kRenderCompPos] != -1) {
 		
-			// Point Lights
 		for (int i = 0; i < data->typelighcmp.size(); i++) {
 			addSetLightDataCmd(dl, data->typelighcmp[i].color, data->typelighcmp[i].position,
 				data->typelighcmp[i].intensity, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
 				data->localtrcmp[0].position, data->typelighcmp[i].direction, data->typelighcmp[i].type);
 		}
-
-			// Directional Lights
-		/*for (int i = 0; i < data->Directionallightcmp.size(); i++) {
-			addSetLightDataCmd(dl, data->Directionallightcmp[i].color, data->Directionallightcmp[i].position,
-				data->Directionallightcmp[i].intensity, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
-				data->localtrcmp[0].position, data->Directionallightcmp[i].direction);
-		}*/
 	}
 }
 

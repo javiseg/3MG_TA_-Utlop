@@ -156,6 +156,7 @@ namespace Utlop
 		data->framebuffer->errorCheck();
 	
 		data->shadowframebuffer->initShader("../UtlopTests/src/shaders/shadowfb_vert.glsl", "../UtlopTests/src/shaders/shadowfb_frag.glsl");
+		data->shadowframebuffer->rectangleToGPU();
 		data->shadowframebuffer->initShadowFBO(_window.width, _window.height);
 		data->shadowframebuffer->setLightPerspective(vec3(0.0f));
 		data->shadowframebuffer->errorCheck();
@@ -271,16 +272,13 @@ namespace Utlop
 			glGetIntegerv(GL_MAJOR_VERSION, &version_max);
 			glGetIntegerv(GL_MINOR_VERSION, &version_min);
 			printf("Version: %d.%d \n", version_max, version_min);
-			//glEnable(GL_CULL_FACE);
-			//glCullFace(GL_FRONT);
+
+
 
 			float lastFrame = (float)glfwGetTime();
 			InitImGUI();
-
-			//PreExecSystems();
-			//InitMaterials(data, "../UtlopTests/src/textures/texture.jpg");
-			//InitMaterials(data, "../UtlopTests/src/textures/default.png");
-			//InitGeometry(data, "../UtlopTests/src/obj/backpack/backpack.obj");
+			
+			
 			//scheduler.run(preSched, &schedulerReady);
 			PreExecSystems();
 			//scheduler.run(preSched, &schedulerReady);
@@ -294,7 +292,6 @@ namespace Utlop
         if (glfwGetKey(_window._window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
           glfwSetWindowShouldClose(_window._window, GL_TRUE);
 				
-				
 				addBindFramebuffer(displayList, data->framebuffer->FBOid);
 				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
 				addEnableDepthTest(displayList);
@@ -304,23 +301,17 @@ namespace Utlop
 
 				glfwPollEvents();
 
-				
-
-				//data->localtrcmp[1].rotation = glm::vec3(0.0f, cos(lastFrame) * 90.0f, 0.0f);
-				//ExecSystems();
-				//scheduler.run(sched, &schedulerReady);
-				//ExecSystems2();
 				if (preExecDone_) {
 					scheduler.run(sched, &schedulerReady);
 					
 				}
+
 				addDrawSkybox(displayList, cubemap->shaderID, data->localtrcmp[0].position,
 					data->cameracmp[0].front_, data->cameracmp[0].Up,
 					data->cameracmp[0].projection_, data->cameracmp[0].view_,
 					cubemap->vao, cubemap->texture);
 				MoveCamera();
-				
-		
+
 				scheduler.waitFor(schedulerReady);
 
 				addBindFramebuffer(displayList, 0);
@@ -328,20 +319,36 @@ namespace Utlop
 				addDoFramebuffer(displayList, data->framebuffer->shaderID, data->framebuffer->rectVAO, data->framebuffer->FBtexture, data->framebuffer->FBOid);
 				
 				
+
 				displayList->submit();
 
-				
+
+				// Preparations for the Shadow Map
+				glViewport(0, 0, data->shadowframebuffer->width, data->shadowframebuffer->height);
+				glBindFramebuffer(GL_FRAMEBUFFER, data->shadowframebuffer->FBOid);
+				glClear(GL_DEPTH_BUFFER_BIT);
+				glUseProgram(data->shadowframebuffer->shaderID);
+				/**/glBindTextureUnit(0, data->shadowframebuffer->FBtexture);
+				//glUniform1i(glGetUniformLocation(data->shadowframebuffer->shaderID, "screenTexture"), 0);
+				glBindVertexArray(data->shadowframebuffer->rectVAO);
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+				// Draw scene for shadow map
+				glBindFramebuffer(GL_FRAMEBUFFER, 0);
+				//GLfloat backgroundColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+				//glClearNamedFramebufferfv(fbo, GL_COLOR, 0, backgroundColor);
+
+
+
+
+				// Switch back to the default viewport
+				glViewport(0, 0, _window.width, _window.height);
 
 
 
 				ImGUI();
 
-
-				
-
         glfwSwapBuffers(_window._window);
         glfwPollEvents();
-
 
         std::chrono::system_clock::time_point end_time = std::chrono::system_clock::now();
         std::this_thread::sleep_until(start_time + std::chrono::milliseconds(_frame_time_millis));

@@ -56,6 +56,10 @@ namespace Utlop {
 		GLuint rectVAO;
 		GLuint rectVBO;
 
+		int width;
+		int height;
+
+
 		GLuint shaderID;
 
 		glm::mat4 lightProjection;
@@ -72,9 +76,11 @@ namespace Utlop {
 			-1.0f,  1.0f,  0.0f, 1.0f
 		};
 
-		void initFBO(int width, int height) {
+		void initFBO(int width_, int height_) {
 
 			/**/
+			width = width_;
+			height = height_;
 			glGenFramebuffers(1, &FBOid);
 			glBindFramebuffer(GL_FRAMEBUFFER, FBOid);
 			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
@@ -119,8 +125,10 @@ namespace Utlop {
 		}
 
 
-		void initShadowFBO(int width, int height) {
+		void initShadowFBO(int width_, int height_) {
 
+			width = width_;
+			height = height_;
 			glGenFramebuffers(1, &FBOid);
 
 			// Texture for Shadow Map FBO¡
