@@ -6,6 +6,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/mat4x4.hpp"
 #include "geometry.h"
+#include "data.h"
 
 namespace Utlop {
 
@@ -49,6 +50,7 @@ namespace Utlop {
 
 	struct DrawMeshCmd : public Command {
 		void executeOnGPU() override {
+			shader = 12;
 			m.Draw(shader, cameracmp);
 		}
 		Mesh m;
@@ -111,7 +113,7 @@ namespace Utlop {
 	struct EnableDepthCmd : public Command {
 		void executeOnGPU() override {
 			glEnable(GL_DEPTH_TEST);
-			glDepthFunc(GL_LESS);
+			//glDepthFunc(GL_LESS);
 		}
 	};
 
@@ -124,14 +126,12 @@ namespace Utlop {
 	struct DoFrameBufferCmd : public Command {
 		void executeOnGPU() override {
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			//GLfloat backgroundColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-			//glClearNamedFramebufferfv(fbo, GL_COLOR, 0, backgroundColor);
-			
 			glUseProgram(shaderID);
-			/**/glBindTextureUnit(0, fbTexture);
+			glBindTextureUnit(0, fbTexture);
 			glUniform1i(glGetUniformLocation(shaderID, "screenTexture"), 0);
 			glBindVertexArray(rectVAO);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
+			glUseProgram(0);
 		}
 		GLuint shaderID;
 		GLuint rectVAO;
@@ -142,6 +142,8 @@ namespace Utlop {
 	struct BindFramebufferCmd : public Command {
 		void executeOnGPU() override {
 			glBindFramebuffer(GL_FRAMEBUFFER, fboID);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glEnable(GL_DEPTH_TEST);
 		}
 		GLuint fboID;
 	};
@@ -181,6 +183,21 @@ namespace Utlop {
 		GLuint texture;
 	};
 
+	struct ShadowMapCmd : public Command {
+		void executeOnGPU() override {
+			// Preparations for the Shadow Map
+			
+			/*glViewport(0, 0, shadowframebuffer.width, shadowframebuffer.height);
+			glBindFramebuffer(GL_FRAMEBUFFER, shadowframebuffer.FBOid);
+			glClear(GL_DEPTH_BUFFER_BIT);
+			ConfigureShaderAndMatrices();
+			RenderScene();
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);*/
+
+		}
+		RenderToTexture shadowframebuffer;
+
+	};
 	class DisplayList {
 		public:
 			list<shared_ptr<Command>> cmdList;
@@ -202,6 +219,7 @@ namespace Utlop {
 	DisplayList& addDisableDepthTest(DisplayList* dl);
 	DisplayList& addDoFramebuffer(DisplayList* dl, GLuint shaderID, GLuint rectVAO, GLuint texture, GLuint fbo);
 	DisplayList& addBindFramebuffer(DisplayList* dl, GLuint fboID);
+	DisplayList& addShadowFrameBufferCmd(DisplayList* dl, RenderToTexture rtt);
 	DisplayList& addDrawSkybox(DisplayList* dl, GLuint shaderID,
 		glm::vec3 position, glm::vec3 front, glm::vec3 Up, glm::mat4 projection,
 		glm::mat4 view, GLuint vao, GLuint texture);

@@ -144,9 +144,10 @@ namespace Utlop
 		{
 			printf("Failed to initialize GLAD");
 		}
-		//Add Vertex
-		loadVertexShader("../UtlopTests/src/shaders/vs.glsl", data->vertexShader);
-		loadFragmentShader("../UtlopTests/src/shaders/fs_texture.glsl", data->fragmentShader);
+		//Load Shader
+		data->shaders.push_back(Shader("../UtlopTests/src/shaders/vs.glsl", "../UtlopTests/src/shaders/fs_texture.glsl"));
+		//loadVertexShader("../UtlopTests/src/shaders/vs.glsl", data->vertexShader);
+		//loadFragmentShader("../UtlopTests/src/shaders/fs_texture.glsl", data->fragmentShader);
 		//Geometry quadGeo = InitGeometry(getData(), "../UtlopTests/src/obj/quad.obj");
 
 		
@@ -157,8 +158,8 @@ namespace Utlop
 	
 		data->shadowframebuffer->initShader("../UtlopTests/src/shaders/shadowfb_vert.glsl", "../UtlopTests/src/shaders/shadowfb_frag.glsl");
 		data->shadowframebuffer->rectangleToGPU();
-		data->shadowframebuffer->initShadowFBO(_window.width, _window.height);
-		data->shadowframebuffer->setLightPerspective(vec3(0.0f));
+		data->shadowframebuffer->initShadowFBO(2048, 2048);
+		data->shadowframebuffer->setLightPerspective(vec3(1.0f));
 		data->shadowframebuffer->errorCheck();
 
 		std::string facesCubemap[6] =
@@ -273,8 +274,6 @@ namespace Utlop
 			glGetIntegerv(GL_MINOR_VERSION, &version_min);
 			printf("Version: %d.%d \n", version_max, version_min);
 
-
-
 			float lastFrame = (float)glfwGetTime();
 			InitImGUI();
 			
@@ -291,6 +290,37 @@ namespace Utlop
 
         if (glfwGetKey(_window._window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
           glfwSetWindowShouldClose(_window._window, GL_TRUE);
+				
+				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
+
+				
+				/*glEnable(GL_DEPTH_TEST);
+
+				// Preparations for the Shadow Map
+				glViewport(0, 0, data->shadowframebuffer->width, data->shadowframebuffer->height);
+				glBindFramebuffer(GL_FRAMEBUFFER, data->shadowframebuffer->FBOid);
+				glClear(GL_DEPTH_BUFFER_BIT);
+				
+				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
+
+				if (preExecDone_) {
+					scheduler.run(sched, &schedulerReady);
+
+				}
+				addDrawSkybox(displayList, cubemap->shaderID, data->localtrcmp[0].position,
+					data->cameracmp[0].front_, data->cameracmp[0].Up,
+					data->cameracmp[0].projection_, data->cameracmp[0].view_,
+					cubemap->vao, cubemap->texture);
+				scheduler.waitFor(schedulerReady);
+				
+				displayList->submit();
+				
+				glBindFramebuffer(GL_FRAMEBUFFER, 0);
+				
+				glViewport(0, 0, _window.width, _window.height);
+				*/
+
+
 				
 				addBindFramebuffer(displayList, data->framebuffer->FBOid);
 				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
@@ -318,31 +348,12 @@ namespace Utlop
 				addDisableDepthTest(displayList);
 				addDoFramebuffer(displayList, data->framebuffer->shaderID, data->framebuffer->rectVAO, data->framebuffer->FBtexture, data->framebuffer->FBOid);
 				
-				
+				addShadowFrameBufferCmd(displayList, *data->shadowframebuffer);
 
 				displayList->submit();
 
 
-				// Preparations for the Shadow Map
-				glViewport(0, 0, data->shadowframebuffer->width, data->shadowframebuffer->height);
-				glBindFramebuffer(GL_FRAMEBUFFER, data->shadowframebuffer->FBOid);
-				glClear(GL_DEPTH_BUFFER_BIT);
-				glUseProgram(data->shadowframebuffer->shaderID);
-				/**/glBindTextureUnit(0, data->shadowframebuffer->FBtexture);
-				//glUniform1i(glGetUniformLocation(data->shadowframebuffer->shaderID, "screenTexture"), 0);
-				glBindVertexArray(data->shadowframebuffer->rectVAO);
-				glDrawArrays(GL_TRIANGLES, 0, 6);
-				// Draw scene for shadow map
-				glBindFramebuffer(GL_FRAMEBUFFER, 0);
-				//GLfloat backgroundColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-				//glClearNamedFramebufferfv(fbo, GL_COLOR, 0, backgroundColor);
-
-
-
-
-				// Switch back to the default viewport
-				glViewport(0, 0, _window.width, _window.height);
-
+				
 
 
 				ImGUI();

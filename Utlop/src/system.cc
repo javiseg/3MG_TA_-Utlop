@@ -77,7 +77,6 @@ void Utlop::CameraSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 
 void Utlop::RenderSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
-	initShader(entity, data);
 	
 	//entity.cmp_indx_[kRenderCompPos] = 0;
 	if (entity.cmp_indx_[kTypeLightCompPos] == -1) {

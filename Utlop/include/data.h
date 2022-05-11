@@ -6,6 +6,7 @@
 #include <memory>
 #include <map>
 #include "glm/gtc/type_ptr.hpp"
+#include "shader.h"
 #include <iostream>
 
 void checkCompileErrors(unsigned int shader, std::string type);
@@ -41,6 +42,8 @@ namespace Utlop {
 		GLuint fragmentShader;
 
 		RenderComponent cubemap;
+
+		vector<Shader> shaders;
 
 		unique_ptr<RenderToTexture> framebuffer;
 		unique_ptr<RenderToTexture> shadowframebuffer;
@@ -130,7 +133,7 @@ namespace Utlop {
 			width = width_;
 			height = height_;
 			glGenFramebuffers(1, &FBOid);
-
+			
 			// Texture for Shadow Map FBO¡
 			glGenTextures(1, &FBtexture);
 			glBindTexture(GL_TEXTURE_2D, FBtexture);
@@ -156,7 +159,7 @@ namespace Utlop {
 			if (fboStatus != GL_FRAMEBUFFER_COMPLETE) {
 				printf("\nFrameBuffer error: %s\n", fboStatus);
 			}
-			//glUseProgram(0);
+			glUseProgram(0);
 		}
 
 		void rectangleToGPU() {

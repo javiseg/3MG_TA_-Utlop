@@ -159,6 +159,18 @@ Utlop::DisplayList& Utlop::addBindFramebuffer(DisplayList* dl, GLuint fboID)
 	return *dl;
 }
 
+Utlop::DisplayList& Utlop::addShadowFrameBufferCmd(DisplayList* dl, RenderToTexture rtt)
+{
+	std::unique_ptr<Utlop::ShadowMapCmd> sfbcmd;
+	sfbcmd = std::make_unique<Utlop::ShadowMapCmd>();
+
+	sfbcmd->shadowframebuffer = rtt;
+
+	dl->cmdList.push_back(move(sfbcmd));
+
+	return *dl;
+}
+
 Utlop::DisplayList& Utlop::addDrawSkybox(DisplayList* dl, GLuint shaderID, glm::vec3 position, glm::vec3 front, glm::vec3 Up, glm::mat4 projection, glm::mat4 view, GLuint vao, GLuint texture)
 {
 	std::unique_ptr<Utlop::SkyboxCmd> skycmd;
