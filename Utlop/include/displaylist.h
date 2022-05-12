@@ -50,7 +50,6 @@ namespace Utlop {
 
 	struct DrawMeshCmd : public Command {
 		void executeOnGPU() override {
-			shader = 12;
 			m.Draw(shader, cameracmp);
 		}
 		Mesh m;

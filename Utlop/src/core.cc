@@ -146,20 +146,19 @@ namespace Utlop
 		}
 		//Load Shader
 		data->shaders.push_back(Shader("../UtlopTests/src/shaders/vs.glsl", "../UtlopTests/src/shaders/fs_texture.glsl"));
-		//loadVertexShader("../UtlopTests/src/shaders/vs.glsl", data->vertexShader);
-		//loadFragmentShader("../UtlopTests/src/shaders/fs_texture.glsl", data->fragmentShader);
-		//Geometry quadGeo = InitGeometry(getData(), "../UtlopTests/src/obj/quad.obj");
-
 		
-		data->framebuffer->initShader("../UtlopTests/src/shaders/fb_vert.glsl", "../UtlopTests/src/shaders/fb_frag.glsl");
+		data->shaders.push_back(Shader("../UtlopTests/src/shaders/fb_vert.glsl", "../UtlopTests/src/shaders/fb_frag.glsl"));
+		data->framebuffer->initShader(data->shaders.size() - 1);
 		data->framebuffer->rectangleToGPU();
 		data->framebuffer->initFBO(_window.width, _window.height);
 		data->framebuffer->errorCheck();
 	
-		data->shadowframebuffer->initShader("../UtlopTests/src/shaders/shadowfb_vert.glsl", "../UtlopTests/src/shaders/shadowfb_frag.glsl");
+		data->shaders.push_back(Shader("../UtlopTests/src/shaders/shadowfb_vert.glsl", "../UtlopTests/src/shaders/shadowfb_frag.glsl"));
+
+		data->shadowframebuffer->initShader(data->shaders.size() - 1);
 		data->shadowframebuffer->rectangleToGPU();
 		data->shadowframebuffer->initShadowFBO(2048, 2048);
-		data->shadowframebuffer->setLightPerspective(vec3(1.0f));
+		data->shadowframebuffer->setLightPerspective(vec3(1.0f), &data->shaders);
 		data->shadowframebuffer->errorCheck();
 
 		std::string facesCubemap[6] =
@@ -294,7 +293,8 @@ namespace Utlop
 				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
 
 				
-				/*glEnable(GL_DEPTH_TEST);
+				ExecSystems();
+				glEnable(GL_DEPTH_TEST);
 
 				// Preparations for the Shadow Map
 				glViewport(0, 0, data->shadowframebuffer->width, data->shadowframebuffer->height);
@@ -303,57 +303,60 @@ namespace Utlop
 				
 				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
 
-				if (preExecDone_) {
+				ChangeShader(data->shadowframebuffer->shader_idx);
+
+				/*if (preExecDone_) {
 					scheduler.run(sched, &schedulerReady);
 
-				}
+				}*/
+				
+
 				addDrawSkybox(displayList, cubemap->shaderID, data->localtrcmp[0].position,
 					data->cameracmp[0].front_, data->cameracmp[0].Up,
 					data->cameracmp[0].projection_, data->cameracmp[0].view_,
 					cubemap->vao, cubemap->texture);
-				scheduler.waitFor(schedulerReady);
+				//scheduler.waitFor(schedulerReady);
 				
+				
+				ExecSystems2();
 				displayList->submit();
 				
 				glBindFramebuffer(GL_FRAMEBUFFER, 0);
 				
 				glViewport(0, 0, _window.width, _window.height);
-				*/
+				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
 
+				ChangeShader(0);
 
+				deltaTime_ = (float)glfwGetTime() - lastFrame;
+				lastFrame = (float)glfwGetTime();
 				
 				addBindFramebuffer(displayList, data->framebuffer->FBOid);
 				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
 				addEnableDepthTest(displayList);
-
-				deltaTime_ = (float)glfwGetTime() - lastFrame;
-				lastFrame = (float)glfwGetTime();
-
-				glfwPollEvents();
-
-				if (preExecDone_) {
-					scheduler.run(sched, &schedulerReady);
-					
-				}
-
 				addDrawSkybox(displayList, cubemap->shaderID, data->localtrcmp[0].position,
 					data->cameracmp[0].front_, data->cameracmp[0].Up,
 					data->cameracmp[0].projection_, data->cameracmp[0].view_,
 					cubemap->vao, cubemap->texture);
+				
+				/*if (preExecDone_) {
+					scheduler.run(sched, &schedulerReady);
+
+				}*/
+				ExecSystems2();
+
+				glfwPollEvents();
+
 				MoveCamera();
 
-				scheduler.waitFor(schedulerReady);
-
+				//scheduler.waitFor(schedulerReady);
 				addBindFramebuffer(displayList, 0);
 				addDisableDepthTest(displayList);
-				addDoFramebuffer(displayList, data->framebuffer->shaderID, data->framebuffer->rectVAO, data->framebuffer->FBtexture, data->framebuffer->FBOid);
+				addDoFramebuffer(displayList, data->shaders[data->framebuffer->shader_idx].id, data->framebuffer->rectVAO, data->framebuffer->FBtexture, data->framebuffer->FBOid);
 				
 				addShadowFrameBufferCmd(displayList, *data->shadowframebuffer);
-
+					
 				displayList->submit();
-
-
-				
 
 
 				ImGUI();
@@ -540,7 +543,7 @@ namespace Utlop
 
 	void Core::ExecSystems()
 	{
-		for (unsigned int i = 0; i < data->sys.size(); i++) {
+		for (unsigned int i = 0; i < data->sys.size()-1; i++) {
 			for (unsigned int h = 0; h < data->entities.size(); h++) {
 				int out = data->entities[h]->componentsID_ & data->sys[i]->id_;
 				if (out == data->sys[i]->id_)
@@ -555,6 +558,13 @@ namespace Utlop
 			int out = data->entities[h]->componentsID_ & data->sys[kRenderCompPos]->id_;
 			if (out == data->sys[kRenderCompPos]->id_)
 				data->sys[kRenderCompPos]->exec(*data->entities[h], data, displayList);
+		}
+	}
+
+	void Core::ChangeShader(GLuint shader_idx)
+	{
+		for (unsigned int h = 0; h < data->rendercmp.size(); h++) {
+			data->rendercmp[h].shader_idx = shader_idx;
 		}
 	}
 

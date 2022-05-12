@@ -63,7 +63,7 @@ namespace Utlop {
 		int height;
 
 
-		GLuint shaderID;
+		GLuint shader_idx;
 
 		glm::mat4 lightProjection;
 
@@ -176,36 +176,20 @@ namespace Utlop {
 
 		}
 
-		void initShader(const char* vertPath, const char* fragPath) {
+		void initShader(GLuint shader_index) {
 			
+			shader_idx = shader_index;
 
-			
-			shaderID = glCreateProgram();
-
-			GLuint fbVertShader;
-			GLuint fbFragShader;
-			loadVertexShader(vertPath, fbVertShader);
-			loadFragmentShader(fragPath, fbFragShader);
-
-			glUseProgram(shaderID);
-			glAttachShader(shaderID, fbVertShader);
-			glAttachShader(shaderID, fbFragShader);
-
-			glLinkProgram(shaderID);
-			checkCompileErrors(shaderID, "PROGRAM");
-			checkCompileErrors(shaderID, "LINK");
-			glUniform1i(glGetUniformLocation(shaderID, "screenTexture"), 0);
-			
 		}
 
-		void setLightPerspective(vec3 lightPosition) {
+		void setLightPerspective(vec3 lightPosition, vector<Shader>* shaders) {
 
 			glm::mat4 orthgonalProjection = glm::ortho(-35.0f, 35.0f, -35.0f, 35.0f, 0.1f, 75.0f);
 			glm::mat4 lightView = glm::lookAt(20.0f * lightPosition, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 			lightProjection = orthgonalProjection * lightView;
 
-			glUseProgram(shaderID);
-			glUniformMatrix4fv(glGetUniformLocation(shaderID, "lightProjection"), 1, GL_FALSE, glm::value_ptr(lightProjection));
+			glUseProgram(shaders->at(shader_idx).id);
+			glUniformMatrix4fv(glGetUniformLocation(shaders->at(shader_idx).id, "lightProjection"), 1, GL_FALSE, glm::value_ptr(lightProjection));
 			glUseProgram(0);
 		}
 	};

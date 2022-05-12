@@ -48,7 +48,6 @@ namespace Utlop {
 		void UpdateUniforms(GLuint shaderID);
 
 		void initialMesh(Entity& entity, RenderCtx* data, const char* path);
-		void initShader(Entity& entity, RenderCtx* data);
 	};
 
 	struct HeritageSystem : public System {

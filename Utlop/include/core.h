@@ -44,6 +44,7 @@ namespace Utlop
 			void PreExecSystem(Entity& entity);
 			void ExecSystems();
 			void ExecSystems2();
+			void ChangeShader(GLuint shader_idx);
 
       static Core* Instance();
 			RenderCtx* getData();

@@ -31,6 +31,9 @@ namespace Utlop {
 		kRenderCompPos = 6
 	};
 
+	enum ComponentConstants {
+		kGameObjectsShader = 0
+	};
 
 	struct Component {
 	};
@@ -52,7 +55,7 @@ namespace Utlop {
 		vector<GLuint> mesh_idx;
 
 
-		GLuint shaderID_ = 999;
+		GLuint shader_idx = 0;
 		GLuint vao_ = 999;
 		GLuint vbo_ = 999;
 		GLuint ebo_ = 999;

@@ -77,7 +77,9 @@ void Utlop::CameraSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 
 void Utlop::RenderSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
-	
+	if (entity.cmp_indx_[kLocalTRCompPos] != -1) {
+		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shader_idx = kGameObjectsShader;
+	}
 	//entity.cmp_indx_[kRenderCompPos] = 0;
 	if (entity.cmp_indx_[kTypeLightCompPos] == -1) {
 		initialMesh(entity, data, "../UtlopTests/src/obj/cube/cube.obj");
@@ -92,12 +94,13 @@ void Utlop::RenderSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 void Utlop::RenderSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 {
 
-	addSetModelViewProjection(dl, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, 
+	addSetModelViewProjection(dl,data->shaders[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shader_idx].id, 
 		data->cameracmp[0].projection_, data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model,
 		data->cameracmp[0].view_);
 	
-	addDrawMeshCmd(dl, data->meshes[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].mesh_idx[0]], data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
-		data->cameracmp[0], data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]]);
+	addDrawMeshCmd(dl, data->meshes[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].mesh_idx[0]], 
+		data->shaders[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shader_idx].id,	data->cameracmp[0], 
+		data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]]);
 
 }
 
@@ -120,21 +123,6 @@ void Utlop::RenderSystem::initialMesh(Entity& entity, RenderCtx* data, const cha
 	}
 }
 
-void Utlop::RenderSystem::initShader(Entity& entity, RenderCtx* data)
-{
-	data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_ = glCreateProgram();
-
-	glUseProgram(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_);
-	glAttachShader(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, data->vertexShader);
-	glAttachShader(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, data->fragmentShader);
-	
-	glLinkProgram(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_);
-
-	checkCompileErrors(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, "PROGRAM");
-	checkCompileErrors(data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_, "LINK");
-
-	glUseProgram(0);
-}
 void Utlop::HeritageSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
 }
@@ -157,7 +145,7 @@ void Utlop::LightSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 		
 		for (int i = 0; i < data->typelighcmp.size(); i++) {
 			addSetLightDataCmd(dl, data->typelighcmp[i].color, data->typelighcmp[i].position,
-				data->typelighcmp[i].intensity, data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shaderID_,
+				data->typelighcmp[i].intensity, data->shaders[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shader_idx].id,
 				data->localtrcmp[0].position, data->typelighcmp[i].direction, data->typelighcmp[i].type);
 		}
 	}
