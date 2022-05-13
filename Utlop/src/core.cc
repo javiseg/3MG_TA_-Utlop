@@ -157,8 +157,8 @@ namespace Utlop
 
 		data->shadowframebuffer->initShader(data->shaders.size() - 1);
 		data->shadowframebuffer->rectangleToGPU();
-		data->shadowframebuffer->initShadowFBO(2048, 2048);
-		data->shadowframebuffer->setLightPerspective(vec3(1.0f), &data->shaders);
+		data->shadowframebuffer->initShadowFBO(_window.width, _window.height);
+		data->shadowframebuffer->setLightPerspective(vec3(1.0f, 0.5, 0.0f), &data->shaders);
 		data->shadowframebuffer->errorCheck();
 
 		std::string facesCubemap[6] =
@@ -173,8 +173,9 @@ namespace Utlop
 
 		cubemap->createBuffers();
 		cubemap->loadTextures(facesCubemap);
-		cubemap->loadShaders("../UtlopTests/src/shaders/skybox_vert.glsl", "../UtlopTests/src/shaders/skybox_frag.glsl");
-		glUniform1i(glGetUniformLocation(cubemap->shaderID, "skybox"), 0);
+		data->shaders.push_back(Shader("../UtlopTests/src/shaders/skybox_vert.glsl", "../UtlopTests/src/shaders/skybox_frag.glsl"));
+		cubemap->shader_idx = data->shaders.size() - 1;
+		glUniform1i(glGetUniformLocation(data->shaders[cubemap->shader_idx].id, "skybox"), 0);
 
 
 		vector<string> robotTextures;
@@ -289,75 +290,58 @@ namespace Utlop
 
         if (glfwGetKey(_window._window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
           glfwSetWindowShouldClose(_window._window, GL_TRUE);
+			
+				deltaTime_ = (float)glfwGetTime() - lastFrame;
+				lastFrame = (float)glfwGetTime();
 				
-				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
+				MoveCamera();
 
-				
-				ExecSystems();
+				ChangeShader(data->shadowframebuffer->shader_idx);
+				data->shaders[data->shadowframebuffer->shader_idx].Activate();
+				// Depth testing needed for Shadow Map
 				glEnable(GL_DEPTH_TEST);
 
 				// Preparations for the Shadow Map
 				glViewport(0, 0, data->shadowframebuffer->width, data->shadowframebuffer->height);
 				glBindFramebuffer(GL_FRAMEBUFFER, data->shadowframebuffer->FBOid);
 				glClear(GL_DEPTH_BUFFER_BIT);
-				
-				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
 
-				ChangeShader(data->shadowframebuffer->shader_idx);
+				ExecSystems();
 
-				/*if (preExecDone_) {
-					scheduler.run(sched, &schedulerReady);
-
-				}*/
-				
-
-				addDrawSkybox(displayList, cubemap->shaderID, data->localtrcmp[0].position,
-					data->cameracmp[0].front_, data->cameracmp[0].Up,
-					data->cameracmp[0].projection_, data->cameracmp[0].view_,
-					cubemap->vao, cubemap->texture);
-				//scheduler.waitFor(schedulerReady);
-				
-				
-				ExecSystems2();
 				displayList->submit();
-				
+
 				glBindFramebuffer(GL_FRAMEBUFFER, 0);
-				
+				// Switch back to the default viewport
 				glViewport(0, 0, _window.width, _window.height);
-				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
 
-				ChangeShader(0);
 
-				deltaTime_ = (float)glfwGetTime() - lastFrame;
-				lastFrame = (float)glfwGetTime();
-				
+
+
+
 				addBindFramebuffer(displayList, data->framebuffer->FBOid);
 				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
 				addEnableDepthTest(displayList);
-				addDrawSkybox(displayList, cubemap->shaderID, data->localtrcmp[0].position,
+				data->shaders[0].Activate();
+				int sm = glGetUniformLocation(data->shaders[0].id, "lightProjection");
+				int sm2 = glGetUniformLocation(data->shaders[0].id, "hasNormalMap");
+				int sm3 = glGetUniformLocation(data->shaders[0].id, "normals");
+				glUniformMatrix4fv(glGetUniformLocation(data->shaders[0].id, "lightProjection"), 1, GL_FALSE, glm::value_ptr(data->shadowframebuffer->lightProjection));
+				glActiveTexture(GL_TEXTURE0 + 2);
+				glBindTexture(GL_TEXTURE_2D, data->shadowframebuffer->FBtexture);
+				int sm4 = glGetUniformLocation(data->shaders[0].id, "shadowMap");
+					glUniform1i(glGetUniformLocation(data->shaders[0].id, "shadowMap"), 2);
+				ChangeShader(0);
+
+				addDrawSkybox(displayList, data->shaders[cubemap->shader_idx].id, data->localtrcmp[0].position,
 					data->cameracmp[0].front_, data->cameracmp[0].Up,
 					data->cameracmp[0].projection_, data->cameracmp[0].view_,
 					cubemap->vao, cubemap->texture);
-				
-				/*if (preExecDone_) {
-					scheduler.run(sched, &schedulerReady);
+				ExecSystems();
 
-				}*/
-				ExecSystems2();
-
-				glfwPollEvents();
-
-				MoveCamera();
-
-				//scheduler.waitFor(schedulerReady);
-				addBindFramebuffer(displayList, 0);
 				addDisableDepthTest(displayList);
 				addDoFramebuffer(displayList, data->shaders[data->framebuffer->shader_idx].id, data->framebuffer->rectVAO, data->framebuffer->FBtexture, data->framebuffer->FBOid);
-				
-				addShadowFrameBufferCmd(displayList, *data->shadowframebuffer);
-					
-				displayList->submit();
 
+				displayList->submit();
 
 				ImGUI();
 
@@ -375,6 +359,23 @@ namespace Utlop
       }
     }
   }
+
+	void Core::Update()
+	{
+		
+		addDrawSkybox(displayList,data->shaders[cubemap->shader_idx].id, data->localtrcmp[0].position,
+			data->cameracmp[0].front_, data->cameracmp[0].Up,
+			data->cameracmp[0].projection_, data->cameracmp[0].view_,
+			cubemap->vao, cubemap->texture);
+
+		MoveCamera();
+
+		ExecSystems();
+
+
+		
+
+	}
 
   Utlop::Window* Core::getWindow()
   {
@@ -543,7 +544,7 @@ namespace Utlop
 
 	void Core::ExecSystems()
 	{
-		for (unsigned int i = 0; i < data->sys.size()-1; i++) {
+		for (unsigned int i = 0; i < data->sys.size(); i++) {
 			for (unsigned int h = 0; h < data->entities.size(); h++) {
 				int out = data->entities[h]->componentsID_ & data->sys[i]->id_;
 				if (out == data->sys[i]->id_)

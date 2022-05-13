@@ -44,12 +44,11 @@ namespace Utlop {
 		GLuint ebo;
 
 		GLuint texture;
-		GLuint shaderID;
+		GLuint shader_idx;
 
 
 		void createBuffers();
 		void loadTextures(std::string faces[6]);
-		void loadShaders(const char* vertPath, const char* fragPath);
 	};
 
 

@@ -90,24 +90,3 @@ void Utlop::CubeMap::loadTextures(std::string faces[6])
 	}
 }
 
-void Utlop::CubeMap::loadShaders(const char* vertPath, const char* fragPath)
-{
-	shaderID = glCreateProgram();
-	
-	GLuint vert, frag;
-	loadVertexShader(vertPath, vert);
-	loadFragmentShader(fragPath, frag);
-
-	glUseProgram(shaderID);
-	glAttachShader(shaderID, vert);
-	glAttachShader(shaderID, frag);
-
-	glLinkProgram(shaderID);
-	checkCompileErrors(shaderID, "PROGRAM");
-	checkCompileErrors(shaderID, "LINK");
-	
-	glUseProgram(0);
-
-
-}
-

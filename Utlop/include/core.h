@@ -22,6 +22,7 @@ namespace Utlop
 
       bool init(float fps);
       void start();
+			void Update();
 
       Utlop::Window* getWindow();
 			float getDeltaTime();

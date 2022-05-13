@@ -4,12 +4,14 @@ in vec3 frag_position;
 in vec3 frag_normal;
 in vec3 FragPos;
 in  flat int lightType;
+in vec4 fragPosLight;
 
 flat in int doesHasNormalMap;
 in vec3 camPosition;
 
 uniform sampler2D diffuse0;
 uniform sampler2D specular0;
+uniform sampler2D shadowMap;
 uniform sampler2D normal0;
 
 
@@ -52,7 +54,25 @@ vec4 PointLight(){
 		specular = specAmount * specularLight;
 	}
 
-	return (texture(diffuse0, text_coords) * (diffuse * inten + ambient) + texture(specular0, text_coords).r * specular * inten) * vec4(pointLightSTR.color,1.0f);
+
+	float shadow = 0.0f;
+	vec3 lightCoords = fragPosLight.xyz / fragPosLight.w;
+	if(lightCoords.z <= 1.0f){
+		lightCoords = (lightCoords + 1.0f) / 2.0f;
+
+		float closestDepth = texture(shadowMap, lightCoords.xy).r;
+		float currentDepth = lightCoords.z;
+
+
+		float bias = 0.005f;
+		if(currentDepth > closestDepth + bias)
+			shadow = 1.0f;
+	}
+
+
+	/*return (texture(diffuse0, text_coords) * (diffuse * inten + ambient) + texture(specular0, text_coords).r * specular * inten) * vec4(pointLightSTR.color,1.0f);*/
+	
+	return (texture(diffuse0, text_coords) * (diffuse * (1.0f - shadow) + ambient) + texture(specular0, text_coords).r * specular * (1.0f - shadow)) * vec4(pointLightSTR.color,1.0f);
 }
 
 vec4 DirectionalLight(){

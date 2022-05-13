@@ -18,8 +18,9 @@ namespace Utlop {
 	};
 	struct WindowClearCmd : public Command {
 		void executeOnGPU() override {
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glClearColor(r, g, b, a);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		}
 		float r, g, b, a;
 	};
@@ -112,6 +113,7 @@ namespace Utlop {
 	struct EnableDepthCmd : public Command {
 		void executeOnGPU() override {
 			glEnable(GL_DEPTH_TEST);
+
 			//glDepthFunc(GL_LESS);
 		}
 	};

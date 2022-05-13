@@ -189,7 +189,7 @@ namespace Utlop {
 			lightProjection = orthgonalProjection * lightView;
 
 			glUseProgram(shaders->at(shader_idx).id);
-			glUniformMatrix4fv(glGetUniformLocation(shaders->at(shader_idx).id, "lightProjection"), 1, GL_FALSE, glm::value_ptr(lightProjection));
+			glUniformMatrix4fv(glGetUniformLocation(shaders->at(shader_idx).id, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightProjection));
 			glUseProgram(0);
 		}
 	};

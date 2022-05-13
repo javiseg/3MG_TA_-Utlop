@@ -27,6 +27,8 @@ layout(location = DIR_LIGHT) uniform PointLightStr pointLight;
 layout(location = CAM_POS) uniform vec3 camPos;
 uniform int hasNormalMap;
 uniform int l_type;
+uniform mat4 mat2proj;
+uniform mat4 lightProjection;
 
 out vec2 text_coords;
 out vec3 frag_position;
@@ -34,6 +36,7 @@ out vec3 frag_normal;
 out vec3 FragPos; 
 out vec3 camPosition;
 out flat int lightType;
+out vec4 fragPosLight;
 flat out int doesHasNormalMap;
 out PointLightStr pointLightSTR;
 
@@ -44,6 +47,7 @@ void main()
 	doesHasNormalMap = hasNormalMap;
 	camPosition = camPos;
 
+	fragPosLight = lightProjection * ModelMatrix * vec4(position, 1.0f);
     text_coords = aTexCoord;
 	gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(position, 1.0f);
 	frag_position = vec3(ModelMatrix * vec4(position, 1.0));
