@@ -183,9 +183,9 @@ namespace Utlop {
 		}
 
 		void setLightPerspective(vec3 lightPosition, vector<Shader>* shaders) {
-
-			glm::mat4 orthgonalProjection = glm::ortho(-35.0f, 35.0f, -35.0f, 35.0f, 0.1f, 75.0f);
-			glm::mat4 lightView = glm::lookAt(20.0f * lightPosition, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			
+			glm::mat4 orthgonalProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 500.0f);
+			glm::mat4 lightView = glm::lookAt(40.0f * lightPosition, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 			lightProjection = orthgonalProjection * lightView;
 
 			glUseProgram(shaders->at(shader_idx).id);

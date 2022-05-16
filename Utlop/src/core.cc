@@ -158,7 +158,8 @@ namespace Utlop
 		data->shadowframebuffer->initShader(data->shaders.size() - 1);
 		data->shadowframebuffer->rectangleToGPU();
 		data->shadowframebuffer->initShadowFBO(_window.width, _window.height);
-		data->shadowframebuffer->setLightPerspective(vec3(1.0f, 0.5, 0.0f), &data->shaders);
+		vec3 lightPosition = vec3(0.0f, 1.0f, 1.0f);
+		data->shadowframebuffer->setLightPerspective(vec3(0.0f, 1.0f, 1.0f), &data->shaders);
 		data->shadowframebuffer->errorCheck();
 
 		std::string facesCubemap[6] =
@@ -282,7 +283,7 @@ namespace Utlop
 			PreExecSystems();
 			//scheduler.run(preSched, &schedulerReady);
 			//scheduler.waitFor(schedulerReady);
-
+			vec3 lightPosition = vec3(0.0f, 1.0f, 1.0f);
 
       while (!glfwWindowShouldClose(_window._window))
       {
@@ -294,6 +295,9 @@ namespace Utlop
 				deltaTime_ = (float)glfwGetTime() - lastFrame;
 				lastFrame = (float)glfwGetTime();
 				
+				lightPosition.x += deltaTime_;
+				data->shadowframebuffer->setLightPerspective(normalize(data->localtrcmp[1].rotation + vec3(0.001f, 0.001f, 0.001f)), &data->shaders);
+
 				MoveCamera();
 
 				ChangeShader(data->shadowframebuffer->shader_idx);
