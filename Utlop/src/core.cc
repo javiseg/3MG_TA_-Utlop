@@ -97,18 +97,18 @@ namespace Utlop
 		AddComponent(*data->entities[lightEntity], kRenderComp);
 		*/
 		//Directional Light
-		int dirLightEntity = AddEntity();
-		AddComponent(*data->entities[dirLightEntity], kLocalTRComp);
-		AddComponent(*data->entities[dirLightEntity], kTypeLightComp);
-		AddComponent(*data->entities[dirLightEntity], kRenderComp);
-		data->typelighcmp[data->entities[dirLightEntity]->cmp_indx_[kTypeLightCompPos]].type = 0;
+		int lightEntity = AddEntity();
+		AddComponent(*data->entities[lightEntity], kLocalTRComp);
+		AddComponent(*data->entities[lightEntity], kTypeLightComp);
+		AddComponent(*data->entities[lightEntity], kRenderComp);
+		data->typelighcmp[data->entities[lightEntity]->cmp_indx_[kTypeLightCompPos]].type = 0;
 		
+    int lightEntity2 = AddEntity();
+    AddComponent(*data->entities[lightEntity2], kLocalTRComp);
+    AddComponent(*data->entities[lightEntity2], kTypeLightComp);
+    AddComponent(*data->entities[lightEntity2], kRenderComp);
+    data->typelighcmp[data->entities[lightEntity2]->cmp_indx_[kTypeLightCompPos]].type = 0;
 
-		/*int lightEntity2 = AddEntity();
-		AddComponent(*data->entities[lightEntity2], kLocalTRComp);
-		AddComponent(*data->entities[lightEntity2], kTypeLightComp);
-		AddComponent(*data->entities[lightEntity2], kRenderComp);*/
-		//
 
 
 		px_sched::Scheduler scheduler1;
@@ -159,7 +159,7 @@ namespace Utlop
 		data->shadowframebuffer->rectangleToGPU();
 		data->shadowframebuffer->initShadowFBO(_window.width, _window.height);
 		vec3 lightPosition = vec3(0.0f, 1.0f, 1.0f);
-		data->shadowframebuffer->setLightPerspective(vec3(0.0f, 1.0f, 1.0f), &data->shaders);
+		data->shadowframebuffer->setLightPerspective(vec3(0.0f, 1.0f, 1.0f), &data->shaders, 0);
 		data->shadowframebuffer->errorCheck();
 
 		std::string facesCubemap[6] =
@@ -201,10 +201,7 @@ namespace Utlop
 		//jupitertextures.push_back("../UtlopTests/src/obj/helmet/specular.png");
 		InitMesh("../UtlopTests/src/obj/sphere/planet.obj", jupitertextures);
 		data->obj_str_type.push_back("Planet");
-		/*vector<string> carTextures;
-		carTextures.push_back("../UtlopTests/src/obj/car/diffuse.png");
-		InitMesh("../UtlopTests/src/obj/car/car.obj", carTextures);*/
-
+		
 		vector<string> floorTextures;
 		floorTextures.push_back("../UtlopTests/src/obj/floor/diffuse.png");
 		InitMesh("../UtlopTests/src/obj/floor/floor.obj", floorTextures);
@@ -216,28 +213,6 @@ namespace Utlop
 		//newCubeTextures.push_back("../UtlopTests/src/obj/cube/normal.jpg");
 		InitMesh("../UtlopTests/src/obj/cube/cube.obj", newCubeTextures);
 		data->obj_str_type.push_back("Wood cube");
-
-		//vector<string> newCubeTextures2;
-		//newCubeTextures2.push_back("../UtlopTests/src/obj/cube/diffuse.png");
-		//newCubeTextures2.push_back("../UtlopTests/src/obj/cube/specular.png");
-		////newCubeTextures2.push_back("../UtlopTests/src/obj/cube/normal.jpg");
-		//InitMesh("../UtlopTests/src/obj/cube/cube.obj", newCubeTextures2);
-		//data->obj_str_type.push_back("Testing wood cube");
-
-		//vector<string> newSphereTextures;
-		//newSphereTextures.push_back("../UtlopTests/src/obj/sphere/diffuse.png");
-		//newSphereTextures.push_back("../UtlopTests/src/obj/sphere/specular.png");
-		////newSphereTextures.push_back("../UtlopTests/src/obj/sphere/normal.png");
-		//InitMesh("../UtlopTests/src/obj/sphere/sphere.obj", newSphereTextures);
-		//data->obj_str_type.push_back("Sphere");
-
-
-
-		//vector<string> floorTextures;
-		//floorTextures.push_back("../UtlopTests/src/obj/cube/cube.png");
-		//floorTextures.push_back("../UtlopTests/src/obj/floor/specular.png");
-		//InitMesh("../UtlopTests/src/obj/cube/cube.obj", floorTextures);
-
 
     return done;
   }
@@ -255,21 +230,12 @@ namespace Utlop
 			
 			Core* cr = Instance();
 			auto preSched = [cr] {
-				//printf("Failed to execute\n");
 				cr->PreExecSystems();
 			};
 			auto sched = [cr] {
-				//printf("Failed to execute\n");
 				cr->ExecSystems();
 			};
 
-
-      
-			
-			
-
-			
-			//glShadeModel(GL_SMOOTH);
 			GLint version_max, version_min;
 			glGetIntegerv(GL_MAJOR_VERSION, &version_max);
 			glGetIntegerv(GL_MINOR_VERSION, &version_min);
@@ -283,7 +249,6 @@ namespace Utlop
 			PreExecSystems();
 			//scheduler.run(preSched, &schedulerReady);
 			//scheduler.waitFor(schedulerReady);
-			vec3 lightPosition = vec3(0.0f, 1.0f, 1.0f);
 
       while (!glfwWindowShouldClose(_window._window))
       {
@@ -295,56 +260,25 @@ namespace Utlop
 				deltaTime_ = (float)glfwGetTime() - lastFrame;
 				lastFrame = (float)glfwGetTime();
 				
-				lightPosition.x += deltaTime_;
-				data->shadowframebuffer->setLightPerspective(normalize(data->localtrcmp[1].rotation + vec3(0.001f, 0.001f, 0.001f)), &data->shaders);
-
+				
 				MoveCamera();
+
 
 				ChangeShader(data->shadowframebuffer->shader_idx);
 				data->shaders[data->shadowframebuffer->shader_idx].Activate();
-				// Depth testing needed for Shadow Map
-				glEnable(GL_DEPTH_TEST);
-
-				// Preparations for the Shadow Map
-				glViewport(0, 0, data->shadowframebuffer->width, data->shadowframebuffer->height);
-				glBindFramebuffer(GL_FRAMEBUFFER, data->shadowframebuffer->FBOid);
-				glClear(GL_DEPTH_BUFFER_BIT);
-
+				addEnableDepthTest(displayList);
+				addViewPortCmd(displayList, 0, 0, data->shadowframebuffer->width, data->shadowframebuffer->height);
+        addBindFramebuffer(displayList, data->shadowframebuffer->FBOid);
+        addClearDepthBufferCmd(displayList);
 				ExecSystems();
-
 				displayList->submit();
 
-				glBindFramebuffer(GL_FRAMEBUFFER, 0);
-				// Switch back to the default viewport
-				glViewport(0, 0, _window.width, _window.height);
-
-
-
-
-
+        addBindFramebuffer(displayList, 0);
+				addViewPortCmd(displayList, 0, 0, _window.width, _window.height);
 				addBindFramebuffer(displayList, data->framebuffer->FBOid);
 				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
-				addEnableDepthTest(displayList);
-				data->shaders[0].Activate();
-				int sm = glGetUniformLocation(data->shaders[0].id, "lightProjection");
-				int sm2 = glGetUniformLocation(data->shaders[0].id, "hasNormalMap");
-				int sm3 = glGetUniformLocation(data->shaders[0].id, "normals");
-				glUniformMatrix4fv(glGetUniformLocation(data->shaders[0].id, "lightProjection"), 1, GL_FALSE, glm::value_ptr(data->shadowframebuffer->lightProjection));
-				glActiveTexture(GL_TEXTURE0 + 2);
-				glBindTexture(GL_TEXTURE_2D, data->shadowframebuffer->FBtexture);
-				int sm4 = glGetUniformLocation(data->shaders[0].id, "shadowMap");
-					glUniform1i(glGetUniformLocation(data->shaders[0].id, "shadowMap"), 2);
-				ChangeShader(0);
-
-				addDrawSkybox(displayList, data->shaders[cubemap->shader_idx].id, data->localtrcmp[0].position,
-					data->cameracmp[0].front_, data->cameracmp[0].Up,
-					data->cameracmp[0].projection_, data->cameracmp[0].view_,
-					cubemap->vao, cubemap->texture);
-				ExecSystems();
-
-				addDisableDepthTest(displayList);
+        Update();
 				addDoFramebuffer(displayList, data->shaders[data->framebuffer->shader_idx].id, data->framebuffer->rectVAO, data->framebuffer->FBtexture, data->framebuffer->FBOid);
-
 				displayList->submit();
 
 				ImGUI();
@@ -367,17 +301,19 @@ namespace Utlop
 	void Core::Update()
 	{
 		
-		addDrawSkybox(displayList,data->shaders[cubemap->shader_idx].id, data->localtrcmp[0].position,
-			data->cameracmp[0].front_, data->cameracmp[0].Up,
-			data->cameracmp[0].projection_, data->cameracmp[0].view_,
-			cubemap->vao, cubemap->texture);
+    addEnableDepthTest(displayList);
 
-		MoveCamera();
+    ChangeShader(0);
 
-		ExecSystems();
+    addShadowFrameBufferCmd(displayList, data->shaders[0].id, data->shadowframebuffer->lightProjection, 2, data->shadowframebuffer->FBtexture);
 
+    addDrawSkybox(displayList, data->shaders[cubemap->shader_idx].id, data->localtrcmp[0].position,
+      data->cameracmp[0].front_, data->cameracmp[0].Up,
+      data->cameracmp[0].projection_, data->cameracmp[0].view_,
+      cubemap->vao, cubemap->texture);
+    ExecSystems();
 
-		
+    addDisableDepthTest(displayList);
 
 	}
 
@@ -653,9 +589,13 @@ namespace Utlop
 				}
 				else if(data->entities[n]->cmp_indx_[kTypeLightCompPos] != -1){
 					static int e = 0;
-					ImGui::RadioButton("PointLight", &e, 0); ImGui::SameLine();
-					ImGui::RadioButton("Directional Light", &e, 1); 
-					data->typelighcmp[data->entities[n]->cmp_indx_[kTypeLightCompPos]].type = (float)e;
+          std::string radioname = "PointLight " + std::to_string(n);
+					ImGui::RadioButton(radioname.c_str(), &data->typelighcmp[data->entities[n]->cmp_indx_[kTypeLightCompPos]].type, 0); ImGui::SameLine();
+          radioname = "DirectLight " + std::to_string(n);
+          ImGui::RadioButton(radioname.c_str(), &data->typelighcmp[data->entities[n]->cmp_indx_[kTypeLightCompPos]].type, 1); ImGui::SameLine();
+          radioname = "SpotLight " + std::to_string(n);
+          ImGui::RadioButton(radioname.c_str(), &data->typelighcmp[data->entities[n]->cmp_indx_[kTypeLightCompPos]].type, 2);
+					//data->typelighcmp[data->entities[n]->cmp_indx_[kTypeLightCompPos]].type = (float)e;
 				}
 
 				

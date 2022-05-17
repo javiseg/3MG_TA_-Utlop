@@ -168,7 +168,8 @@ void Utlop::TypeLightSystem::exec(Entity& entity, RenderCtx* data, DisplayList* 
 {
 	if (entity.cmp_indx_[kLocalTRCompPos] != -1) {
 		data->typelighcmp[entity.cmp_indx_[kTypeLightCompPos]].position = data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].position;
-		data->typelighcmp[entity.cmp_indx_[kTypeLightCompPos]].direction = data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation;
-		//data->shadowframebuffer->setLightPerspective(data->typelighcmp[entity.cmp_indx_[kTypeLightCompPos]].position, &data->shaders, data->cameracmp[0].projection_);
+		data->typelighcmp[entity.cmp_indx_[kTypeLightCompPos]].direction = data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].position;
 	}
+  data->shadowframebuffer->setLightPerspective(normalize(data->localtrcmp[1].position + vec3(0.001f, 0.001f, 0.001f)), &data->shaders,
+    data->typelighcmp[entity.cmp_indx_[kTypeLightCompPos]].type);
 }

@@ -182,11 +182,31 @@ namespace Utlop {
 
 		}
 
-		void setLightPerspective(vec3 lightPosition, vector<Shader>* shaders) {
-			
+		void setLightPerspective(vec3 lightPosition, vector<Shader>* shaders, GLuint type) {
+      glm::mat4 projection;
 			glm::mat4 orthgonalProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 500.0f);
-			glm::mat4 lightView = glm::lookAt(40.0f * lightPosition, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-			lightProjection = orthgonalProjection * lightView;
+      glm::mat4 lightView = mat4(1.0f); 
+      switch (type) {
+        // PointLight
+        case 0: {
+            projection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 500.0f);
+          break;
+        };
+        // DirectionalLight
+        case 1: {
+            projection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 500.0f);
+            lightView = glm::lookAt(40.0f * lightPosition, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+          break;
+        };
+        // SpotLight
+        case 2: {
+            projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 100.0f);
+            lightView = glm::lookAt(lightPosition, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+          break;
+        };
+      }
+
+      lightProjection = projection * lightView;
 
 			glUseProgram(shaders->at(shader_idx).id);
 			glUniformMatrix4fv(glGetUniformLocation(shaders->at(shader_idx).id, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightProjection));

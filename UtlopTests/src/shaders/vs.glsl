@@ -5,10 +5,16 @@
 #define MODEL_MATRIX    3
 #define VIEW_MATRIX     4
 #define PROJ_MATRIX     5
-#define DIR_LIGHT	    6
-#define CAM_POS			11
+#define POINT_LIGHT	    6
+#define CAM_POS			    11
+#define DIR_LIGHT       12
 
-
+struct DirectionalLightStr{
+	vec3 direction;
+	vec3 color;
+	float intensity;
+	vec3 dirLightPos;
+};
 struct PointLightStr{
 	vec3 direction;
 	vec3 color;
@@ -23,8 +29,9 @@ layout(location = MODEL_MATRIX) uniform mat4 ModelMatrix;
 layout(location = VIEW_MATRIX) uniform mat4 ViewMatrix;
 layout(location = PROJ_MATRIX) uniform mat4 ProjectionMatrix;
 
-layout(location = DIR_LIGHT) uniform PointLightStr pointLight;
+layout(location = POINT_LIGHT) uniform PointLightStr pointLight;
 layout(location = CAM_POS) uniform vec3 camPos;
+layout(location = DIR_LIGHT) uniform DirectionalLightStr directionalLight;
 uniform int hasNormalMap;
 uniform int l_type;
 uniform mat4 mat2proj;
@@ -39,10 +46,12 @@ out flat int lightType;
 out vec4 fragPosLight;
 flat out int doesHasNormalMap;
 out PointLightStr pointLightSTR;
+out DirectionalLightStr directionalLightSTR;
 
 void main()
 {
 	pointLightSTR = pointLight;
+  directionalLightSTR = directionalLight;
 	lightType = l_type;
 	doesHasNormalMap = hasNormalMap;
 	camPosition = camPos;

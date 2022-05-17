@@ -24,18 +24,25 @@ Utlop::DisplayList& Utlop::addWindowClearCmd(DisplayList* dl, float r, float g, 
 	window_clear_cmd->b = b;
 	window_clear_cmd->a = a;
 
-	//Add the callback function
-
-
 	dl->cmdList.push_back(move(window_clear_cmd));
 
 	return *dl;
 }
 
-Utlop::DisplayList& Utlop::addInitMaterialCmd(DisplayList* dl/*, float r, float g, float b, float a*/)
+Utlop::DisplayList& Utlop::addViewPortCmd(DisplayList* dl, GLint x, GLint y, GLsizei width, GLsizei height)
 {
-	return *dl;
+  shared_ptr<ViewPortCmd> vp_cmd;
+  vp_cmd = make_shared<ViewPortCmd>();
+  vp_cmd->x = x;
+  vp_cmd->y = y;
+  vp_cmd->height = height;
+  vp_cmd->width = width;
+
+  dl->cmdList.push_back(move(vp_cmd));
+
+  return *dl;
 }
+
 
 Utlop::DisplayList& Utlop::addDrawCmd(Utlop::DisplayList* dl, GLuint shaderId, GLuint materialID, GLuint vao, GLsizei size,
 	glm::mat4 view, glm::mat4 model)
@@ -132,6 +139,16 @@ Utlop::DisplayList& Utlop::addDisableDepthTest(DisplayList* dl)
 	return *dl;
 }
 
+Utlop::DisplayList& Utlop::addClearDepthBufferCmd(DisplayList* dl)
+{
+  std::unique_ptr<Utlop::ClearDepthBufferCmd> cdbcmd;
+  cdbcmd = std::make_unique<Utlop::ClearDepthBufferCmd>();
+
+  dl->cmdList.push_back(move(cdbcmd));
+
+  return *dl;
+}
+
 Utlop::DisplayList& Utlop::addDoFramebuffer(DisplayList* dl, GLuint shaderID, GLuint rectVAO, GLuint texture, GLuint fbo)
 {
 	std::unique_ptr<Utlop::DoFrameBufferCmd> fbcmd;
@@ -159,12 +176,15 @@ Utlop::DisplayList& Utlop::addBindFramebuffer(DisplayList* dl, GLuint fboID)
 	return *dl;
 }
 
-Utlop::DisplayList& Utlop::addShadowFrameBufferCmd(DisplayList* dl, RenderToTexture rtt)
+Utlop::DisplayList& Utlop::addShadowFrameBufferCmd(DisplayList* dl, GLuint shaderID, mat4 lightProjection, GLuint activeTexture, GLuint FBtexture)
 {
 	std::unique_ptr<Utlop::ShadowMapCmd> sfbcmd;
 	sfbcmd = std::make_unique<Utlop::ShadowMapCmd>();
 
-	sfbcmd->shadowframebuffer = rtt;
+  sfbcmd->activeTexture = activeTexture;
+  sfbcmd->FBtexture = FBtexture;
+  sfbcmd->lightProjection = lightProjection;
+  sfbcmd->shaderID = shaderID;
 
 	dl->cmdList.push_back(move(sfbcmd));
 
@@ -189,8 +209,3 @@ Utlop::DisplayList& Utlop::addDrawSkybox(DisplayList* dl, GLuint shaderID, glm::
 
 	return *dl;
 }
-
-//void Utlop::callback_WindowClearCmd(WindowClearCmd cmd)
-//{
-//	
-//}
