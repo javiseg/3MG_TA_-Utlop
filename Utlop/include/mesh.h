@@ -22,12 +22,11 @@ namespace Utlop {
 
 	struct Mesh
 	{
-		std::vector<float> vertices;
-		std::vector<uint32_t> indices;
 		std::vector<Texture> textures;
 
 		GLuint normalMap;
 		GLuint vao;
+    GLuint n_indices;
 		
 		string path;
 
@@ -38,14 +37,6 @@ namespace Utlop {
 		}
 		~Mesh() {}
 		
-		const std::vector<float>& Mesh::getVertices() const
-		{
-			return vertices;
-		}
-		const std::vector<uint32_t>& Mesh::getIndices() const
-		{
-			return indices;
-		}
 		const std::vector<Texture>& Mesh::getTextures() const
 		{
 			return textures;

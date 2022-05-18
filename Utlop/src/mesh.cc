@@ -1,12 +1,11 @@
-#include "..\include\geometry.h"
+#include "mesh.h"
 #include "displaylist.h"
 #include "core.h"
 
 Utlop::Mesh::Mesh(const std::vector<float> vertices_, const std::vector<uint32_t> indices_, 
 	std::vector<Texture> textures_, string geoPath)
 {
-	vertices = vertices_;
-	indices = indices_;
+  n_indices = indices_.size();
 	textures = textures_;
 	path = geoPath;
 	normalMap = 0;
@@ -21,7 +20,7 @@ Utlop::Mesh::Mesh(const std::vector<float> vertices_, const std::vector<uint32_t
 	glCreateBuffers(1, &vbo);
 	glCreateBuffers(1, &ebo);
 
-	glNamedBufferData(vbo, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+	glNamedBufferData(vbo, vertices_.size() * sizeof(float), vertices_.data(), GL_STATIC_DRAW);
 	glNamedBufferData(ebo,	indices_.size() * sizeof(GLuint), 
 		indices_.data(), GL_STATIC_DRAW);
 
@@ -82,7 +81,7 @@ void Utlop::Mesh::Draw(GLuint& shader, CameraComponent& cameracmp)
 	//camera.Matrix(shader, "camMatrix");
 
 	// Draw the actual mesh
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, n_indices, GL_UNSIGNED_INT, 0);
 
 	glUseProgram(0);
 }

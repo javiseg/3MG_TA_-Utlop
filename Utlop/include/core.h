@@ -30,10 +30,12 @@ namespace Utlop
 			int AddEntity();
 			void createEntities(Core* cr);
 			void AddComponent(Entity& entity, Utlop::ComponentID id);
+      void AddAllComponents(Entity& entity, GLuint components);
 			vector<Texture> InitMaterials(RenderCtx* data, vector<string> texturePaths);
 			Geometry InitGeometry(RenderCtx* data, const char* path);
 			void ChangeMesh(Entity& entity, RenderCtx* data, int option);
 
+      void ClearDataLists(vector<std::vector<int>>* selectedType);
 			void InitMesh(string geometryPath, vector<string> texturePath);
 
 			void MoveCamera();

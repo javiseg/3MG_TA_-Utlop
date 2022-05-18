@@ -1,6 +1,6 @@
 #include "system.h"
 #include "data.h"
-#include "geometry.h"
+#include "mesh.h"
 #include "texture.h"
 #include "displaylist.h"
 #include "core.h"
@@ -28,8 +28,6 @@ void Utlop::LocalTRSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl
 
 	data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
 		rotate(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, radians(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation.z), vec3(0.0f, 0.0f, 1.0f));
-
-
 }
 
 
@@ -70,8 +68,6 @@ void Utlop::CameraSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 
 	data->cameracmp[entity.cmp_indx_[kCameraCompPos]].view_ = glm::lookAt(data->cameracmp[entity.cmp_indx_[kCameraCompPos]].position_,
 		data->cameracmp[entity.cmp_indx_[kCameraCompPos]].position_ + data->cameracmp[entity.cmp_indx_[kCameraCompPos]].front_, data->cameracmp[entity.cmp_indx_[kCameraCompPos]].Up);
-
-	
 }
 
 
@@ -82,18 +78,15 @@ void Utlop::RenderSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 	}
 	//entity.cmp_indx_[kRenderCompPos] = 0;
 	if (entity.cmp_indx_[kTypeLightCompPos] == -1) {
-		initialMesh(entity, data, "../UtlopTests/src/obj/cube/cube.obj");
+		initialMesh(entity, data, "../UtlopTests/src/obj/robot/robot.obj");
 	}
 	else {
 		initialMesh(entity, data, "../UtlopTests/src/obj/lightcube.obj");
 	}
-	//initMat(entity, data, "../UtlopTests/src/textures/default.png");
-	
 }
 
 void Utlop::RenderSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 {
-
 	addSetModelViewProjection(dl,data->shaders[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shader_idx].id, 
 		data->cameracmp[0].projection_, data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model,
 		data->cameracmp[0].view_);
@@ -101,26 +94,22 @@ void Utlop::RenderSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 	addDrawMeshCmd(dl, data->meshes[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].mesh_idx[0]], 
 		data->shaders[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shader_idx].id,	data->cameracmp[0], 
 		data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]]);
-
 }
 
-
-void Utlop::RenderSystem::UpdateUniforms(GLuint shaderID)
-{
-	
-}
 
 void Utlop::RenderSystem::initialMesh(Entity& entity, RenderCtx* data, const char* path)
 {
-	int mesh_index = -1;
-	for (unsigned int i = 0; i < data->meshes.size(); i++) {
-		if (data->meshes[i].path._Equal(path)) {
-			mesh_index = i;
-		}
-	}
-	if (mesh_index != -1) {
-		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].mesh_idx.push_back(mesh_index);
-	}
+	if (data->rendercmp[entity.cmp_indx_[kRenderCompPos]].mesh_idx.empty()) {
+    int mesh_index = -1;
+    for (unsigned int i = 0; i < data->meshes.size(); i++) {
+      if (data->meshes[i].path._Equal(path)) {
+        mesh_index = i;
+      }
+    }
+    if (mesh_index != -1) {
+      data->rendercmp[entity.cmp_indx_[kRenderCompPos]].mesh_idx.push_back(mesh_index);
+    }
+  }
 }
 
 void Utlop::HeritageSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
@@ -141,7 +130,7 @@ void Utlop::LightSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 
 void Utlop::LightSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 {
-	if (entity.cmp_indx_[kRenderCompPos] != -1) {
+	if ((entity.componentsID_ & kRenderComp) == kRenderComp) {
 		
 		for (int i = 0; i < data->typelighcmp.size(); i++) {
 			addSetLightDataCmd(dl, data->typelighcmp[i].color, data->typelighcmp[i].position,

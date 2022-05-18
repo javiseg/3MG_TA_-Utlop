@@ -1,6 +1,6 @@
 #pragma once
 #include "system.h"
-#include "geometry.h"
+#include "mesh.h"
 #include "texture.h"
 #include "gameObject.h"
 #include <memory>

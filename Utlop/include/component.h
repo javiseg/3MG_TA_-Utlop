@@ -49,16 +49,10 @@ namespace Utlop {
 	};
 	struct RenderComponent : public Component {
 		// Indice a material, geometría y mat settings?
-		vector<GLuint> geo_idx;
 		vector<GLuint> material_idx;
-		vector<GLuint> materialsettings_idx;
 		vector<GLuint> mesh_idx;
 
-
 		GLuint shader_idx = 0;
-		GLuint vao_ = 999;
-		GLuint vbo_ = 999;
-		GLuint ebo_ = 999;
 	};
 
 	struct CameraComponent : public Component {

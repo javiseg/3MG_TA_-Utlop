@@ -45,8 +45,6 @@ namespace Utlop {
 		~RenderSystem() {}
 		void preExec(Entity& entity, Utlop::RenderCtx* data) override;
 		void exec(Entity& entity, RenderCtx* data, DisplayList* dl) override;
-		void UpdateUniforms(GLuint shaderID);
-
 		void initialMesh(Entity& entity, RenderCtx* data, const char* path);
 	};
 

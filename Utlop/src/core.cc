@@ -12,6 +12,7 @@
 #include <time.h>
 #include <glm/gtc/type_ptr.hpp>
 #include "tools.h"
+#include "database.h"
 #include "stb_image.h"
 #define PX_SCHED_IMPLEMENTATION 1
 #include "px_sched.h"
@@ -54,8 +55,8 @@ namespace Utlop
   }
 
 	void Utlop::Core::createEntities(Core* cr) {
-		for (int i = 0; i < 1; i++) {
-			for (int j = 0; j < 1; j++) {
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
 				int entityIdx = cr->AddEntity();
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kLocalTRComp);
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kRenderComp);
@@ -103,12 +104,14 @@ namespace Utlop
 		AddComponent(*data->entities[lightEntity], kRenderComp);
 		data->typelighcmp[data->entities[lightEntity]->cmp_indx_[kTypeLightCompPos]].type = 0;
 		
+
+    /*
     int lightEntity2 = AddEntity();
     AddComponent(*data->entities[lightEntity2], kLocalTRComp);
     AddComponent(*data->entities[lightEntity2], kTypeLightComp);
     AddComponent(*data->entities[lightEntity2], kRenderComp);
     data->typelighcmp[data->entities[lightEntity2]->cmp_indx_[kTypeLightCompPos]].type = 0;
-
+    */
 
 
 		px_sched::Scheduler scheduler1;
@@ -236,6 +239,7 @@ namespace Utlop
 				cr->ExecSystems();
 			};
 
+
 			GLint version_max, version_min;
 			glGetIntegerv(GL_MAJOR_VERSION, &version_max);
 			glGetIntegerv(GL_MINOR_VERSION, &version_min);
@@ -271,7 +275,7 @@ namespace Utlop
         addBindFramebuffer(displayList, data->shadowframebuffer->FBOid);
         addClearDepthBufferCmd(displayList);
 				ExecSystems();
-				displayList->submit();
+				displayList->executeOnGPU();
 
         addBindFramebuffer(displayList, 0);
 				addViewPortCmd(displayList, 0, 0, _window.width, _window.height);
@@ -279,7 +283,7 @@ namespace Utlop
 				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
         Update();
 				addDoFramebuffer(displayList, data->shaders[data->framebuffer->shader_idx].id, data->framebuffer->rectVAO, data->framebuffer->FBtexture, data->framebuffer->FBOid);
-				displayList->submit();
+				displayList->executeOnGPU();
 
 				ImGUI();
 
@@ -394,6 +398,34 @@ namespace Utlop
 	
 	}
 
+  void Core::AddAllComponents(Entity& entity, GLuint components)
+  {
+    if ((components & kLocalTRComp) == kLocalTRComp) {
+      data->localtrcmp.push_back(LocalTRComponent());
+      entity.cmp_indx_[kLocalTRCompPos] = (int)(data->localtrcmp.size() - 1);
+    }
+    if ((components & kWorldTRComp) == kWorldTRComp) {
+      data->worldtrcmp.push_back(WorldTRComponent());
+      entity.cmp_indx_[kWorldTRCompPos] = (int)(data->worldtrcmp.size() - 1);
+    }
+    if ((components & kCameraComp) == kCameraComp) {
+      data->cameracmp.push_back(CameraComponent());
+      entity.cmp_indx_[kCameraCompPos] = (int)(data->cameracmp.size() - 1);
+    }
+    if ((components & kRenderComp) == kRenderComp) {
+      data->rendercmp.push_back(RenderComponent());
+      entity.cmp_indx_[kRenderCompPos] = (int)(data->rendercmp.size() - 1);
+    }
+    if ((components & kLightComp) == kLightComp) {
+      data->lightcmp.push_back(LightComponent());
+      entity.cmp_indx_[kLightCompPos] = (int)(data->lightcmp.size() - 1);
+    }
+    if ((components & kTypeLightComp) == kTypeLightComp) {
+      data->typelighcmp.push_back(TypeLightComponent());
+      entity.cmp_indx_[kTypeLightCompPos] = (int)(data->typelighcmp.size() - 1);
+    }
+  }
+
 
 	vector<Texture> Core::InitMaterials(RenderCtx* data, vector<string> texturePaths)
 	{
@@ -414,12 +446,6 @@ namespace Utlop
 		Geometry geo;
 		loadOBJ2(path, geo);
 
-		const GLuint vertexPosition = 0;
-		const GLuint texcoord = 1;
-		const GLuint normalPosition = 2;
-
-		data->geometry.push_back(geo);
-
 		return geo;
 	}
 
@@ -428,14 +454,24 @@ namespace Utlop
 		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].mesh_idx[0] = option;
 	}
 
-	void Core::InitMesh(string geometryPath, vector<string> texturePath)
+  void Core::ClearDataLists(vector<std::vector<int>>* selectedType)
+  {
+    data->entities.erase(data->entities.begin() + 1, data->entities.end());
+    data->localtrcmp.erase(data->localtrcmp.begin() + 1, data->localtrcmp.end());
+    data->rendercmp.clear();
+    data->lightcmp.clear();
+    data->typelighcmp.clear();
+    data->worldtrcmp.clear();
+    selectedType->clear();
+  }
+
+  void Core::InitMesh(string geometryPath, vector<string> texturePath)
 	{
 		Geometry geo = InitGeometry(data, geometryPath.c_str());
-		//InitMaterials(data, texturePath);
-
+		
 		Mesh newMesh(geo.totalVertex_, geo.totalIndices_, InitMaterials(data, texturePath), geometryPath);
 		data->meshes.push_back(newMesh);
-
+   
 	}
 
 
@@ -533,6 +569,7 @@ namespace Utlop
 		ImGui::NewFrame();
 		ImGui::SetNextWindowPos(ImVec2(0, 0));
 		ImGui::SetNextWindowSize(ImVec2(300, 780));
+    static vector<std::vector<int>> selectedType;
 		if (ImGui::Begin("Utlop Engine")) {
 
 			ImGui::ColorEdit4("Color", &bg_color_[0]);
@@ -544,7 +581,15 @@ namespace Utlop
 				AddComponent(*data->entities[entityIdx], kRenderComp);
 				AddComponent(*data->entities[entityIdx], kLightComp);
 				PreExecSystem(*data->entities[entityIdx]);
-			}
+			} ImGui::SameLine();
+
+      if (ImGui::Button("Load DataBase")) {
+        DataBase db;
+        ClearDataLists(&selectedType);
+        db.LoadDatabase("../UtlopTests/src/db/scene.db", data);
+        PreExecSystems();
+      }
+
 
 			ImGui::TextColored(ImVec4(1, 1, 0, 1), "Current GameObjects");
 			ImGui::BeginChild("GameObject");
@@ -552,7 +597,7 @@ namespace Utlop
 			vec3 position;
 			vec3 rotation;
 			vec3 scale;
-			static vector<std::vector<int>> selectedType;
+			
 			const char* obj_type[]{ "Robot", "White Cube", "Helmet", "Container", "Car", "Cube"};
 			
 
@@ -583,7 +628,7 @@ namespace Utlop
 				if (data->entities[n]->cmp_indx_[kRenderCompPos] != -1 && data->entities[n]->cmp_indx_[kTypeLightCompPos] == -1) {
 					char s[10];
 					itoa(n, s, 10);
-					selectedType[n].push_back(0);
+					selectedType[n].push_back(data->rendercmp[data->entities[n]->cmp_indx_[kRenderCompPos]].mesh_idx[0]);
 					ImGui::ListBox(s, &selectedType[n][0], &data->obj_str_type[0], data->obj_str_type.size());
 					ChangeMesh(*data->entities[n], data, selectedType[n][0]);
 				}

@@ -1,18 +1,14 @@
 #include "displaylist.h"
-#include "geometry.h"
+#include "mesh.h"
 #include "component.h"
 #include <memory>
 
-void Utlop::DisplayList::executeOnGPU(list<shared_ptr<Command>> cmdListToExecute)
+void Utlop::DisplayList::executeOnGPU()
 {
-	for (auto&& list : cmdListToExecute) {
+	for (auto&& list : cmdList) {
 		list->executeOnGPU();
 	}
-}
-
-void Utlop::DisplayList::submit()
-{
-	executeOnGPU(move(cmdList));
+  cmdList.clear();
 }
 
 Utlop::DisplayList& Utlop::addWindowClearCmd(DisplayList* dl, float r, float g, float b, float a)

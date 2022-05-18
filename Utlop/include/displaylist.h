@@ -5,7 +5,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/mat4x4.hpp"
-#include "geometry.h"
+#include "mesh.h"
 #include "data.h"
 
 namespace Utlop {
@@ -226,8 +226,7 @@ namespace Utlop {
 	class DisplayList {
 		public:
 			list<shared_ptr<Command>> cmdList;
-			void executeOnGPU(list<shared_ptr<Command>> cmdListToExecute);
-			void submit();
+			void executeOnGPU();
 
 	};
 
