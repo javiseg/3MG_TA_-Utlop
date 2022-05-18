@@ -8,10 +8,27 @@
 
 void Utlop::LocalTRSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
+  data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model = mat4(1.0f);
+
+  data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
+    translate(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].position);
+
+  data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
+    glm::scale(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].scale);
+
+  data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
+    rotate(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, radians(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation.x), vec3(1.0f, 0.0f, 0.0f));
+
+  data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
+    rotate(data->localtrcmp[entity.cmp_indx_[0]].model, radians(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation.y), vec3(0.0f, 1.0f, 0.0f));
+
+  data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
+    rotate(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, radians(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation.z), vec3(0.0f, 0.0f, 1.0f));
 }
 
 void Utlop::LocalTRSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 {
+  /*
 	data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model = mat4(1.0f);
 
 	data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
@@ -28,6 +45,7 @@ void Utlop::LocalTRSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl
 
 	data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
 		rotate(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, radians(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation.z), vec3(0.0f, 0.0f, 1.0f));
+  */
 }
 
 

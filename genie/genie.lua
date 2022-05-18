@@ -32,7 +32,8 @@ solution("Utlop")
     path.join(UTLOP_DIR, "./deps/imgui/"),
     path.join(UTLOP_DIR, "./deps/imgui/backends/"),
     path.join(UTLOP_DIR, "./deps/sched/"),
-    path.join(UTLOP_DIR, "./deps/sqlite/")
+    path.join(UTLOP_DIR, "./deps/sqlite/"),
+    path.join(UTLOP_DIR, "./deps/ImGuizmo/")
   }
 
   --Here only the files that we want compile.
@@ -62,7 +63,8 @@ solution("Utlop")
     path.join(UTLOP_DIR, "./deps/imgui/backends/imgui_impl_glfw.cpp"),
     path.join(UTLOP_DIR, "./deps/imgui/backends/imgui_impl_opengl3.cpp"),
     path.join(UTLOP_DIR, "./deps/sched/px_sched.h"),
-    path.join(UTLOP_DIR, "./deps/sqlite/**.c")
+    path.join(UTLOP_DIR, "./deps/sqlite/**.c"),
+    path.join(UTLOP_DIR, "./deps/ImGuizmo/**.cpp")
 
   }
 
@@ -101,7 +103,8 @@ solution("Utlop")
     path.join(UTLOP_DIR, "./deps/imgui/"),
     path.join(UTLOP_DIR, "./deps/imgui/backends/"),
     path.join(UTLOP_DIR, "./deps/sched/"),
-    path.join(UTLOP_DIR, "./deps/sqlite/")
+    path.join(UTLOP_DIR, "./deps/sqlite/"),
+    path.join(UTLOP_DIR, "./deps/ImGuizmo/")
   }
 
   --Here only the files that we want compile.

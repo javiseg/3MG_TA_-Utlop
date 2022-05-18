@@ -50,6 +50,7 @@ namespace Utlop {
 
 		vector<const char*> obj_str_type;
 
+    bool imguimoUsing = false;
 	};
 
 	struct RenderToTexture {

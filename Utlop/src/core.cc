@@ -13,6 +13,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "tools.h"
 #include "database.h"
+#include "ImGuizmo.h"
 #include "stb_image.h"
 #define PX_SCHED_IMPLEMENTATION 1
 #include "px_sched.h"
@@ -55,8 +56,8 @@ namespace Utlop
   }
 
 	void Utlop::Core::createEntities(Core* cr) {
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < 1; j++) {
 				int entityIdx = cr->AddEntity();
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kLocalTRComp);
 				cr->AddComponent(*cr->getData()->entities[entityIdx], kRenderComp);
@@ -562,12 +563,64 @@ namespace Utlop
 	{
 		return camera_speed_;
 	}
+
+  void EditTransform(const Utlop::CameraComponent& camera, LocalTRComponent& transform, int n)
+  {
+    ImGuizmo::BeginFrame();
+
+    std::string slidername;
+    static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::ROTATE);
+    static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
+
+    
+    vec3 position;
+    vec3 rotation;
+    vec3 scale;
+
+    if (ImGui::IsKeyPressed(90))
+      mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+    if (ImGui::IsKeyPressed(69))
+      mCurrentGizmoOperation = ImGuizmo::ROTATE;
+    if (ImGui::IsKeyPressed(82)) // r Key
+      mCurrentGizmoOperation = ImGuizmo::SCALE;
+    slidername = "Translate " + std::to_string(n);
+    if (ImGui::RadioButton(slidername.c_str(), mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
+      mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+    ImGui::SameLine();
+    slidername = "Rotate " + std::to_string(n);
+    if (ImGui::RadioButton(slidername.c_str(), mCurrentGizmoOperation == ImGuizmo::ROTATE))
+      mCurrentGizmoOperation = ImGuizmo::ROTATE;
+    ImGui::SameLine();
+    slidername = "Scale " + std::to_string(n);
+    if (ImGui::RadioButton(slidername.c_str(), mCurrentGizmoOperation == ImGuizmo::SCALE))
+      mCurrentGizmoOperation = ImGuizmo::SCALE;
+    
+
+    glm::mat4 modelMat = transform.model;
+
+
+    ImGuiIO& io = ImGui::GetIO();
+    ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
+    ImGuizmo::Manipulate(value_ptr(camera.view_), value_ptr(camera.projection_),
+      mCurrentGizmoOperation, mCurrentGizmoMode, value_ptr(modelMat),
+      NULL, nullptr);
+
+    transform.model = modelMat;
+
+
+    ImGuizmo::DecomposeMatrixToComponents(value_ptr(transform.model),
+      value_ptr(transform.position),
+      value_ptr(transform.rotation),
+      value_ptr(transform.scale));
+
+  }
+
 	void Core::ImGUI()
 	{
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-		ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
 		ImGui::SetNextWindowSize(ImVec2(300, 780));
     static vector<std::vector<int>> selectedType;
 		if (ImGui::Begin("Utlop Engine")) {
@@ -590,7 +643,6 @@ namespace Utlop
         PreExecSystems();
       }
 
-
 			ImGui::TextColored(ImVec4(1, 1, 0, 1), "Current GameObjects");
 			ImGui::BeginChild("GameObject");
 
@@ -601,6 +653,8 @@ namespace Utlop
 			const char* obj_type[]{ "Robot", "White Cube", "Helmet", "Container", "Car", "Cube"};
 			
 
+
+
 			for (int n = 0; n < data->entities.size(); n++) {
 				if (selectedType.size()<= n)
 					selectedType.push_back(vector<int>(0));
@@ -610,7 +664,10 @@ namespace Utlop
 					rotation = data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].rotation;
 					scale = data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].scale;
 					ImGui::SetCursorPosX(100.0f);
-					std::string slidername = "Location of " + std::to_string(n);
+          mat4 model = data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].model;
+          float matrixTranslation[3], matrixRotation[3], matrixScale[3];
+          
+          /*std::string slidername = "Location of " + std::to_string(n);
 					ImGui::Text("Location");
 					ImGui::SliderFloat3(slidername.c_str(), &position[0], -100.0f, 100.0f);
 					data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].position = position;
@@ -624,9 +681,14 @@ namespace Utlop
 					ImGui::Text("Scale");
 					ImGui::SliderFloat3(slidername3.c_str(), &scale[0], 0.0f, 10.0f);
 					data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].scale = scale;
-				}
+				*/}
 				if (data->entities[n]->cmp_indx_[kRenderCompPos] != -1 && data->entities[n]->cmp_indx_[kTypeLightCompPos] == -1) {
-					char s[10];
+          
+          EditTransform(data->cameracmp[0], data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]], n);
+        
+         
+
+          char s[10];
 					itoa(n, s, 10);
 					selectedType[n].push_back(data->rendercmp[data->entities[n]->cmp_indx_[kRenderCompPos]].mesh_idx[0]);
 					ImGui::ListBox(s, &selectedType[n][0], &data->obj_str_type[0], data->obj_str_type.size());
