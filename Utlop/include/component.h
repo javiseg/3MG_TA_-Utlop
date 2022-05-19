@@ -75,10 +75,7 @@ namespace Utlop {
 	};
 
 	struct HeritageComponent : public Component {
-		unsigned int entityID;
-		unsigned int parentID;
-		mat4 localMatrix;
-		mat4 parentMatrix;
+    unsigned int parentID;
 	};
 
 	struct LightComponent : public Component {

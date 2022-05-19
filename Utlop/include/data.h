@@ -22,20 +22,15 @@ namespace Utlop {
 		vector<shared_ptr<Entity>> entities;
 		//shared_ptr<std::vector<shared_ptr<std::vector<Entity>>>> entitiesVector;
 
-		map<int, vector<Component>> cmap;
-		map<int, Component> kComponentMap;
-
-
 		vector<LocalTRComponent> localtrcmp;
 		vector<WorldTRComponent> worldtrcmp;
 		vector<CameraComponent> cameracmp;
 		vector<RenderComponent> rendercmp;
 		vector<LightComponent> lightcmp;
 		vector<TypeLightComponent> typelighcmp;
+    vector<HeritageComponent> heritagecmp;
 		
-		vector<Geometry> geometry;
 		vector<Material> material;
-		vector<GameObject> gObjects;
 		vector<Mesh> meshes;
 
 		GLuint vertexShader;

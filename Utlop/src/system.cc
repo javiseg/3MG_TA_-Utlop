@@ -20,7 +20,7 @@ void Utlop::LocalTRSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
     rotate(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, radians(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation.x), vec3(1.0f, 0.0f, 0.0f));
 
   data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
-    rotate(data->localtrcmp[entity.cmp_indx_[0]].model, radians(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation.y), vec3(0.0f, 1.0f, 0.0f));
+    rotate(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, radians(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation.y), vec3(0.0f, 1.0f, 0.0f));
 
   data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
     rotate(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, radians(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation.z), vec3(0.0f, 0.0f, 1.0f));
@@ -28,24 +28,24 @@ void Utlop::LocalTRSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 
 void Utlop::LocalTRSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 {
-  /*
-	data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model = mat4(1.0f);
+  if (entity.cmp_indx_[kHeritageCompPos] == -1) {
+    data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model = mat4(1.0f);
 
-	data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
-		translate(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].position);
+    data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
+      translate(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].position);
 
-	data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
-		glm::scale(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].scale);
+    data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
+      glm::scale(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].scale);
 
-	data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
-		rotate(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, radians(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation.x), vec3(1.0f, 0.0f, 0.0f));
+    data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
+      rotate(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, radians(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation.x), vec3(1.0f, 0.0f, 0.0f));
 
-	data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
-		rotate(data->localtrcmp[entity.cmp_indx_[0]].model, radians(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation.y), vec3(0.0f, 1.0f, 0.0f));
+    data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
+      rotate(data->localtrcmp[entity.cmp_indx_[0]].model, radians(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation.y), vec3(0.0f, 1.0f, 0.0f));
 
-	data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
-		rotate(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, radians(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation.z), vec3(0.0f, 0.0f, 1.0f));
-  */
+    data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =
+      rotate(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model, radians(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation.z), vec3(0.0f, 0.0f, 1.0f));
+  }
 }
 
 
@@ -136,6 +136,29 @@ void Utlop::HeritageSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 
 void Utlop::HeritageSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 {
+  if (entity.cmp_indx_[kLocalTRCompPos] != -1 &&
+    data->entities[data->heritagecmp[entity.cmp_indx_[kHeritageCompPos]].parentID]->cmp_indx_[kLocalTRCompPos] != -1) {
+    
+    mat4 model = mat4(1.0f);
+
+    model =
+      translate(model, data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].position);
+
+    model =
+      glm::scale(model, data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].scale);
+
+    model =
+      rotate(model, radians(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation.x), vec3(1.0f, 0.0f, 0.0f));
+
+    model =
+      rotate(model, radians(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation.y), vec3(0.0f, 1.0f, 0.0f));
+
+    model =
+      rotate(model, radians(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].rotation.z), vec3(0.0f, 0.0f, 1.0f));
+  
+    data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model =  data->localtrcmp[data->entities[data->heritagecmp[entity.cmp_indx_[kHeritageCompPos]].parentID]->cmp_indx_[kLocalTRCompPos]].model * model;
+  
+  }
 }
 
 void Utlop::LightSystem::preExec(Entity& entity, Utlop::RenderCtx* data)

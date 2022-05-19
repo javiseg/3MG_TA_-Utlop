@@ -26,6 +26,10 @@ bool loadOBJ2(const char* path, Utlop::Geometry& geo);
 
 namespace Utlop
 {
+  const unsigned int kWidth = 1680;
+  const unsigned int kHeight = 720;
+
+
 	struct PerFrameData
 	{
 		mat4 model;
@@ -79,10 +83,7 @@ namespace Utlop
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		polygon_ = false;
 		camera_speed_ = 10.0f;
-		InitSystems();
-		InitComponents();
-
-		
+		InitSystems();		
 
 		//Debug:
 		AddEntity();
@@ -140,7 +141,7 @@ namespace Utlop
 		bg_color_.w = 1.0f;
 		bool done = glfwInit();
 
-		getWindow()->init(1380, 780, "Utlop");
+		getWindow()->init(kWidth, kHeight, "Utlop");
 
 		glfwMakeContextCurrent(_window._window);
 
@@ -154,14 +155,14 @@ namespace Utlop
 		data->shaders.push_back(Shader("../UtlopTests/src/shaders/fb_vert.glsl", "../UtlopTests/src/shaders/fb_frag.glsl"));
 		data->framebuffer->initShader(data->shaders.size() - 1);
 		data->framebuffer->rectangleToGPU();
-		data->framebuffer->initFBO(_window.width, _window.height);
+		data->framebuffer->initFBO(kWidth - 300.0f, kHeight);
 		data->framebuffer->errorCheck();
 	
 		data->shaders.push_back(Shader("../UtlopTests/src/shaders/shadowfb_vert.glsl", "../UtlopTests/src/shaders/shadowfb_frag.glsl"));
 
 		data->shadowframebuffer->initShader(data->shaders.size() - 1);
 		data->shadowframebuffer->rectangleToGPU();
-		data->shadowframebuffer->initShadowFBO(_window.width, _window.height);
+		data->shadowframebuffer->initShadowFBO(kWidth - 300.0f, kHeight);
 		vec3 lightPosition = vec3(0.0f, 1.0f, 1.0f);
 		data->shadowframebuffer->setLightPerspective(vec3(0.0f, 1.0f, 1.0f), &data->shaders, 0);
 		data->shadowframebuffer->errorCheck();
@@ -272,14 +273,14 @@ namespace Utlop
 				ChangeShader(data->shadowframebuffer->shader_idx);
 				data->shaders[data->shadowframebuffer->shader_idx].Activate();
 				addEnableDepthTest(displayList);
-				addViewPortCmd(displayList, 0, 0, data->shadowframebuffer->width, data->shadowframebuffer->height);
+				addViewPortCmd(displayList, 0, 0, kWidth, kHeight);
         addBindFramebuffer(displayList, data->shadowframebuffer->FBOid);
         addClearDepthBufferCmd(displayList);
 				ExecSystems();
 				displayList->executeOnGPU();
 
         addBindFramebuffer(displayList, 0);
-				addViewPortCmd(displayList, 0, 0, _window.width, _window.height);
+				addViewPortCmd(displayList, 0, 0, kWidth - 300.0f, kHeight);
 				addBindFramebuffer(displayList, data->framebuffer->FBOid);
 				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
         Update();
@@ -373,25 +374,22 @@ namespace Utlop
 						entity.cmp_indx_[kRenderCompPos] = (int)(data->rendercmp.size() - 1);
 					break;
 				}
-
 				case kHeritageComp: {
-						printf("\nTO DO: Add heritage comp at Add component \n");
-					break;
+            data->heritagecmp.push_back(HeritageComponent());
+            entity.cmp_indx_[kHeritageCompPos] = (int)(data->heritagecmp.size() - 1);
+          break;
 				}
-
 				case kLightComp: {
 						data->lightcmp.push_back(LightComponent());
 						entity.cmp_indx_[kLightCompPos] = (int)(data->lightcmp.size() - 1);
 					break;
 				}
-
 				case kTypeLightComp: {
 					data->typelighcmp.push_back(TypeLightComponent());
 					entity.cmp_indx_[kTypeLightCompPos] = (int)(data->typelighcmp.size() - 1);
 					break;
 				}
 			}
-
 		}
 		else {
 			printf("\nComponent already in Entity\n");
@@ -417,6 +415,10 @@ namespace Utlop
       data->rendercmp.push_back(RenderComponent());
       entity.cmp_indx_[kRenderCompPos] = (int)(data->rendercmp.size() - 1);
     }
+    if ((components & kHeritageComp) == kHeritageComp) {
+      data->heritagecmp.push_back(HeritageComponent());
+      entity.cmp_indx_[kHeritageCompPos] = (int)(data->heritagecmp.size() - 1);
+    }
     if ((components & kLightComp) == kLightComp) {
       data->lightcmp.push_back(LightComponent());
       entity.cmp_indx_[kLightCompPos] = (int)(data->lightcmp.size() - 1);
@@ -425,6 +427,26 @@ namespace Utlop
       data->typelighcmp.push_back(TypeLightComponent());
       entity.cmp_indx_[kTypeLightCompPos] = (int)(data->typelighcmp.size() - 1);
     }
+  }
+
+  void Core::SetChildren(Entity& entity, GLuint parentIndex)
+  {
+    data->heritagecmp.push_back(HeritageComponent());
+    data->heritagecmp.back().parentID = parentIndex;
+    entity.cmp_indx_[kHeritageCompPos] = data->heritagecmp.size() - 1;
+  }
+
+  void Core::AddChildren(GLuint parentIndex)
+  {
+    int index_entity = AddEntity();
+
+    AddComponent(*data->entities[index_entity], kLocalTRComp);
+    AddComponent(*data->entities[index_entity], kLightComp);
+    AddComponent(*data->entities[index_entity], kRenderComp);
+    AddComponent(*data->entities[index_entity], kHeritageComp);
+    data->heritagecmp[data->entities[index_entity]->cmp_indx_[kHeritageCompPos]].parentID = parentIndex;
+
+    PreExecSystem(*data->entities[index_entity]);
   }
 
 
@@ -442,7 +464,7 @@ namespace Utlop
 		return textures;
 	}
 
-	Geometry Core::InitGeometry(RenderCtx* data, const char* path)
+	Geometry Core::InitGeometry(const char* path)
 	{
 		Geometry geo;
 		loadOBJ2(path, geo);
@@ -468,24 +490,13 @@ namespace Utlop
 
   void Core::InitMesh(string geometryPath, vector<string> texturePath)
 	{
-		Geometry geo = InitGeometry(data, geometryPath.c_str());
-		
+    Geometry geo;
+    loadOBJ2(geometryPath.c_str(), geo);
 		Mesh newMesh(geo.totalVertex_, geo.totalIndices_, InitMaterials(data, texturePath), geometryPath);
 		data->meshes.push_back(newMesh);
    
 	}
 
-
-	void Core::InitComponents()
-	{
-		data->kComponentMap.insert(make_pair(kLocalTRComp, LocalTRComponent()));
-		data->kComponentMap.insert(make_pair(kWorldTRComp, WorldTRComponent()));
-		data->kComponentMap.insert(make_pair(kRenderComp, RenderComponent()));
-		data->kComponentMap.insert(make_pair(kCameraComp, CameraComponent()));
-		data->kComponentMap.insert(make_pair(kHeritageComp, HeritageComponent()));
-		data->kComponentMap.insert(make_pair(kLightComp, LightComponent()));
-		data->kComponentMap.insert(make_pair(kTypeLightComp, TypeLightComponent()));
-	}
 
 	void Core::InitSystems()
 	{
@@ -564,24 +575,24 @@ namespace Utlop
 		return camera_speed_;
 	}
 
-  void EditTransform(const Utlop::CameraComponent& camera, LocalTRComponent& transform, int n)
+  void EditTransform(const Utlop::CameraComponent& camera, LocalTRComponent& transform, int n, int hasHeritageCmp)
   {
     ImGuizmo::BeginFrame();
-
+    
     std::string slidername;
     static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::ROTATE);
-    static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
+    static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::LOCAL);
 
     
     vec3 position;
     vec3 rotation;
     vec3 scale;
 
-    if (ImGui::IsKeyPressed(90))
+    if (ImGui::IsKeyPressed(ImGuiKey_T))
       mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-    if (ImGui::IsKeyPressed(69))
+    if (ImGui::IsKeyPressed(ImGuiKey_R))
       mCurrentGizmoOperation = ImGuizmo::ROTATE;
-    if (ImGui::IsKeyPressed(82)) // r Key
+    if (ImGui::IsKeyPressed(ImGuiKey_Y)) // r Key
       mCurrentGizmoOperation = ImGuizmo::SCALE;
     slidername = "Translate " + std::to_string(n);
     if (ImGui::RadioButton(slidername.c_str(), mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
@@ -600,18 +611,18 @@ namespace Utlop
 
 
     ImGuiIO& io = ImGui::GetIO();
-    ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
+    ImGuizmo::SetRect(0, 0, io.DisplaySize.x - 300.0f, io.DisplaySize.y);
     ImGuizmo::Manipulate(value_ptr(camera.view_), value_ptr(camera.projection_),
       mCurrentGizmoOperation, mCurrentGizmoMode, value_ptr(modelMat),
       NULL, nullptr);
 
     transform.model = modelMat;
 
-
-    ImGuizmo::DecomposeMatrixToComponents(value_ptr(transform.model),
-      value_ptr(transform.position),
-      value_ptr(transform.rotation),
-      value_ptr(transform.scale));
+    if(hasHeritageCmp == -1)
+      ImGuizmo::DecomposeMatrixToComponents(value_ptr(transform.model),
+        value_ptr(transform.position),
+        value_ptr(transform.rotation),
+        value_ptr(transform.scale));
 
   }
 
@@ -620,9 +631,17 @@ namespace Utlop
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+
+    static int gameObjectSelected = -1;
+
     ImGui::SetNextWindowPos(ImVec2(0, 0));
 		ImGui::SetNextWindowSize(ImVec2(300, 780));
     static vector<std::vector<int>> selectedType;
+    for (int i = 0; i < data->entities.size(); i++) {
+      if (i == selectedType.size()) {
+        selectedType.push_back(vector<int>(0));
+      }
+    }
 		if (ImGui::Begin("Utlop Engine")) {
 
 			ImGui::ColorEdit4("Color", &bg_color_[0]);
@@ -637,6 +656,7 @@ namespace Utlop
 			} ImGui::SameLine();
 
       if (ImGui::Button("Load DataBase")) {
+        gameObjectSelected = -1;
         DataBase db;
         ClearDataLists(&selectedType);
         db.LoadDatabase("../UtlopTests/src/db/scene.db", data);
@@ -644,78 +664,110 @@ namespace Utlop
       }
 
 			ImGui::TextColored(ImVec4(1, 1, 0, 1), "Current GameObjects");
-			ImGui::BeginChild("GameObject");
-
-			vec3 position;
-			vec3 rotation;
-			vec3 scale;
-			
-			const char* obj_type[]{ "Robot", "White Cube", "Helmet", "Container", "Car", "Cube"};
-			
+      if(ImGui::BeginChild("GameObject")) {
 
 
+        const char* obj_type[]{ "Robot", "White Cube", "Helmet", "Container", "Car", "Cube" };
 
-			for (int n = 0; n < data->entities.size(); n++) {
-				if (selectedType.size()<= n)
-					selectedType.push_back(vector<int>(0));
-				if (data->entities[n]->cmp_indx_[kLocalTRCompPos] != -1) {
-					ImGui::Text("%04d: Object", n);
-					position = data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].position;
-					rotation = data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].rotation;
-					scale = data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].scale;
-					ImGui::SetCursorPosX(100.0f);
-          mat4 model = data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].model;
-          float matrixTranslation[3], matrixRotation[3], matrixScale[3];
-          
-          /*std::string slidername = "Location of " + std::to_string(n);
-					ImGui::Text("Location");
-					ImGui::SliderFloat3(slidername.c_str(), &position[0], -100.0f, 100.0f);
-					data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].position = position;
-					ImGui::SetCursorPosX(100.0f);
-					std::string slidername2 = "Rotation of " + std::to_string(n);
-					ImGui::Text("Rotation");
-					ImGui::SliderFloat3(slidername2.c_str(), &rotation[0], -359.0f, 359.0f);
-					data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].rotation = rotation;
-					ImGui::SetCursorPosX(100.0f);
-					std::string slidername3 = "Scale of " + std::to_string(n);
-					ImGui::Text("Scale");
-					ImGui::SliderFloat3(slidername3.c_str(), &scale[0], 0.0f, 10.0f);
-					data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]].scale = scale;
-				*/}
-				if (data->entities[n]->cmp_indx_[kRenderCompPos] != -1 && data->entities[n]->cmp_indx_[kTypeLightCompPos] == -1) {
-          
-          EditTransform(data->cameracmp[0], data->localtrcmp[data->entities[n]->cmp_indx_[kLocalTRCompPos]], n);
+        if (ImGui::TreeNode("Objects"))
+        {
+          for (int i = 0; i < data->entities.size(); i++)
+          {
+            // Use SetNextItemOpen() so set the default state of a node to be open. We could
+            // also use TreeNodeEx() with the ImGuiTreeNodeFlags_DefaultOpen flag to achieve the same thing!
+            if (i == 0)
+              ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+            std::string name;
+            if (data->entities[i]->cmp_indx_[kTypeLightCompPos] != -1) {
+              name = "Light " + std::to_string(i);
+            }
+            else if (data->entities[i]->cmp_indx_[kCameraCompPos] != -1) {
+              name = "Camera " + std::to_string(i);
+            }
+            else {
+              name = "Game object " + std::to_string(i);
+            }
+            if (ImGui::TreeNode((void*)(intptr_t)i, name.c_str(), i))
+            {
+              if (ImGui::SmallButton("Properties")) {
+                gameObjectSelected = i;
+              }
+              ImGui::TreePop();
+            }
+          }
+          ImGui::TreePop();
+        }
+
         
-         
+        ImGui::EndChild();
 
-          char s[10];
-					itoa(n, s, 10);
-					selectedType[n].push_back(data->rendercmp[data->entities[n]->cmp_indx_[kRenderCompPos]].mesh_idx[0]);
-					ImGui::ListBox(s, &selectedType[n][0], &data->obj_str_type[0], data->obj_str_type.size());
-					ChangeMesh(*data->entities[n], data, selectedType[n][0]);
-				}
-				else if(data->entities[n]->cmp_indx_[kTypeLightCompPos] != -1){
-					static int e = 0;
-          std::string radioname = "PointLight " + std::to_string(n);
-					ImGui::RadioButton(radioname.c_str(), &data->typelighcmp[data->entities[n]->cmp_indx_[kTypeLightCompPos]].type, 0); ImGui::SameLine();
-          radioname = "DirectLight " + std::to_string(n);
-          ImGui::RadioButton(radioname.c_str(), &data->typelighcmp[data->entities[n]->cmp_indx_[kTypeLightCompPos]].type, 1); ImGui::SameLine();
-          radioname = "SpotLight " + std::to_string(n);
-          ImGui::RadioButton(radioname.c_str(), &data->typelighcmp[data->entities[n]->cmp_indx_[kTypeLightCompPos]].type, 2);
-					//data->typelighcmp[data->entities[n]->cmp_indx_[kTypeLightCompPos]].type = (float)e;
-				}
+      }
 
-				
-			}
+      ImGui::SetNextWindowPos(ImVec2(1380, 0));
+      ImGui::SetNextWindowSize(ImVec2(300, 780));
+      if (ImGui::Begin("Properties")) {
 
-			ImGui::EndChild();
+        if (gameObjectSelected > -1) {
 
-			ImGui::End();
-			ImGui::Render();
-			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+          vec3 position;
+          vec3 rotation;
+          vec3 scale;
+          
+          if (data->entities[gameObjectSelected]->cmp_indx_[kLocalTRCompPos] != -1) {
+
+              ImGui::Text("%04d: Object", gameObjectSelected);
+
+              //EditTransform(data->cameracmp[0], data->localtrcmp[data->entities[gameObjectSelected]->cmp_indx_[kLocalTRCompPos]], gameObjectSelected, data->entities[gameObjectSelected]->cmp_indx_[kHeritageCompPos]);
+
+              position = data->localtrcmp[data->entities[gameObjectSelected]->cmp_indx_[kLocalTRCompPos]].position;
+              rotation = data->localtrcmp[data->entities[gameObjectSelected]->cmp_indx_[kLocalTRCompPos]].rotation;
+              scale = data->localtrcmp[data->entities[gameObjectSelected]->cmp_indx_[kLocalTRCompPos]].scale;
+              ImGui::SetCursorPosX(100.0f);
+              
+              std::string slidername = "Location of " + std::to_string(gameObjectSelected);
+              ImGui::Text("Location");
+              ImGui::SliderFloat3(slidername.c_str(), &position[0], -100.0f, 100.0f);
+              data->localtrcmp[data->entities[gameObjectSelected]->cmp_indx_[kLocalTRCompPos]].position = position;
+              ImGui::SetCursorPosX(100.0f);
+              std::string slidername2 = "Rotation of " + std::to_string(gameObjectSelected);
+              ImGui::Text("Rotation");
+              ImGui::SliderFloat3(slidername2.c_str(), &rotation[0], -359.0f, 359.0f);
+              data->localtrcmp[data->entities[gameObjectSelected]->cmp_indx_[kLocalTRCompPos]].rotation = rotation;
+              ImGui::SetCursorPosX(100.0f);
+              std::string slidername3 = "Scale of " + std::to_string(gameObjectSelected);
+              ImGui::Text("Scale");
+              ImGui::SliderFloat3(slidername3.c_str(), &scale[0], 0.0f, 10.0f);
+              data->localtrcmp[data->entities[gameObjectSelected]->cmp_indx_[kLocalTRCompPos]].scale = scale;
+            }
+            if (data->entities[gameObjectSelected]->cmp_indx_[kRenderCompPos] != -1 && data->entities[gameObjectSelected]->cmp_indx_[kTypeLightCompPos] == -1) {
+              char s[10];
+              itoa(gameObjectSelected, s, 10);
+              selectedType[gameObjectSelected].push_back(data->rendercmp[data->entities[gameObjectSelected]->cmp_indx_[kRenderCompPos]].mesh_idx[0]);
+              ImGui::ListBox(s, &selectedType[gameObjectSelected][0], &data->obj_str_type[0], data->obj_str_type.size());
+              ChangeMesh(*data->entities[gameObjectSelected], data, selectedType[gameObjectSelected][0]);
+            }
+            else if (data->entities[gameObjectSelected]->cmp_indx_[kTypeLightCompPos] != -1) {
+              static int e = 0;
+              std::string radioname = "PointLight " + std::to_string(gameObjectSelected);
+              ImGui::RadioButton(radioname.c_str(), &data->typelighcmp[data->entities[gameObjectSelected]->cmp_indx_[kTypeLightCompPos]].type, 0); ImGui::SameLine();
+              radioname = "DirectLight " + std::to_string(gameObjectSelected);
+              ImGui::RadioButton(radioname.c_str(), &data->typelighcmp[data->entities[gameObjectSelected]->cmp_indx_[kTypeLightCompPos]].type, 1); ImGui::SameLine();
+              radioname = "SpotLight " + std::to_string(gameObjectSelected);
+              ImGui::RadioButton(radioname.c_str(), &data->typelighcmp[data->entities[gameObjectSelected]->cmp_indx_[kTypeLightCompPos]].type, 2);
+              //data->typelighcmp[data->entities[n]->cmp_indx_[kTypeLightCompPos]].type = (float)e;
+            }
+
+            if (ImGui::SmallButton("Add Children")) {
+              AddChildren(gameObjectSelected);
+            }
+        }
+        ImGui::End();
+      }
+      ImGui::End();
+      ImGui::Render();
+      ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		}
-
-		
 	}
 	void Core::InitImGUI()
 	{
