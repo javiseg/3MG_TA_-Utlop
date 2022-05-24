@@ -53,11 +53,12 @@ namespace Utlop {
 
 	struct DrawMeshCmd : public Command {
 		void executeOnGPU() override {
-			m.Draw(shader, cameracmp);
+			m.Draw(shader, cameracmp, hasLightComponent);
 		}
 		Mesh m;
 		GLuint shader;
 		CameraComponent cameracmp;
+		int hasLightComponent;
 	};
 
 	struct SetPolygonCmd : public Command {
@@ -94,7 +95,7 @@ namespace Utlop {
       int p_pos = -1;
       int t_pos = -1;
       int c_pos = -1;
-
+      
       switch (type) {
         case 0: {
           p_dir = glGetUniformLocation(shaderID, "pointLight.direction");
@@ -109,21 +110,22 @@ namespace Utlop {
           p_pos = glGetUniformLocation(shaderID, "directionalLight.dirLightPos");
         }; break;
         case 2: { //SpotLight
-          p_dir = glGetUniformLocation(shaderID, "directionalLight.direction");
-          p_color = glGetUniformLocation(shaderID, "directionalLight.color");
-          p_intensity = glGetUniformLocation(shaderID, "directionalLight.intensity");
-          p_pos = glGetUniformLocation(shaderID, "directionalLight.dirLightPos");
+          p_dir = glGetUniformLocation(shaderID, "spotLight.direction");
+          p_color = glGetUniformLocation(shaderID, "spotLight.color");
+          p_intensity = glGetUniformLocation(shaderID, "spotLight.intensity");
+          p_pos = glGetUniformLocation(shaderID, "spotLight.LightPos");
         }; break;
-      }
-			t_pos = glGetUniformLocation(shaderID, "l_type");
-			c_pos = glGetUniformLocation(shaderID, "camPos");
+        }
+      t_pos = glGetUniformLocation(shaderID, "l_type");
+      c_pos = glGetUniformLocation(shaderID, "camPos");
 
-			glUniform1iv(t_pos, 1, &type);
-			glUniform3fv(p_color, 1, glm::value_ptr(color));
-			glUniform1fv(p_intensity, 1, &intensity);
-			glUniform3fv(p_pos, 1, glm::value_ptr(position));
-			glUniform3fv(c_pos, 1, glm::value_ptr(camPosition));
-			glUniform3fv(p_dir, 1, glm::value_ptr(direction));
+      glUniform1iv(t_pos, 1, &type);
+      glUniform3fv(p_color, 1, glm::value_ptr(color));
+      glUniform1fv(p_intensity, 1, &intensity);
+      glUniform3fv(p_pos, 1, glm::value_ptr(position));
+      glUniform3fv(c_pos, 1, glm::value_ptr(camPosition));
+      glUniform3fv(p_dir, 1, glm::value_ptr(direction));
+      
 
 			glUseProgram(0);
 		}
@@ -235,7 +237,7 @@ namespace Utlop {
   DisplayList& addViewPortCmd(DisplayList* dl, GLint x, GLint y, GLsizei width, GLsizei height);
   DisplayList& addDrawCmd(DisplayList* dl, GLuint shaderId, GLuint materialID, GLuint vao, GLsizei size,
 		glm::mat4 view, glm::mat4 model);
-	DisplayList& addDrawMeshCmd(DisplayList* dl, Utlop::Mesh m, GLuint shader, Utlop::CameraComponent cameracmp, Utlop::LocalTRComponent localcmp);
+	DisplayList& addDrawMeshCmd(DisplayList* dl, Utlop::Mesh m, GLuint shader, Utlop::CameraComponent cameracmp, Utlop::LocalTRComponent localcmp,int hasLightComponent);
 	DisplayList& addSetPolygonCmd(DisplayList* dl, uint8_t on);
 	DisplayList& addSetModelViewProjection(DisplayList* dl, GLuint shaderID, glm::mat4 projection, glm::mat4 model, glm::mat4 view);
 	DisplayList& addSetLightDataCmd(DisplayList* dl, glm::vec3 color, glm::vec3 position, float intensity, GLuint shaderID, vec3 camPosition, vec3 direction, int type);

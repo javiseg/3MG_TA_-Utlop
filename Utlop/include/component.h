@@ -79,10 +79,7 @@ namespace Utlop {
 	};
 
 	struct LightComponent : public Component {
-		vec3 direction;
-		vec3 color;
-		vec3 position;
-		float intensity;
+    int hasLightComponent = 0;
 	};
 
 	struct TypeLightComponent : public Component {

@@ -47,7 +47,7 @@ Utlop::Mesh::Mesh(const std::vector<float> vertices_, const std::vector<uint32_t
 
 }
 
-void Utlop::Mesh::Draw(GLuint& shader, CameraComponent& cameracmp)
+void Utlop::Mesh::Draw(GLuint& shader, CameraComponent& cameracmp, int hasLightcomponent)
 {
 	glUseProgram(shader);
 
@@ -74,7 +74,9 @@ void Utlop::Mesh::Draw(GLuint& shader, CameraComponent& cameracmp)
 		textures[i].bind();
 	}
 	
+
 	glUniform1i(glGetUniformLocation(shader, "hasNormalMap"), numNormal);
+	glUniform1i(glGetUniformLocation(shader, "hasLightCmp"), hasLightcomponent);
 
 	// Take care of the camera Matrix
 	glUniform3f(glGetUniformLocation(shader, "camPosition"), cameracmp.position_.x, cameracmp.position_.y, cameracmp.position_.z);
@@ -86,10 +88,11 @@ void Utlop::Mesh::Draw(GLuint& shader, CameraComponent& cameracmp)
 	glUseProgram(0);
 }
 
-void Utlop::Mesh::DrawMesh(Mesh m, GLuint& shader, CameraComponent& cameracmp, LocalTRComponent& localcmp)
+void Utlop::Mesh::DrawMesh(Mesh m, GLuint& shader, CameraComponent& cameracmp, LocalTRComponent& localcmp, int hasLightcomponent)
 {
 	addSetModelViewProjection(Core::Instance()->getDisplayList(), shader, cameracmp.projection_,
 		localcmp.model, cameracmp.view_);
-	addDrawMeshCmd(Core::Instance()->getDisplayList(), m, shader, cameracmp, localcmp);
+
+	addDrawMeshCmd(Core::Instance()->getDisplayList(), m, shader, cameracmp, localcmp, hasLightcomponent);
 
 }

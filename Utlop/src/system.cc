@@ -111,7 +111,7 @@ void Utlop::RenderSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 	
 	addDrawMeshCmd(dl, data->meshes[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].mesh_idx[0]], 
 		data->shaders[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shader_idx].id,	data->cameracmp[0], 
-		data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]]);
+		data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]], entity.cmp_indx_[kLightCompPos]);
 }
 
 
@@ -163,10 +163,7 @@ void Utlop::HeritageSystem::exec(Entity& entity, RenderCtx* data, DisplayList* d
 
 void Utlop::LightSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
-	data->lightcmp[entity.cmp_indx_[kLightCompPos]].color = vec3(1.0f, 1.0f, 1.0f);
-	data->lightcmp[entity.cmp_indx_[kLightCompPos]].direction = vec3(1.0f, 1.0f, 1.0f);
-	data->lightcmp[entity.cmp_indx_[kLightCompPos]].intensity = 2.0f;
-	data->lightcmp[entity.cmp_indx_[kLightCompPos]].position = vec3(0.0f, 0.0f, 20.0f);
+  data->lightcmp[entity.cmp_indx_[kLightCompPos]].hasLightComponent = 1.0f;
 }
 
 void Utlop::LightSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)

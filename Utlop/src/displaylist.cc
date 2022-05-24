@@ -57,7 +57,7 @@ Utlop::DisplayList& Utlop::addDrawCmd(Utlop::DisplayList* dl, GLuint shaderId, G
 	return *dl;
 }
 
-Utlop::DisplayList& Utlop::addDrawMeshCmd(DisplayList* dl, Utlop::Mesh m, GLuint shader, Utlop::CameraComponent cameracmp, Utlop::LocalTRComponent localcmp)
+Utlop::DisplayList& Utlop::addDrawMeshCmd(DisplayList* dl, Utlop::Mesh m, GLuint shader, Utlop::CameraComponent cameracmp, Utlop::LocalTRComponent localcmp, int hasLightComponent)
 {
 	shared_ptr<DrawMeshCmd> drawMeshCmd;
 	drawMeshCmd = make_shared<DrawMeshCmd>();
@@ -65,6 +65,7 @@ Utlop::DisplayList& Utlop::addDrawMeshCmd(DisplayList* dl, Utlop::Mesh m, GLuint
 	drawMeshCmd->m = m;
 	drawMeshCmd->shader = shader;
 	drawMeshCmd->cameracmp = cameracmp;
+  drawMeshCmd->hasLightComponent = hasLightComponent;
 
 	dl->cmdList.push_back(move(drawMeshCmd));
 
@@ -97,7 +98,8 @@ Utlop::DisplayList& Utlop::addSetModelViewProjection(Utlop::DisplayList* dl, GLu
 	return *dl;
 }
 
-Utlop::DisplayList& Utlop::addSetLightDataCmd(Utlop::DisplayList* dl, glm::vec3 color, glm::vec3 position, float intensity, GLuint shaderID, vec3 camPosition, vec3 direction, int type)
+Utlop::DisplayList& Utlop::addSetLightDataCmd(Utlop::DisplayList* dl, glm::vec3 color, glm::vec3 position, float intensity, 
+  GLuint shaderID, vec3 camPosition, vec3 direction, int type)
 {
 	std::shared_ptr<Utlop::SetLightDataCmd> lightCmd;
 	lightCmd = std::make_shared<Utlop::SetLightDataCmd>();

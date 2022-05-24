@@ -652,7 +652,7 @@ namespace Utlop
 				int entityIdx = AddEntity();
 				AddComponent(*data->entities[entityIdx], kLocalTRComp);
 				AddComponent(*data->entities[entityIdx], kRenderComp);
-				AddComponent(*data->entities[entityIdx], kLightComp);
+				//AddComponent(*data->entities[entityIdx], kLightComp);
 				PreExecSystem(*data->entities[entityIdx]);
 			} ImGui::SameLine();
 

@@ -42,8 +42,8 @@ namespace Utlop {
 			return textures;
 		}
 
-		void Draw(GLuint& shader, CameraComponent& cameracmp);
-		void DrawMesh(Mesh m, GLuint& shader, CameraComponent& cameracmp, LocalTRComponent& localcmp);	
+		void Draw(GLuint& shader, CameraComponent& cameracmp, int hasLightcomponent);
+		void DrawMesh(Mesh m, GLuint& shader, CameraComponent& cameracmp, LocalTRComponent& localcmp, int hasLightcomponent);
 	};
 	struct Geometry {
 		vector<float> vertices_;

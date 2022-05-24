@@ -3,7 +3,8 @@ in vec2 text_coords;
 in vec3 frag_position;
 in vec3 frag_normal;
 in vec3 FragPos;
-in  flat int lightType;
+in flat int lightType;
+in flat int hasLightComponent;
 in vec4 fragPosLight;
 
 flat in int doesHasNormalMap;
@@ -26,9 +27,16 @@ struct PointLightStr{
 	float intensity;
 	vec3 dirLightPos;
 };
+struct SpotLightStr{
+	vec3 direction;
+	vec3 color;
+	float intensity;
+	vec3 LightPos;
+};
 
 in PointLightStr pointLightSTR;
 in DirectionalLightStr directionalLightSTR;
+in SpotLightStr spotLightSTR;
 
 out vec4 gl_FragColor; 
 
@@ -104,13 +112,14 @@ vec4 DirectionalLight(){
 
 vec4 SpotLight()
 {
+
 	float outerCone = 0.90f;
 	float innerCone = 0.95f;
 
 	float ambient = 0.20f;
 
 	vec3 normal = normalize(frag_normal);
-	vec3 lightDirection = normalize(pointLightSTR.dirLightPos - frag_position);
+	vec3 lightDirection = normalize(spotLightSTR.LightPos - frag_position);
 	float diffuse = max(dot(normal, lightDirection), 0.0f);
 
 	
@@ -128,7 +137,7 @@ vec4 SpotLight()
 	float angle = dot(vec3(0.0f, -1.0f, 0.0f), -lightDirection);
 	float inten = clamp((angle - outerCone) / (innerCone - outerCone), 0.0f, 1.0f);
 
-
+  /*
 	float shadow = 0.0f;
 	
   vec3 lightCoords = fragPosLight.xyz / fragPosLight.w;
@@ -155,16 +164,16 @@ vec4 SpotLight()
 		
     shadow /= pow((sampleRadius * 2 + 1), 2);
 
-	}
+	}*/
 
-	return (texture(diffuse0, text_coords) * (diffuse * (1.0f - shadow) * inten + ambient) + texture(specular0, text_coords).r * specular * (1.0f - shadow) * inten) * vec4(pointLightSTR.color,1.0f);
+	return (texture(diffuse0, text_coords) * (diffuse * inten + ambient) + texture(specular0, text_coords).r * specular * inten) * vec4(spotLightSTR.color,1.0f);
 }
 
 void main()
 {
   vec4 outputColor = vec4(0.0f);
-	if(pointLightSTR.intensity == 0){
-		vec4 outputColor = texture(diffuse0, text_coords);
+	if(hasLightComponent == -1){
+		outputColor = texture(diffuse0, text_coords);
 		gl_FragColor = outputColor;
 	}else{
 		if(lightType == 0){
