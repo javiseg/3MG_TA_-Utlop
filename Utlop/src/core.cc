@@ -103,6 +103,7 @@ namespace Utlop
 		int lightEntity = AddEntity();
 		AddComponent(*data->entities[lightEntity], kLocalTRComp);
 		AddComponent(*data->entities[lightEntity], kTypeLightComp);
+		AddComponent(*data->entities[lightEntity], kLightComp);
 		AddComponent(*data->entities[lightEntity], kRenderComp);
 		data->typelighcmp[data->entities[lightEntity]->cmp_indx_[kTypeLightCompPos]].type = 0;
 		
@@ -164,7 +165,10 @@ namespace Utlop
 		data->shadowframebuffer->rectangleToGPU();
 		data->shadowframebuffer->initShadowFBO(kWidth - 300.0f, kHeight);
 		vec3 lightPosition = vec3(0.0f, 1.0f, 1.0f);
-		data->shadowframebuffer->setLightPerspective(vec3(0.0f, 1.0f, 1.0f), &data->shaders, 0);
+    TypeLightComponent tmplight;
+    tmplight.position = vec3(1.0f);
+    tmplight.type = 0;
+		data->shadowframebuffer->setLightPerspective(tmplight, &data->shaders);
 		data->shadowframebuffer->errorCheck();
 
 		std::string facesCubemap[6] =
@@ -652,7 +656,7 @@ namespace Utlop
 				int entityIdx = AddEntity();
 				AddComponent(*data->entities[entityIdx], kLocalTRComp);
 				AddComponent(*data->entities[entityIdx], kRenderComp);
-				//AddComponent(*data->entities[entityIdx], kLightComp);
+				AddComponent(*data->entities[entityIdx], kLightComp);
 				PreExecSystem(*data->entities[entityIdx]);
 			} ImGui::SameLine();
 

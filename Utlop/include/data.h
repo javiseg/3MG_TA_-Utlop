@@ -178,15 +178,16 @@ namespace Utlop {
 
 		}
 
-		void setLightPerspective(vec3 lightPosition, vector<Shader>* shaders, GLuint type) {
+		void setLightPerspective(TypeLightComponent light, vector<Shader>* shaders) {
       
       glm::mat4 projection = mat4(1.0f);// = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 500.0f);
       glm::mat4 lightView = mat4(1.0f); // = glm::lookAt(40.0f * lightPosition, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-      
+      light.position += vec3(0.001f, 0.001f, 0.001f);
+      light.direction += vec3(0.001f, 0.001f, 0.001f);
       
       //glm::mat4 orthgonalProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 500.0f);
       //glm::mat4 lightView = mat4(1.0f); 
-      switch (type) {
+      switch (light.type) {
         // PointLight
         case 0: {
             projection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 500.0f);
@@ -194,14 +195,16 @@ namespace Utlop {
         };
         // DirectionalLight
         case 1: {
-            projection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 500.0f);
-            lightView = glm::lookAt(40.0f * lightPosition, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            light.position = normalize(light.position);
+            projection = glm::ortho(-200.0f, 200.0f, -100.0f, 100.0f, 0.1f, 500.0f);
+            lightView = glm::lookAt(40.0f * light.position, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
           break;
         };
         // SpotLight
         case 2: {
-            projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 100.0f);
-            lightView = glm::lookAt(lightPosition, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+            light.position -=  vec3(0.0f, 3.0f, 0.0f);
+            projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 200.0f);
+            lightView = glm::lookAt(light.position, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
           break;
         };
       }
@@ -210,7 +213,7 @@ namespace Utlop {
       lightProjection = projection * lightView;
 
       glUseProgram(shaders->at(shader_idx).id);
-      glUniformMatrix4fv(glGetUniformLocation(shaders->at(shader_idx).id, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightProjection));
+      glUniformMatrix4fv(glGetUniformLocation(shaders->at(shader_idx).id, "lightprojection"), 1, GL_FALSE, glm::value_ptr(lightProjection));
       glUseProgram(0);
 		}
 	};

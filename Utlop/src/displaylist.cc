@@ -109,7 +109,7 @@ Utlop::DisplayList& Utlop::addSetLightDataCmd(Utlop::DisplayList* dl, glm::vec3 
 	lightCmd->intensity = intensity;
 	lightCmd->shaderID = shaderID;
 	lightCmd->camPosition = camPosition;
-	lightCmd->direction = direction;
+	lightCmd->direction = position;
 	lightCmd->type = type;
 
 	dl->cmdList.push_back(move(lightCmd));
