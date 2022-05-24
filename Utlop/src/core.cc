@@ -272,8 +272,9 @@ namespace Utlop
 
 				ChangeShader(data->shadowframebuffer->shader_idx);
 				data->shaders[data->shadowframebuffer->shader_idx].Activate();
+        
 				addEnableDepthTest(displayList);
-				addViewPortCmd(displayList, 0, 0, kWidth, kHeight);
+				addViewPortCmd(displayList, 0, 0, kWidth - 300.0f, kHeight);
         addBindFramebuffer(displayList, data->shadowframebuffer->FBOid);
         addClearDepthBufferCmd(displayList);
 				ExecSystems();
@@ -611,7 +612,7 @@ namespace Utlop
 
 
     ImGuiIO& io = ImGui::GetIO();
-    ImGuizmo::SetRect(0, 0, io.DisplaySize.x - 300.0f, io.DisplaySize.y);
+    ImGuizmo::SetRect(0, 0, io.DisplaySize.x , io.DisplaySize.y);
     ImGuizmo::Manipulate(value_ptr(camera.view_), value_ptr(camera.projection_),
       mCurrentGizmoOperation, mCurrentGizmoMode, value_ptr(modelMat),
       NULL, nullptr);
@@ -718,7 +719,7 @@ namespace Utlop
 
               ImGui::Text("%04d: Object", gameObjectSelected);
 
-              //EditTransform(data->cameracmp[0], data->localtrcmp[data->entities[gameObjectSelected]->cmp_indx_[kLocalTRCompPos]], gameObjectSelected, data->entities[gameObjectSelected]->cmp_indx_[kHeritageCompPos]);
+              EditTransform(data->cameracmp[0], data->localtrcmp[data->entities[gameObjectSelected]->cmp_indx_[kLocalTRCompPos]], gameObjectSelected, data->entities[gameObjectSelected]->cmp_indx_[kHeritageCompPos]);
 
               position = data->localtrcmp[data->entities[gameObjectSelected]->cmp_indx_[kLocalTRCompPos]].position;
               rotation = data->localtrcmp[data->entities[gameObjectSelected]->cmp_indx_[kLocalTRCompPos]].rotation;
