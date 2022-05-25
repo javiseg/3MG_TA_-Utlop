@@ -45,12 +45,14 @@ uniform int l_type;
 uniform mat4 mat2proj;
 uniform mat4 lightProjection;
 uniform int hasLightCmp;
+uniform vec3 colorSilhoutte;
 
 out vec2 text_coords;
 out vec3 frag_position;
 out vec3 frag_normal;
 out vec3 FragPos; 
 out vec3 camPosition;
+out vec3 f_colorSilhoutte;
 out flat int lightType;
 out vec4 fragPosLight;
 out int hasLightComponent;
@@ -61,6 +63,7 @@ out SpotLightStr spotLightSTR;
 
 void main()
 {
+  f_colorSilhoutte = colorSilhoutte;
 	pointLightSTR = pointLight;
   directionalLightSTR = directionalLight;
   spotLightSTR = spotLight;

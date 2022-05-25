@@ -210,3 +210,21 @@ Utlop::DisplayList& Utlop::addDrawSkybox(DisplayList* dl, GLuint shaderID, glm::
 
 	return *dl;
 }
+
+
+Utlop::DisplayList& Utlop::addSilhoutteCmd(DisplayList* dl, GLuint shaderID, vec3 color, GLuint fboid, GLuint activeTexture, GLuint FBtexture)
+{
+
+  std::unique_ptr<Utlop::SilhoutteCmd> slhcmd;
+  slhcmd = std::make_unique<Utlop::SilhoutteCmd>();
+
+  slhcmd->shaderID = shaderID;
+  slhcmd->color = color;
+  slhcmd->fbid = fboid;
+
+  dl->cmdList.push_back(move(slhcmd));
+
+
+  return *dl;
+  // TODO: Insertar una instrucción "return" aquí
+}

@@ -207,3 +207,21 @@ void Utlop::TypeLightSystem::exec(Entity& entity, RenderCtx* data, DisplayList* 
   }
   
 }
+
+void Utlop::SilhoutteSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
+{
+  data->silhouttecmp[entity.cmp_indx_[kSilhoutteCompPos]].color = vec3(0.0f,0.0f, 1.0f);
+}
+
+void Utlop::SilhoutteSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
+{
+
+  if (entity.cmp_indx_[kLocalTRCompPos] != -1 && entity.cmp_indx_[kRenderCompPos] != -1) {
+    if (!data->rendercmp[entity.cmp_indx_[kRenderCompPos]].mesh_idx.empty()) {
+
+     
+
+    }
+  }
+
+}

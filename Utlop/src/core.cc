@@ -36,6 +36,7 @@ namespace Utlop
     _instance = this;
 		data->framebuffer = make_unique<RenderToTexture>();
 		data->shadowframebuffer = make_unique<RenderToTexture>();
+		data->silhoutteframebuffer = make_unique<RenderToTexture>();
 		cubemap = make_unique<CubeMap>();
   }
 
@@ -118,6 +119,21 @@ namespace Utlop
 		data->shadowframebuffer->setLightPerspective(tmplight, &data->shaders);
 		data->shadowframebuffer->errorCheck();
 
+
+    ////////////////Test///////////////////////////
+    // Load Silhoutte buffer shader
+    data->shaders.push_back(Shader("../UtlopTests/src/shaders/silhoutte_vert.glsl", "../UtlopTests/src/shaders/silhoutte_frag.glsl"));
+    data->silhoutteframebuffer->initShader(data->shaders.size() - 1);
+    data->silhoutteframebuffer->rectangleToGPU();
+    data->silhoutteframebuffer->initFBO(kWidth - 300.0f, kHeight);
+    data->silhoutteframebuffer->errorCheck();
+    //////////////////////////////////////////
+
+
+
+
+
+
 		std::string facesCubemap[6] =
 		{
 			"../UtlopTests/src/textures/cubemap/right.jpg",
@@ -186,6 +202,14 @@ namespace Utlop
     // Init Capsule OBJ
     InitMesh("../UtlopTests/src/obj/capsule/capsule.obj");
     data->obj_str_type.push_back("Capsule");
+
+
+    int silhoutteEntity = AddEntity();
+    AddComponent(*data->entities[silhoutteEntity], kLocalTRComp);
+    AddComponent(*data->entities[silhoutteEntity], kLightComp);
+    AddComponent(*data->entities[silhoutteEntity], kRenderComp);
+    AddComponent(*data->entities[silhoutteEntity], kSilhoutteComp);
+
 
 
     return done;
@@ -259,6 +283,69 @@ namespace Utlop
         ShadowMapUpdate();
         displayList->executeOnGPU();
      
+
+
+        //////////////////TEST////////////////////////////////
+
+
+        ChangeShader(data->silhoutteframebuffer->shader_idx);
+        data->shaders[data->silhoutteframebuffer->shader_idx].Activate();
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glViewport(0, 0, kWidth - 300.0f, kHeight);
+        glEnable(GL_DEPTH_TEST);
+        glBindFramebuffer(GL_FRAMEBUFFER, data->silhoutteframebuffer->FBOid);
+        glClearColor(bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        ExecSystems();
+        for (int i = 0; i < data->entities.size(); i++) {
+          if ((data->entities[i]->componentsID_ & kSilhoutteComp) == kSilhoutteComp) {
+            data->shaders[data->silhoutteframebuffer->shader_idx].Activate();
+            glUniformMatrix4fv(glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "ModelMatrix"),
+              1, GL_FALSE, glm::value_ptr(data->localtrcmp[data->entities[i]->cmp_indx_[kLocalTRCompPos]].model));
+            glUniformMatrix4fv(glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "ViewMatrix"),
+              1, GL_FALSE, glm::value_ptr(data->cameracmp[0].view_));
+            glUniformMatrix4fv(glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "ProjectionMatrix"),
+              1, GL_FALSE, glm::value_ptr(data->cameracmp[0].projection_));
+            glUniform3fv(glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "color"),
+              1, glm::value_ptr(data->silhouttecmp[data->entities[i]->cmp_indx_[kSilhoutteCompPos]].color));
+
+          }
+        }
+        displayList->executeOnGPU();
+
+        data->shaders[data->silhoutteframebuffer->shader_idx].Activate();
+
+        glEnable(GL_DEPTH_TEST);
+        glUseProgram(data->shaders[data->silhoutteframebuffer->shader_idx].id);
+        glBindTextureUnit(0, data->silhoutteframebuffer->FBtexture);
+        
+        glUniform1i(glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "silhoutteTexture"), 0);
+        //glUniform3fv(glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "color"), 1, value_ptr(vec3(1.0f, 1.0f, 1.0f)));
+        int tex = glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "silhoutteTexture");
+        int color = glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "color");
+
+        //glUniform3fv(glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "color"), 1, glm::value_ptr(vec3(0.0f, 1.0f, 0.0)));
+        
+       
+        
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClearColor(bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glUseProgram(data->shaders[data->silhoutteframebuffer->shader_idx].id);
+        glBindVertexArray(data->silhoutteframebuffer->rectVAO);
+        glDrawElements(GL_TRIANGLES, data->silhoutteframebuffer->indices, GL_UNSIGNED_INT, 0);
+        glUseProgram(0);
+        
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClearColor(bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+        //////////////////////////////////////////////////////
+
 
         scheduler.run(schedUpdate, &schedulerUpdateReady);
         
@@ -455,6 +542,11 @@ namespace Utlop
 					entity.cmp_indx_[kTypeLightCompPos] = (int)(data->typelighcmp.size() - 1);
 					break;
 				}
+				case kSilhoutteComp: {
+					data->silhouttecmp.push_back(SilhoutteComponent());
+					entity.cmp_indx_[kSilhoutteCompPos] = (int)(data->silhouttecmp.size() - 1);
+					break;
+				}
 			}
 		}
 		else {
@@ -488,6 +580,10 @@ namespace Utlop
     if ((components & kTypeLightComp) == kTypeLightComp) {
       data->typelighcmp.push_back(TypeLightComponent());
       entity.cmp_indx_[kTypeLightCompPos] = (int)(data->typelighcmp.size() - 1);
+    }
+    if ((components & kSilhoutteComp) == kSilhoutteComp) {
+      data->silhouttecmp.push_back(SilhoutteComponent());
+      entity.cmp_indx_[kSilhoutteCompPos] = (int)(data->silhouttecmp.size() - 1);
     }
   }
 
@@ -555,7 +651,7 @@ namespace Utlop
 	{
     Geometry geo;
     loadOBJ2(geometryPath.c_str(), geo);
-		Mesh newMesh(geo.totalVertex_, geo.totalIndices_, geometryPath);
+		Mesh newMesh(geo.totalVertex_, geo.totalIndices_, geometryPath, geo);
 		data->meshes.push_back(newMesh);
    
 	}
@@ -569,6 +665,7 @@ namespace Utlop
 		data->sys.push_back(make_shared<HeritageSystem>());
 		data->sys.push_back(make_shared<LightSystem>());
 		data->sys.push_back(make_shared<TypeLightSystem>());
+		data->sys.push_back(make_shared<SilhoutteSystem>());
 	}
 
 	void Core::PreExecSystems()
@@ -718,6 +815,7 @@ namespace Utlop
 				int entityIdx = AddEntity();
 				AddComponent(*data->entities[entityIdx], kLocalTRComp);
 				AddComponent(*data->entities[entityIdx], kRenderComp);
+				AddComponent(*data->entities[entityIdx], kSilhoutteComp);
 				PreExecSystem(*data->entities[entityIdx]);
 			} ImGui::SameLine();
 

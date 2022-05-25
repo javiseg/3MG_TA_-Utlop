@@ -67,4 +67,13 @@ namespace Utlop {
 		void preExec(Entity& entity, Utlop::RenderCtx* data) override;
 		void exec(Entity& entity, RenderCtx* data, DisplayList* dl) override;
 	};
+
+	struct SilhoutteSystem : public System {
+    SilhoutteSystem() {
+			id_ = kSilhoutteComp;
+		}
+		~SilhoutteSystem() {}
+		void preExec(Entity& entity, Utlop::RenderCtx* data) override;
+		void exec(Entity& entity, RenderCtx* data, DisplayList* dl) override;
+	};
 }

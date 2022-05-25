@@ -5,6 +5,7 @@ in vec2 texCoords;
 in flat int f_postProcessType;
 
 uniform sampler2D screenTexture;
+uniform sampler2D silhoutteTexture;
 
 
 const float offset_x = 1.0f / 1380.0f;
@@ -36,10 +37,10 @@ void main()
   if(f_postProcessType == 0){
     gl_FragColor = texture(screenTexture, texCoords);
   }else if(f_postProcessType == 1){
-	  vec3 color = vec3(0.0f);
-    for(int i = 0; i < 9; i++)
-        color += vec3(texture(screenTexture, texCoords.st + offsets[i])) * kernel[i];
-    gl_FragColor = vec4(color, 1.0f);
+	  //vec3 color = vec3(0.0f);
+    //for(int i = 0; i < 9; i++)
+        //color += vec3(texture(screenTexture, texCoords.st + offsets[i])) * kernel[i];
+    gl_FragColor = texture(silhoutteTexture, texCoords.st);
   }else if(f_postProcessType == 2){
 	  vec3 color = vec3(0.0f);
     for(int i = 0; i < 9; i++)

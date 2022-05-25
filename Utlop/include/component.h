@@ -17,7 +17,8 @@ namespace Utlop {
 		kHeritageComp = 4,
 		kLightComp = 8,
 		kTypeLightComp = 16,
-		kRenderComp = 32
+    kSilhoutteComp = 32,
+		kRenderComp = 64
 	};
 
 	enum ComponentPos {
@@ -26,7 +27,8 @@ namespace Utlop {
 		kHeritageCompPos = 2,
 		kLightCompPos = 3,
 		kTypeLightCompPos = 4,
-		kRenderCompPos = 5
+    kSilhoutteCompPos = 5,
+    kRenderCompPos = 6
 	};
 
 	enum ComponentConstants {
@@ -84,6 +86,10 @@ namespace Utlop {
 		vec3 position;
 		float intensity;
 		int type = 0;
+	};
+
+	struct SilhoutteComponent : public Component {
+		vec3 color;
 	};
 
 }

@@ -24,6 +24,7 @@ namespace Utlop {
 		vector<LightComponent> lightcmp;
 		vector<TypeLightComponent> typelighcmp;
     vector<HeritageComponent> heritagecmp;
+    vector<SilhoutteComponent> silhouttecmp;
 		
 		vector<Mesh> meshes;
 		vector<Material> materials;
@@ -37,6 +38,7 @@ namespace Utlop {
 
 		unique_ptr<RenderToTexture> framebuffer;
 		unique_ptr<RenderToTexture> shadowframebuffer;
+		unique_ptr<RenderToTexture> silhoutteframebuffer;
 
 		vector<const char*> obj_str_type;
 		vector<const char*> mat_str_type;

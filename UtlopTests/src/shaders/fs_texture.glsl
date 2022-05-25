@@ -13,6 +13,7 @@ in vec3 camPosition;
 uniform sampler2D diffuse0;
 uniform sampler2D specular0;
 uniform sampler2D shadowMap;
+uniform sampler2D silhoutteMap;
 uniform sampler2D normal0;
 
 struct DirectionalLightStr{
@@ -37,6 +38,7 @@ struct SpotLightStr{
 in PointLightStr pointLightSTR;
 in DirectionalLightStr directionalLightSTR;
 in SpotLightStr spotLightSTR;
+in vec3 f_colorSilhoutte;
 
 out vec4 gl_FragColor; 
 
@@ -182,7 +184,7 @@ void main()
 {
   vec4 outputColor = vec4(0.0f);
 	if(hasLightComponent == -1){
-		outputColor = texture(diffuse0, text_coords);
+		outputColor = texture(silhoutteMap,text_coords);
 		gl_FragColor = outputColor;
 	}else{
 		if(lightType == 0){

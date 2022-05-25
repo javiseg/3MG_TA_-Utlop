@@ -157,7 +157,13 @@ namespace Utlop {
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
       glUseProgram(shaderID);
       glBindTextureUnit(0, fbTexture);
+      glBindTextureUnit(1, 3);
       glUniform1i(glGetUniformLocation(shaderID, "screenTexture"), 0);
+      glUniform1i(glGetUniformLocation(shaderID, "silhoutteTexture"), 1);
+      glUniform1i(glGetUniformLocation(shaderID, "shadowMap"), 2);
+
+
+
       glUniform1i(glGetUniformLocation(shaderID, "postProcessType"), type);
       glBindVertexArray(rectVAO);
       glDrawElements(GL_TRIANGLES, indicessize, GL_UNSIGNED_INT, 0);
@@ -230,6 +236,23 @@ namespace Utlop {
     GLuint activeTexture;
     GLuint FBtexture;
 	};
+	struct SilhoutteCmd : public Command {
+		void executeOnGPU() override {
+			
+      glUseProgram(shaderID);
+      glUniformMatrix4fv(glGetUniformLocation(shaderID, "colorSilhoutte"), 1, GL_FALSE, glm::value_ptr(color));
+      glActiveTexture(GL_TEXTURE0 + activeTexture);
+      glBindTexture(GL_TEXTURE_2D, FBtexture);
+      glUniform1i(glGetUniformLocation(shaderID, "silhoutteMap"), 4);
+      glUseProgram(0);
+
+		}
+    GLuint activeTexture;
+    GLuint FBtexture;
+    vec3 color;
+    GLuint shaderID;
+    GLuint fbid;
+	};
 	class DisplayList {
 		public:
 			list<shared_ptr<Command>> cmdList;
@@ -255,4 +278,5 @@ namespace Utlop {
 	DisplayList& addDrawSkybox(DisplayList* dl, GLuint shaderID,
 		glm::vec3 position, glm::vec3 front, glm::vec3 Up, glm::mat4 projection,
 		glm::mat4 view, GLuint vao, GLuint texture);
+  DisplayList& addSilhoutteCmd(DisplayList* dl, GLuint shaderID, vec3 color, GLuint fboid, GLuint activeTexture, GLuint FBtexture);
 }

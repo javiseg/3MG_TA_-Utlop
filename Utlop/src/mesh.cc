@@ -3,11 +3,13 @@
 #include "core.h"
 
 Utlop::Mesh::Mesh(const std::vector<float> vertices_, const std::vector<uint32_t> indices_, 
-	string geoPath)
+	string geoPath, Geometry geo_)
 {
   n_indices = indices_.size();
 	path = geoPath;
 	normalMap = 0;
+  geo = geo_;
+
 
 	glCreateVertexArrays(1, &vao);
 	GLuint vbo;
