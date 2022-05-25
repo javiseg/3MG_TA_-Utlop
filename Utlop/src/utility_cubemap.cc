@@ -2,6 +2,7 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include "data.h"
 #include "tools.h"
 #ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
@@ -12,9 +13,6 @@ using glm::vec3;
 using glm::vec4;
 using glm::ivec2;
 
-void loadVertexShader(const char* filename, GLuint& vertShader);
-void loadFragmentShader(const char* filename, GLuint& fragShader);
-void checkCompileErrors(unsigned int shader, std::string type);
 
 vec3 faceCoordsToXYZ(int i, int j, int faceID, int faceSize)
 {
@@ -50,7 +48,7 @@ void Utlop::CubeMap::createBuffers()
 
 }
 
-void Utlop::CubeMap::loadTextures(std::string faces[6])
+void Utlop::CubeMap::loadTextures(std::string faces[6], RenderCtx* data)
 {
 
 	glGenTextures(1, &texture);
@@ -88,5 +86,7 @@ void Utlop::CubeMap::loadTextures(std::string faces[6])
 			stbi_image_free(data);
 		}
 	}
+  glUniform1i(glGetUniformLocation(data->shaders[shader_idx].id, "skybox"), 0);
+
 }
 

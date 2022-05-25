@@ -22,8 +22,6 @@ namespace Utlop {
 
 	struct Mesh
 	{
-		std::vector<Texture> textures;
-
 		GLuint normalMap;
 		GLuint vao;
     GLuint n_indices;
@@ -31,19 +29,13 @@ namespace Utlop {
 		string path;
 
 		Mesh(const std::vector<float> vertices_, const std::vector<uint32_t> indices_,
-			std::vector<Texture> textures_, string geoPath);
+      string geoPath);
 		Mesh(){
 			vao = 999;
 		}
 		~Mesh() {}
 		
-		const std::vector<Texture>& Mesh::getTextures() const
-		{
-			return textures;
-		}
-
-		void Draw(GLuint& shader, CameraComponent& cameracmp, int hasLightcomponent);
-		void DrawMesh(Mesh m, GLuint& shader, CameraComponent& cameracmp, LocalTRComponent& localcmp, int hasLightcomponent);
+		void Draw(GLuint& shader, CameraComponent& cameracmp, int hasLightcomponent, Material mat);
 	};
 	struct Geometry {
 		vector<float> vertices_;

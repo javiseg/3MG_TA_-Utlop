@@ -3,10 +3,9 @@
 #include "core.h"
 
 Utlop::Mesh::Mesh(const std::vector<float> vertices_, const std::vector<uint32_t> indices_, 
-	std::vector<Texture> textures_, string geoPath)
+	string geoPath)
 {
   n_indices = indices_.size();
-	textures = textures_;
 	path = geoPath;
 	normalMap = 0;
 
@@ -47,7 +46,8 @@ Utlop::Mesh::Mesh(const std::vector<float> vertices_, const std::vector<uint32_t
 
 }
 
-void Utlop::Mesh::Draw(GLuint& shader, CameraComponent& cameracmp, int hasLightcomponent)
+
+void Utlop::Mesh::Draw(GLuint& shader, CameraComponent& cameracmp, int hasLightcomponent, Material mat)
 {
 	glUseProgram(shader);
 
@@ -57,10 +57,10 @@ void Utlop::Mesh::Draw(GLuint& shader, CameraComponent& cameracmp, int hasLightc
 	unsigned int numSpecular = 0;
 	unsigned int numNormal = 0;
 
-	for (unsigned int i = 0; i < textures.size(); i++)
+	for (unsigned int i = 0; i < mat.textures.size(); i++)
 	{
 		std::string num;
-		std::string type = textures[i].type;
+		std::string type = mat.textures[i].type;
 		if (type == "diffuse"){
 			num = std::to_string(numDiffuse++);
 		}
@@ -70,8 +70,8 @@ void Utlop::Mesh::Draw(GLuint& shader, CameraComponent& cameracmp, int hasLightc
 		else if (type == "normal") {
 			num = std::to_string(numNormal++);
 		}
-		textures[i].texUnit(shader, (type + num).c_str(), i);
-		textures[i].bind();
+    mat.textures[i].texUnit(shader, (type + num).c_str(), i);
+    mat.textures[i].bind();
 	}
 	
 
@@ -88,11 +88,3 @@ void Utlop::Mesh::Draw(GLuint& shader, CameraComponent& cameracmp, int hasLightc
 	glUseProgram(0);
 }
 
-void Utlop::Mesh::DrawMesh(Mesh m, GLuint& shader, CameraComponent& cameracmp, LocalTRComponent& localcmp, int hasLightcomponent)
-{
-	addSetModelViewProjection(Core::Instance()->getDisplayList(), shader, cameracmp.projection_,
-		localcmp.model, cameracmp.view_);
-
-	addDrawMeshCmd(Core::Instance()->getDisplayList(), m, shader, cameracmp, localcmp, hasLightcomponent);
-
-}

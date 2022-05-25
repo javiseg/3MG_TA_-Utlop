@@ -2,6 +2,7 @@
 
 out vec4 gl_FragColor;
 in vec2 texCoords;
+in flat int f_postProcessType;
 
 uniform sampler2D screenTexture;
 
@@ -17,14 +18,12 @@ vec2 offsets[9] = vec2[]
 );
 
 
-//Blur
-/*
-float kernel[9] = float[](
+float kernelBlur[9] = float[](
     1.0 / 10, 2.0 / 10, 1.0 / 10,
     2.0 / 10, 4.0 / 10, 2.0 / 10,
     1.0 / 10, 2.0 / 10, 1.0 / 10  
 );
-*/
+
 float kernel[9] = float[](
     1, 1, 1,
     1, -8, 1,
@@ -33,11 +32,19 @@ float kernel[9] = float[](
 
 void main()
 {
-	vec3 color = vec3(0.0f);
+
+  if(f_postProcessType == 0){
+    gl_FragColor = texture(screenTexture, texCoords);
+  }else if(f_postProcessType == 1){
+	  vec3 color = vec3(0.0f);
     for(int i = 0; i < 9; i++)
         color += vec3(texture(screenTexture, texCoords.st + offsets[i])) * kernel[i];
     gl_FragColor = vec4(color, 1.0f);
-
-	//Without effects:
-	gl_FragColor = texture(screenTexture, texCoords);
+  }else if(f_postProcessType == 2){
+	  vec3 color = vec3(0.0f);
+    for(int i = 0; i < 9; i++)
+        color += vec3(texture(screenTexture, texCoords.st + offsets[i])) * kernelBlur[i];
+    gl_FragColor = vec4(color, 1.0f);
+  }
+	
 }

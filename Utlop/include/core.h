@@ -23,13 +23,14 @@ namespace Utlop
       bool init(float fps);
       void start();
 			void Update();
+      void ShadowMapUpdate();
 
       Utlop::Window* getWindow();
 			float getDeltaTime();
 
       // Entity
 			int AddEntity();
-			void createEntities(Core* cr);
+			void DeleteEntity(int index);
 			
       // Components
       void AddComponent(Entity& entity, Utlop::ComponentID id);
@@ -42,13 +43,13 @@ namespace Utlop
       void PreExecSystems();
       void PreExecSystem(Entity& entity);
       void ExecSystems();
-      void ExecSystems2();
 
-      // Meshes
-      vector<Texture> InitMaterials(RenderCtx* data, vector<string> texturePaths);
+      // Meshes and materials
+      Material InitMaterial(vector<string> texturePaths);
 			Geometry InitGeometry(const char* path);
-      void InitMesh(string geometryPath, vector<string> texturePath);
+      void InitMesh(string geometryPath);
 			void ChangeMesh(Entity& entity, RenderCtx* data, int option);
+			void ChangeMaterial(Entity& entity, RenderCtx* data, int option);
 
       void ClearDataLists(vector<std::vector<int>>* selectedType);
 			

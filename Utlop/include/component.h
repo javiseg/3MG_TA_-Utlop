@@ -13,22 +13,20 @@ namespace Utlop {
 
 	enum ComponentID {
 		kLocalTRComp = 1,
-		kWorldTRComp = 2,
-		kCameraComp = 4,
-		kHeritageComp = 8,
-		kLightComp = 16,
-		kTypeLightComp = 32,
-		kRenderComp = 64
+		kCameraComp = 2,
+		kHeritageComp = 4,
+		kLightComp = 8,
+		kTypeLightComp = 16,
+		kRenderComp = 32
 	};
 
 	enum ComponentPos {
 		kLocalTRCompPos = 0,
-		kWorldTRCompPos = 1,
-		kCameraCompPos = 2,
-		kHeritageCompPos = 3,
-		kLightCompPos = 4,
-		kTypeLightCompPos = 5,
-		kRenderCompPos = 6
+		kCameraCompPos = 1,
+		kHeritageCompPos = 2,
+		kLightCompPos = 3,
+		kTypeLightCompPos = 4,
+		kRenderCompPos = 5
 	};
 
 	enum ComponentConstants {
@@ -44,9 +42,7 @@ namespace Utlop {
 		vec3 scale = vec3(1.0f);
 		vec3 position = vec3(0.0f,0.0f,0.0f);
 	};
-	struct WorldTRComponent : public Component {
-		mat4 model;
-	};
+
 	struct RenderComponent : public Component {
 		// Indice a material, geometría y mat settings?
 		vector<GLuint> material_idx;

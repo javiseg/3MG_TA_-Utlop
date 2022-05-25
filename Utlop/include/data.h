@@ -5,13 +5,10 @@
 #include "gameObject.h"
 #include <memory>
 #include <map>
+#include "mesh.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "shader.h"
 #include <iostream>
-
-void checkCompileErrors(unsigned int shader, std::string type);
-void loadVertexShader(const char* filename, GLuint& vertShader);
-void loadFragmentShader(const char* filename, GLuint& fragShader);
 
 namespace Utlop {
 	struct RenderToTexture;
@@ -20,18 +17,16 @@ namespace Utlop {
 
 		vector<shared_ptr<System>> sys;
 		vector<shared_ptr<Entity>> entities;
-		//shared_ptr<std::vector<shared_ptr<std::vector<Entity>>>> entitiesVector;
 
 		vector<LocalTRComponent> localtrcmp;
-		vector<WorldTRComponent> worldtrcmp;
 		vector<CameraComponent> cameracmp;
 		vector<RenderComponent> rendercmp;
 		vector<LightComponent> lightcmp;
 		vector<TypeLightComponent> typelighcmp;
     vector<HeritageComponent> heritagecmp;
 		
-		vector<Material> material;
 		vector<Mesh> meshes;
+		vector<Material> materials;
 
 		GLuint vertexShader;
 		GLuint fragmentShader;
@@ -44,6 +39,7 @@ namespace Utlop {
 		unique_ptr<RenderToTexture> shadowframebuffer;
 
 		vector<const char*> obj_str_type;
+		vector<const char*> mat_str_type;
 
     bool imguimoUsing = false;
 	};
@@ -54,26 +50,19 @@ namespace Utlop {
 		GLuint RBOid;
 		GLuint rectVAO;
 		GLuint rectVBO;
+		GLuint rectEBO;
+    GLint type = 0;
 
 		int width;
 		int height;
 
+    GLint indices;
 
 		GLuint shader_idx;
 
 		glm::mat4 lightProjection;
 
-		float rectangleVertices[24] =
-		{
-			// Coords    // texCoords
-			 1.0f, -1.0f,  1.0f, 0.0f,
-			-1.0f, -1.0f,  0.0f, 0.0f,
-			-1.0f,  1.0f,  0.0f, 1.0f,
-
-			 1.0f,  1.0f,  1.0f, 1.0f,
-			 1.0f, -1.0f,  1.0f, 0.0f,
-			-1.0f,  1.0f,  0.0f, 1.0f
-		};
+    
 
 		void initFBO(int width_, int height_) {
 
@@ -102,25 +91,6 @@ namespace Utlop {
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBOid);
 			glUseProgram(0);
 
-			/**/
-			/*
-			glCreateFramebuffers(1, &FBOid);
-
-			glCreateTextures(GL_TEXTURE_2D, 1, &FBtexture);
-			glTextureParameteri(FBtexture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTextureParameteri(FBtexture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTextureParameteri(FBtexture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTextureParameteri(FBtexture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTextureStorage2D(FBtexture, 1, GL_RGB8, width, height);
-			glNamedFramebufferTexture(FBOid, GL_COLOR_ATTACHMENT0, FBtexture, 0);
-			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBOid);
-
-
-			auto fboStatus = glCheckNamedFramebufferStatus(FBOid, GL_FRAMEBUFFER);
-			if (fboStatus != GL_FRAMEBUFFER_COMPLETE) {
-				std::cout << "Framebuffer error: " << fboStatus << "\n";
-			}
-			*/
 		}
 
 
@@ -130,7 +100,6 @@ namespace Utlop {
 			height = height_;
 			glGenFramebuffers(1, &FBOid);
 			
-			// Texture for Shadow Map FBO¡
 			glGenTextures(1, &FBtexture);
 			glBindTexture(GL_TEXTURE_2D, FBtexture);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
@@ -138,13 +107,12 @@ namespace Utlop {
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-			// Prevents darkness outside the frustrum
-			float clampColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		
+      float clampColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, clampColor);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, FBOid);
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, FBtexture, 0);
-			// Needed since we don't touch the color buffer
 			glDrawBuffer(GL_NONE);
 			glReadBuffer(GL_NONE);
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -160,16 +128,40 @@ namespace Utlop {
 
 		void rectangleToGPU() {
 
-			glGenVertexArrays(1, &rectVAO);
-			glGenBuffers(1, &rectVBO);
-			glBindVertexArray(rectVAO);
-			glBindBuffer(GL_ARRAY_BUFFER, rectVBO);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(rectangleVertices), &rectangleVertices, GL_STATIC_DRAW);
-			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-			glEnableVertexAttribArray(1);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
+      const GLfloat vertices_[20] =
+      {
+        -1.0f, -1.0f , 0.0f, 0.0f, 0.0f,
+        -1.0f,  1.0f , 0.0f, 0.0f, 1.0f,
+         1.0f,  1.0f , 0.0f, 1.0f, 1.0f,
+         1.0f, -1.0f , 0.0f, 1.0f, 0.0f,
+      };
+
+      const GLuint indices_[6] =
+      {
+        0, 2, 1,
+        0, 3, 2
+      };
+
+      indices = sizeof(indices_) / sizeof(indices_[0]);
+
+      glCreateVertexArrays(1, &rectVAO);
+      glCreateBuffers(1, &rectVBO);
+      glCreateBuffers(1, &rectEBO);
+      glNamedBufferData(rectVBO, sizeof(vertices_), vertices_, GL_STATIC_DRAW);
+      glNamedBufferData(rectEBO, sizeof(indices_),indices_, GL_STATIC_DRAW);
+
+      glEnableVertexArrayAttrib(rectVAO, 0);
+      glVertexArrayAttribBinding(rectVAO, 0, 0);
+      glVertexArrayAttribFormat(rectVAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
+
+      glEnableVertexArrayAttrib(rectVAO, 1);
+      glVertexArrayAttribBinding(rectVAO, 1, 0);
+      glVertexArrayAttribFormat(rectVAO, 1, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(float));
+
+      glVertexArrayVertexBuffer(rectVAO, 0, rectVBO, 0, 5 * sizeof(float));
+
+      glVertexArrayElementBuffer(rectVAO, rectEBO);
 		}
 
 		void initShader(GLuint shader_index) {

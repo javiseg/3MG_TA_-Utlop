@@ -96,11 +96,12 @@ void Utlop::RenderSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 	}
 	//entity.cmp_indx_[kRenderCompPos] = 0;
 	if (entity.cmp_indx_[kTypeLightCompPos] == -1) {
-		initialMesh(entity, data, "../UtlopTests/src/obj/robot/robot.obj");
+		initialMesh(entity, data, "../UtlopTests/src/obj/cube/cube.obj");
 	}
 	else {
 		initialMesh(entity, data, "../UtlopTests/src/obj/lightcube.obj");
 	}
+  data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx.push_back(0);
 }
 
 void Utlop::RenderSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
@@ -111,7 +112,8 @@ void Utlop::RenderSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 	
 	addDrawMeshCmd(dl, data->meshes[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].mesh_idx[0]], 
 		data->shaders[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].shader_idx].id,	data->cameracmp[0], 
-		data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]], entity.cmp_indx_[kLightCompPos]);
+		data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]], entity.cmp_indx_[kLightCompPos], 
+    data->materials[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx[0]]);
 }
 
 
@@ -126,6 +128,9 @@ void Utlop::RenderSystem::initialMesh(Entity& entity, RenderCtx* data, const cha
     }
     if (mesh_index != -1) {
       data->rendercmp[entity.cmp_indx_[kRenderCompPos]].mesh_idx.push_back(mesh_index);
+    }
+    else {
+      data->rendercmp[entity.cmp_indx_[kRenderCompPos]].mesh_idx.push_back(0);
     }
   }
 }
@@ -180,14 +185,14 @@ void Utlop::LightSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 
 void Utlop::TypeLightSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
+  data->typelighcmp[entity.cmp_indx_[kTypeLightCompPos]].color = vec3(1.0f, 1.0f, 1.0f);
+  data->typelighcmp[entity.cmp_indx_[kTypeLightCompPos]].direction = vec3(0.0f, -1.0f, 0.0f);
+  data->typelighcmp[entity.cmp_indx_[kTypeLightCompPos]].intensity = 2.0f;
 	if (entity.cmp_indx_[kLocalTRCompPos] != -1) {
-		data->typelighcmp[entity.cmp_indx_[kTypeLightCompPos]].color = vec3(1.0f, 1.0f, 1.0f);
-		data->typelighcmp[entity.cmp_indx_[kTypeLightCompPos]].direction = vec3(0.0f, -1.0f, 0.0f);
-		data->typelighcmp[entity.cmp_indx_[kTypeLightCompPos]].intensity = 2.0f;
 		data->typelighcmp[entity.cmp_indx_[kTypeLightCompPos]].position = data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].position;
 	}
 	else {
-		printf("\nERROR: Point light entity without transform\n");
+    data->typelighcmp[entity.cmp_indx_[kTypeLightCompPos]].position = vec3(1.0f, 1.0f, 1.0f);
 	}
 }
 
@@ -199,7 +204,6 @@ void Utlop::TypeLightSystem::exec(Entity& entity, RenderCtx* data, DisplayList* 
 	
     data->shadowframebuffer->setLightPerspective(data->typelighcmp[entity.cmp_indx_[kTypeLightCompPos]],
       &data->shaders);
-
   }
   
 }

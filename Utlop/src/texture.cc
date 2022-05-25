@@ -3,6 +3,7 @@
 
 Utlop::Texture::Texture(const char* path, const char* texType, GLenum slot, GLenum format, GLenum pixelType)
 {
+  id = 0;
 	type = texType;
 	unit = slot;
 	// Stores the width, height, and the number of color channels of the image
@@ -51,10 +52,11 @@ Utlop::Texture::Texture(const char* path, const char* texType, GLenum slot, GLen
 
 void Utlop::Texture::texUnit(GLuint shader, const char* uniform, GLuint unit)
 {
-	GLuint texUni = glGetUniformLocation(shader, uniform);
 	// Shader needs to be activated before changing the value of a uniform
 	glUseProgram(shader);
-	// Sets the value of the uniform
+  GLuint texUni = glGetUniformLocation(shader, uniform);
+
+  // Sets the value of the uniform
 	glUniform1i(texUni, unit);
 	//glUseProgram(0);
 }

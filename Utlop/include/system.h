@@ -22,14 +22,6 @@ namespace Utlop {
 		void preExec(Entity& entity, Utlop::RenderCtx* data) override;
 		void exec(Entity& entity, RenderCtx* data, DisplayList* dl) override;
 	};
-	struct WorldTRSystem : public System{
-		WorldTRSystem() {
-			id_ = kWorldTRComp;
-		}
-		~WorldTRSystem() {}
-		void preExec(Entity& entity, Utlop::RenderCtx* data) override {}
-		void exec(Entity& entity, RenderCtx* data, DisplayList* dl) override {}
-	};
 	struct CameraSystem : public System {
 		CameraSystem() {
 			id_ = kCameraComp;

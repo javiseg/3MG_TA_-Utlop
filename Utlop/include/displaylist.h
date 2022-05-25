@@ -53,9 +53,10 @@ namespace Utlop {
 
 	struct DrawMeshCmd : public Command {
 		void executeOnGPU() override {
-			m.Draw(shader, cameracmp, hasLightComponent);
+			m.Draw(shader, cameracmp, hasLightComponent, mat);
 		}
 		Mesh m;
+    Material mat;
 		GLuint shader;
 		CameraComponent cameracmp;
 		int hasLightComponent;
@@ -152,18 +153,22 @@ namespace Utlop {
 
 	struct DoFrameBufferCmd : public Command {
 		void executeOnGPU() override {
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			glUseProgram(shaderID);
-			glBindTextureUnit(0, fbTexture);
-			glUniform1i(glGetUniformLocation(shaderID, "screenTexture"), 0);
-			glBindVertexArray(rectVAO);
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-			glUseProgram(0);
+		
+      glBindFramebuffer(GL_FRAMEBUFFER, 0);
+      glUseProgram(shaderID);
+      glBindTextureUnit(0, fbTexture);
+      glUniform1i(glGetUniformLocation(shaderID, "screenTexture"), 0);
+      glUniform1i(glGetUniformLocation(shaderID, "postProcessType"), type);
+      glBindVertexArray(rectVAO);
+      glDrawElements(GL_TRIANGLES, indicessize, GL_UNSIGNED_INT, 0);
+      glUseProgram(0);
 		}
 		GLuint shaderID;
 		GLuint rectVAO;
 		GLuint fbTexture;
 		GLuint fbo;
+    GLuint indicessize = 6;
+    GLint type = 0;
 	};
 
 	struct BindFramebufferCmd : public Command {
@@ -237,14 +242,14 @@ namespace Utlop {
   DisplayList& addViewPortCmd(DisplayList* dl, GLint x, GLint y, GLsizei width, GLsizei height);
   DisplayList& addDrawCmd(DisplayList* dl, GLuint shaderId, GLuint materialID, GLuint vao, GLsizei size,
 		glm::mat4 view, glm::mat4 model);
-	DisplayList& addDrawMeshCmd(DisplayList* dl, Utlop::Mesh m, GLuint shader, Utlop::CameraComponent cameracmp, Utlop::LocalTRComponent localcmp,int hasLightComponent);
+	DisplayList& addDrawMeshCmd(DisplayList* dl, Utlop::Mesh m, GLuint shader, Utlop::CameraComponent cameracmp, Utlop::LocalTRComponent localcmp,int hasLightComponent, Material mat);
 	DisplayList& addSetPolygonCmd(DisplayList* dl, uint8_t on);
 	DisplayList& addSetModelViewProjection(DisplayList* dl, GLuint shaderID, glm::mat4 projection, glm::mat4 model, glm::mat4 view);
 	DisplayList& addSetLightDataCmd(DisplayList* dl, glm::vec3 color, glm::vec3 position, float intensity, GLuint shaderID, vec3 camPosition, vec3 direction, int type);
 	DisplayList& addEnableDepthTest(DisplayList* dl);
 	DisplayList& addDisableDepthTest(DisplayList* dl);
   DisplayList& addClearDepthBufferCmd(DisplayList* dl);
-  DisplayList& addDoFramebuffer(DisplayList* dl, GLuint shaderID, GLuint rectVAO, GLuint texture, GLuint fbo);
+  DisplayList& addDoFramebuffer(DisplayList* dl, GLuint shaderID, GLuint rectVAO, GLuint texture, GLuint fbo, GLuint indicessize, GLint fb_type);
 	DisplayList& addBindFramebuffer(DisplayList* dl, GLuint fboID);
 	DisplayList& addShadowFrameBufferCmd(DisplayList* dl, GLuint shaderID, mat4 lightProjection, GLuint activeTexture, GLuint FBtexture);
 	DisplayList& addDrawSkybox(DisplayList* dl, GLuint shaderID,

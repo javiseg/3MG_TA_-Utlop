@@ -18,24 +18,12 @@
 #define PX_SCHED_IMPLEMENTATION 1
 #include "px_sched.h"
 
-void loadCubemap(const char* path, GLuint& texture);
-void loadVertexShader(const char* filename, GLuint& vertShader);
-void loadFragmentShader(const char* filename, GLuint& fragShader);
-void setMat4fv(GLuint shader_id, glm::mat4 value, const GLchar* name, GLboolean transpose = GL_FALSE);
 bool loadOBJ2(const char* path, Utlop::Geometry& geo);
 
 namespace Utlop
 {
   const unsigned int kWidth = 1680;
   const unsigned int kHeight = 720;
-
-
-	struct PerFrameData
-	{
-		mat4 model;
-		mat4 mvp;
-		vec4 cameraPos;
-	};
 
   Core* Core::_instance = nullptr;
 
@@ -59,19 +47,6 @@ namespace Utlop
 		glfwTerminate();
   }
 
-	void Utlop::Core::createEntities(Core* cr) {
-		for (int i = 0; i < 2; i++) {
-			for (int j = 0; j < 1; j++) {
-				int entityIdx = cr->AddEntity();
-				cr->AddComponent(*cr->getData()->entities[entityIdx], kLocalTRComp);
-				cr->AddComponent(*cr->getData()->entities[entityIdx], kRenderComp);
-				cr->AddComponent(*cr->getData()->entities[entityIdx], kLightComp);
-				//cr->AddComponent(*cr->getData()->entities[entityIdx], kTypeLightComp);
-				
-				cr->getData()->localtrcmp[cr->getData()->entities[entityIdx]->cmp_indx_[kLocalTRCompPos]].position -= vec3(20.0f * i, 20.0f * j, 0.0f);
-			}
-		}
-	}
   bool Core::init(float fps)
   {
     _fps = fps;
@@ -85,37 +60,19 @@ namespace Utlop
 		camera_speed_ = 10.0f;
 		InitSystems();		
 
-		//Debug:
+    //Camera
 		AddEntity();
 		AddComponent(*data->entities[0], kCameraComp);
 		AddComponent(*data->entities[0], kLocalTRComp);
 		data->localtrcmp[data->entities[0]->cmp_indx_[kCameraCompPos]].position = vec3(0.0f, 0.0f, 55.0f);
 
-
-		//Point Light
-		/*
+		//Light
 		int lightEntity = AddEntity();
 		AddComponent(*data->entities[lightEntity], kLocalTRComp);
 		AddComponent(*data->entities[lightEntity], kTypeLightComp);
-		AddComponent(*data->entities[lightEntity], kRenderComp);
-		*/
-		//Directional Light
-		int lightEntity = AddEntity();
-		AddComponent(*data->entities[lightEntity], kLocalTRComp);
-		AddComponent(*data->entities[lightEntity], kTypeLightComp);
-		AddComponent(*data->entities[lightEntity], kLightComp);
 		AddComponent(*data->entities[lightEntity], kRenderComp);
 		data->typelighcmp[data->entities[lightEntity]->cmp_indx_[kTypeLightCompPos]].type = 0;
-		
-
-    /*
-    int lightEntity2 = AddEntity();
-    AddComponent(*data->entities[lightEntity2], kLocalTRComp);
-    AddComponent(*data->entities[lightEntity2], kTypeLightComp);
-    AddComponent(*data->entities[lightEntity2], kRenderComp);
-    data->typelighcmp[data->entities[lightEntity2]->cmp_indx_[kTypeLightCompPos]].type = 0;
-    */
-
+	
 
 		px_sched::Scheduler scheduler1;
 		scheduler1.init();
@@ -123,21 +80,9 @@ namespace Utlop
 
 
 		Core* cr = Instance();
-		auto job = [cr] {
-			cr->createEntities(cr);
-		};
-		printf("Antes\n");
-		//scheduler1.run(job, &schedulerReady1);
-		createEntities(cr);
 
-		printf("Waiting for tasks to finish...\n");
-		scheduler1.waitFor(schedulerReady1); // wait for all tasks to finish
-		printf("Waiting for tasks to finish...DONE \n");
-		printf("Despues\n");
-		//AddEntity();
-		
-		
-		
+		scheduler1.waitFor(schedulerReady1);
+
 		bg_color_ = vec4(0.0f);
 		bg_color_.w = 1.0f;
 		bool done = glfwInit();
@@ -150,15 +95,17 @@ namespace Utlop
 		{
 			printf("Failed to initialize GLAD");
 		}
-		//Load Shader
+		//Load Default Shader
 		data->shaders.push_back(Shader("../UtlopTests/src/shaders/vs.glsl", "../UtlopTests/src/shaders/fs_texture.glsl"));
 		
+    // Load Frame buffer shader
 		data->shaders.push_back(Shader("../UtlopTests/src/shaders/fb_vert.glsl", "../UtlopTests/src/shaders/fb_frag.glsl"));
 		data->framebuffer->initShader(data->shaders.size() - 1);
 		data->framebuffer->rectangleToGPU();
 		data->framebuffer->initFBO(kWidth - 300.0f, kHeight);
 		data->framebuffer->errorCheck();
 	
+    // Load Shadow framebuffer shader
 		data->shaders.push_back(Shader("../UtlopTests/src/shaders/shadowfb_vert.glsl", "../UtlopTests/src/shaders/shadowfb_frag.glsl"));
 
 		data->shadowframebuffer->initShader(data->shaders.size() - 1);
@@ -180,48 +127,66 @@ namespace Utlop
 			"../UtlopTests/src/textures/cubemap/front.jpg",
 			"../UtlopTests/src/textures/cubemap/back.jpg"
 		};
+    // Inits cubemap
+    data->shaders.push_back(Shader("../UtlopTests/src/shaders/skybox_vert.glsl", "../UtlopTests/src/shaders/skybox_frag.glsl"));
+    cubemap->shader_idx = data->shaders.size() - 1;
 
 		cubemap->createBuffers();
-		cubemap->loadTextures(facesCubemap);
-		data->shaders.push_back(Shader("../UtlopTests/src/shaders/skybox_vert.glsl", "../UtlopTests/src/shaders/skybox_frag.glsl"));
-		cubemap->shader_idx = data->shaders.size() - 1;
-		glUniform1i(glGetUniformLocation(data->shaders[cubemap->shader_idx].id, "skybox"), 0);
-
-
-		vector<string> robotTextures;
-		robotTextures.push_back("../UtlopTests/src/obj/robot/diffuse.jpg");
-		InitMesh("../UtlopTests/src/obj/robot/robot.obj", robotTextures);
-		data->obj_str_type.push_back("Robot");
-
-		vector<string> cubeTextures;
-		cubeTextures.push_back("../UtlopTests/src/textures/white.png");
-		InitMesh("../UtlopTests/src/obj/lightcube.obj", cubeTextures);
-		data->obj_str_type.push_back("White cube");
-
-		vector<string> helmetTextures;
-		helmetTextures.push_back("../UtlopTests/src/obj/helmet/diffuse.png");
-		helmetTextures.push_back("../UtlopTests/src/obj/helmet/specular.png");
-		//helmetTextures.push_back("../UtlopTests/src/obj/helmet/normal.png");
-		InitMesh("../UtlopTests/src/obj/helmet/helmet.obj", helmetTextures);
-		data->obj_str_type.push_back("Helmet");
-
-		vector<string> jupitertextures;
-		jupitertextures.push_back("../UtlopTests/src/obj/sphere/jupiter.jpg");
-		//jupitertextures.push_back("../UtlopTests/src/obj/helmet/specular.png");
-		InitMesh("../UtlopTests/src/obj/sphere/planet.obj", jupitertextures);
-		data->obj_str_type.push_back("Planet");
+		cubemap->loadTextures(facesCubemap, data);
 		
-		vector<string> floorTextures;
-		floorTextures.push_back("../UtlopTests/src/obj/floor/diffuse.png");
-		InitMesh("../UtlopTests/src/obj/floor/floor.obj", floorTextures);
-		data->obj_str_type.push_back("Floor");
 
-		vector<string> newCubeTextures;
-		newCubeTextures.push_back("../UtlopTests/src/obj/cube/diffuse1.jpg");
-		newCubeTextures.push_back("../UtlopTests/src/obj/cube/specular.png");
-		//newCubeTextures.push_back("../UtlopTests/src/obj/cube/normal.jpg");
-		InitMesh("../UtlopTests/src/obj/cube/cube.obj", newCubeTextures);
-		data->obj_str_type.push_back("Wood cube");
+    // Init White material
+    Material defaultWhite;
+    vector<string> defaultStrings;
+    defaultStrings.push_back("../UtlopTests/src/textures/white.png");
+    defaultWhite = InitMaterial(defaultStrings);
+    data->mat_str_type.push_back("White Material");
+    data->materials.push_back(defaultWhite);
+
+    // Init Cube OBJ
+		InitMesh("../UtlopTests/src/obj/cube/cube.obj");
+		data->obj_str_type.push_back("Cube");
+
+    // Init helmet material
+    Material helmet;
+    vector<string> helmetStrings;
+    helmetStrings.push_back("../UtlopTests/src/textures/helmet/diffuse.png");
+    helmetStrings.push_back("../UtlopTests/src/textures/helmet/specular.png");
+    helmet = InitMaterial(helmetStrings);
+    data->mat_str_type.push_back("Helmet Material");
+    data->materials.push_back(helmet);
+
+    // Init Helmet OBJ
+    InitMesh("../UtlopTests/src/obj/helmet/helmet.obj");
+    data->obj_str_type.push_back("Helmet");
+
+
+    // Init Floor material
+    Material floor;
+    vector<string> floorStrings;
+    floorStrings.push_back("../UtlopTests/src/textures/wood/diffuse.png");
+    floorStrings.push_back("../UtlopTests/src/textures/wood/specular.png");
+    floor = InitMaterial(floorStrings);
+    data->mat_str_type.push_back("Wood Material");
+    data->materials.push_back(floor);
+    
+    // Init Floor OBJ
+    InitMesh("../UtlopTests/src/obj/floor/floor.obj");
+    data->obj_str_type.push_back("Floor");
+
+    // Init Material Brick
+    Material brick;
+    vector<string> brickStrings;
+    brickStrings.push_back("../UtlopTests/src/textures/bricks/diffuse.png");
+    brickStrings.push_back("../UtlopTests/src/textures/bricks/specular.png");
+    brick = InitMaterial(brickStrings);
+    data->mat_str_type.push_back("Bricks Material");
+    data->materials.push_back(brick);
+
+    // Init Capsule OBJ
+    InitMesh("../UtlopTests/src/obj/capsule/capsule.obj");
+    data->obj_str_type.push_back("Capsule");
+
 
     return done;
   }
@@ -236,29 +201,49 @@ namespace Utlop
 			px_sched::Scheduler scheduler;
 			scheduler.init();
 			px_sched::Sync schedulerReady;
-			
+			px_sched::Sync schedulerUpdateReady;
+			px_sched::Sync schedulerShadowMapUpdateReady;
+      px_sched::Job g;
+
 			Core* cr = Instance();
 			auto preSched = [cr] {
 				cr->PreExecSystems();
 			};
-			auto sched = [cr] {
-				cr->ExecSystems();
+      scheduler.run(preSched, &schedulerReady);
+
+			auto schedUpdate = [cr] {
+				addBindFramebuffer(cr->displayList, 0);
+        addViewPortCmd(cr->displayList, 0, 0, kWidth - 300.0f, kHeight);
+        addBindFramebuffer(cr->displayList, cr->data->framebuffer->FBOid);
+        addWindowClearCmd(cr->displayList, cr->bg_color_.x, cr->bg_color_.y, cr->bg_color_.z, cr->bg_color_.w);
+
+        addEnableDepthTest(cr->displayList);
+
+        cr->ChangeShader(0);
+        addShadowFrameBufferCmd(cr->displayList, cr->data->shaders[0].id, cr->data->shadowframebuffer->lightProjection, 2, cr->data->shadowframebuffer->FBtexture);
+
+        addDrawSkybox(cr->displayList, cr->data->shaders[cr->cubemap->shader_idx].id, cr->data->localtrcmp[0].position,
+          cr->data->cameracmp[0].front_, cr->data->cameracmp[0].Up,
+          cr->data->cameracmp[0].projection_, cr->data->cameracmp[0].view_,
+          cr->cubemap->vao, cr->cubemap->texture);
+        cr->ExecSystems();
+
+        addDisableDepthTest(cr->displayList);
+        addDoFramebuffer(cr->displayList, cr->data->shaders[cr->data->framebuffer->shader_idx].id, cr->data->framebuffer->rectVAO, 
+          cr->data->framebuffer->FBtexture, cr->data->framebuffer->FBOid, 
+          cr->data->framebuffer->indices, cr->data->framebuffer->type);
+
+			};
+			auto schedShadowUpdate = [cr] {
+				cr->ShadowMapUpdate();
 			};
 
-
-			GLint version_max, version_min;
-			glGetIntegerv(GL_MAJOR_VERSION, &version_max);
-			glGetIntegerv(GL_MINOR_VERSION, &version_min);
-			printf("Version: %d.%d \n", version_max, version_min);
+      
 
 			float lastFrame = (float)glfwGetTime();
 			InitImGUI();
 			
-			
-			//scheduler.run(preSched, &schedulerReady);
-			PreExecSystems();
-			//scheduler.run(preSched, &schedulerReady);
-			//scheduler.waitFor(schedulerReady);
+      scheduler.waitFor(schedulerReady);
 
       while (!glfwWindowShouldClose(_window._window))
       {
@@ -266,37 +251,24 @@ namespace Utlop
 
         if (glfwGetKey(_window._window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
           glfwSetWindowShouldClose(_window._window, GL_TRUE);
-			
+        
 				deltaTime_ = (float)glfwGetTime() - lastFrame;
 				lastFrame = (float)glfwGetTime();
-				
-				
-				MoveCamera();
-
-
-				ChangeShader(data->shadowframebuffer->shader_idx);
-				data->shaders[data->shadowframebuffer->shader_idx].Activate();
         
-				addEnableDepthTest(displayList);
-				addViewPortCmd(displayList, 0, 0, kWidth - 300.0f, kHeight);
-        addBindFramebuffer(displayList, data->shadowframebuffer->FBOid);
-        addClearDepthBufferCmd(displayList);
-				ExecSystems();
-				displayList->executeOnGPU();
+				MoveCamera();
+        ShadowMapUpdate();
+        displayList->executeOnGPU();
+     
 
-        addBindFramebuffer(displayList, 0);
-				addViewPortCmd(displayList, 0, 0, kWidth - 300.0f, kHeight);
-				addBindFramebuffer(displayList, data->framebuffer->FBOid);
-				addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
-        Update();
-				addDoFramebuffer(displayList, data->shaders[data->framebuffer->shader_idx].id, data->framebuffer->rectVAO, data->framebuffer->FBtexture, data->framebuffer->FBOid);
+        scheduler.run(schedUpdate, &schedulerUpdateReady);
+        
+        scheduler.waitFor(schedulerUpdateReady);
 				displayList->executeOnGPU();
 
 				ImGUI();
 
         glfwSwapBuffers(_window._window);
         glfwPollEvents();
-
         std::chrono::system_clock::time_point end_time = std::chrono::system_clock::now();
         std::this_thread::sleep_until(start_time + std::chrono::milliseconds(_frame_time_millis));
 				
@@ -311,7 +283,11 @@ namespace Utlop
 
 	void Core::Update()
 	{
-		
+    addBindFramebuffer(displayList, 0);
+    addViewPortCmd(displayList, 0, 0, kWidth - 300.0f, kHeight);
+    addBindFramebuffer(displayList, data->framebuffer->FBOid);
+    addWindowClearCmd(displayList, bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
+
     addEnableDepthTest(displayList);
 
     ChangeShader(0);
@@ -325,8 +301,23 @@ namespace Utlop
     ExecSystems();
 
     addDisableDepthTest(displayList);
+    addDoFramebuffer(displayList, data->shaders[data->framebuffer->shader_idx].id, 
+      data->framebuffer->rectVAO, data->framebuffer->FBtexture, data->framebuffer->FBOid, 
+     data->framebuffer->indices, data->framebuffer->type);
 
 	}
+
+  void Core::ShadowMapUpdate()
+  {
+    ChangeShader(data->shadowframebuffer->shader_idx);
+    data->shaders[data->shadowframebuffer->shader_idx].Activate();
+
+    addEnableDepthTest(displayList);
+    addViewPortCmd(displayList, 0, 0, kWidth - 300.0f, kHeight);
+    addBindFramebuffer(displayList, data->shadowframebuffer->FBOid);
+    addClearDepthBufferCmd(displayList);
+    ExecSystems();
+  }
 
   Utlop::Window* Core::getWindow()
   {
@@ -352,6 +343,81 @@ namespace Utlop
 		return newEntity.entityIdx;
 	}
 
+  void Core::DeleteEntity(int index)
+  {
+    for (int i = 0; i < data->entities.size(); i++) {
+
+      if (i != index) {
+
+        if ((data->entities[i]->componentsID_ & kHeritageComp) == kHeritageComp) {
+          if (data->entities[i]->cmp_indx_[kHeritageCompPos] < data->heritagecmp.size()) {
+
+            if (data->heritagecmp[data->entities[i]->cmp_indx_[kHeritageCompPos]].parentID == data->entities[index]->entityIdx) {
+              DeleteEntity(i);
+              i = 0;
+            }
+          }
+        }
+      }
+    }
+    if ((data->entities[index]->componentsID_ & kLocalTRComp) == kLocalTRComp) {
+      data->localtrcmp.erase(data->localtrcmp.begin() + data->entities[index]->cmp_indx_[kLocalTRCompPos]);
+    }
+    if ((data->entities[index]->componentsID_ & kCameraComp) == kCameraComp) {
+      data->cameracmp.erase(data->cameracmp.begin() + data->entities[index]->cmp_indx_[kCameraCompPos]);
+    }
+    if ((data->entities[index]->componentsID_ & kRenderComp) == kRenderComp) {
+      data->rendercmp.erase(data->rendercmp.begin() + data->entities[index]->cmp_indx_[kRenderCompPos]);
+    }
+    if ((data->entities[index]->componentsID_ & kHeritageComp) == kHeritageComp) {
+      data->heritagecmp.erase(data->heritagecmp.begin() + data->entities[index]->cmp_indx_[kHeritageCompPos]);
+    }
+    if ((data->entities[index]->componentsID_ & kLightComp) == kLightComp) {
+      data->lightcmp.erase(data->lightcmp.begin() + data->entities[index]->cmp_indx_[kLightCompPos]);
+    }
+    if ((data->entities[index]->componentsID_ & kTypeLightComp) == kTypeLightComp) {
+      data->typelighcmp.erase(data->typelighcmp.begin() + data->entities[index]->cmp_indx_[kTypeLightCompPos]);
+    }
+
+    for (int i = 0; i < data->entities.size(); i++) {
+
+      if (i > index) {
+        if ((data->entities[index]->componentsID_ & kLocalTRComp) == kLocalTRComp &&
+          (data->entities[i]->componentsID_ & kLocalTRComp) == kLocalTRComp) {
+          data->entities[i]->cmp_indx_[kLocalTRCompPos] -= 1;
+        }
+        if ((data->entities[index]->componentsID_ & kCameraComp) == kCameraComp &&
+          (data->entities[i]->componentsID_ & kCameraComp) == kCameraComp) {
+          data->entities[i]->cmp_indx_[kCameraCompPos] -= 1;
+        }
+        if ((data->entities[index]->componentsID_ & kRenderComp) == kRenderComp &&
+          (data->entities[i]->componentsID_ & kRenderComp) == kRenderComp) {
+          data->entities[i]->cmp_indx_[kRenderCompPos] -= 1;
+        }
+        if ((data->entities[index]->componentsID_ & kHeritageComp) == kHeritageComp &&
+          (data->entities[i]->componentsID_ & kHeritageComp) == kHeritageComp) {
+          data->entities[i]->cmp_indx_[kHeritageCompPos] -= 1;
+        }
+        if ((data->entities[index]->componentsID_ & kLightComp) == kLightComp &&
+          (data->entities[i]->componentsID_ & kLightComp) == kLightComp) {
+          data->entities[i]->cmp_indx_[kLightCompPos] -= 1;
+        }
+        if ((data->entities[index]->componentsID_ & kTypeLightComp) == kTypeLightComp &&
+          (data->entities[i]->componentsID_ & kTypeLightComp) == kTypeLightComp) {
+          data->entities[i]->cmp_indx_[kTypeLightCompPos] -= 1;
+        }
+
+      }
+
+      
+    }
+
+
+
+    data->entities.erase(data->entities.begin() + index);
+
+  }
+
 	void Core::AddComponent(Entity& entity, Utlop::ComponentID id)
 	{
 		if ((entity.componentsID_ & id) == 0) {
@@ -362,11 +428,6 @@ namespace Utlop
 				case kLocalTRComp: {
 						data->localtrcmp.push_back(LocalTRComponent());
 						entity.cmp_indx_[kLocalTRCompPos] = (int)(data->localtrcmp.size() - 1);
-					break;
-				}
-				case kWorldTRComp: {
-						data->worldtrcmp.push_back(WorldTRComponent());
-						entity.cmp_indx_[kWorldTRCompPos] = (int)(data->worldtrcmp.size() - 1);
 					break;
 				}
 				case kCameraComp: {
@@ -407,10 +468,6 @@ namespace Utlop
     if ((components & kLocalTRComp) == kLocalTRComp) {
       data->localtrcmp.push_back(LocalTRComponent());
       entity.cmp_indx_[kLocalTRCompPos] = (int)(data->localtrcmp.size() - 1);
-    }
-    if ((components & kWorldTRComp) == kWorldTRComp) {
-      data->worldtrcmp.push_back(WorldTRComponent());
-      entity.cmp_indx_[kWorldTRCompPos] = (int)(data->worldtrcmp.size() - 1);
     }
     if ((components & kCameraComp) == kCameraComp) {
       data->cameracmp.push_back(CameraComponent());
@@ -454,19 +511,19 @@ namespace Utlop
     PreExecSystem(*data->entities[index_entity]);
   }
 
-
-	vector<Texture> Core::InitMaterials(RenderCtx* data, vector<string> texturePaths)
+	Material Core::InitMaterial(vector<string> texturePaths)
 	{
-		vector<Texture> textures;
+    Material tmpMat;
+		
 		for (int i = 0; i < texturePaths.size(); i++) {
 			if(i == 0)
-				textures.push_back(Texture(texturePaths[i].c_str(), "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE));
+        tmpMat.textures.push_back(Texture(texturePaths[i].c_str(), "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE));
 			else if(i == 1)
-				textures.push_back(Texture(texturePaths[i].c_str(), "specular", 1, GL_RED, GL_UNSIGNED_BYTE));
+        tmpMat.textures.push_back(Texture(texturePaths[i].c_str(), "specular", 1, GL_RED, GL_UNSIGNED_BYTE));
 			else if(i  == 2)
-				textures.push_back(Texture(texturePaths[i].c_str(), "normal", 1, GL_RGB, GL_UNSIGNED_BYTE));
+        tmpMat.textures.push_back(Texture(texturePaths[i].c_str(), "normal", 2, GL_RGB, GL_UNSIGNED_BYTE));
 		}
-		return textures;
+		return tmpMat;
 	}
 
 	Geometry Core::InitGeometry(const char* path)
@@ -481,7 +538,9 @@ namespace Utlop
 	{
 		data->rendercmp[entity.cmp_indx_[kRenderCompPos]].mesh_idx[0] = option;
 	}
-
+  void Core::ChangeMaterial(Entity& entity, RenderCtx* data, int option) {
+    data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx[0] = option;
+  }
   void Core::ClearDataLists(vector<std::vector<int>>* selectedType)
   {
     data->entities.erase(data->entities.begin() + 1, data->entities.end());
@@ -489,15 +548,14 @@ namespace Utlop
     data->rendercmp.clear();
     data->lightcmp.clear();
     data->typelighcmp.clear();
-    data->worldtrcmp.clear();
     selectedType->clear();
   }
 
-  void Core::InitMesh(string geometryPath, vector<string> texturePath)
+  void Core::InitMesh(string geometryPath)
 	{
     Geometry geo;
     loadOBJ2(geometryPath.c_str(), geo);
-		Mesh newMesh(geo.totalVertex_, geo.totalIndices_, InitMaterials(data, texturePath), geometryPath);
+		Mesh newMesh(geo.totalVertex_, geo.totalIndices_, geometryPath);
 		data->meshes.push_back(newMesh);
    
 	}
@@ -506,7 +564,6 @@ namespace Utlop
 	void Core::InitSystems()
 	{
 		data->sys.push_back(make_shared<LocalTRSystem>());
-		data->sys.push_back(make_shared<WorldTRSystem>());
 		data->sys.push_back(make_shared<CameraSystem>());
 		data->sys.push_back(make_shared<RenderSystem>());
 		data->sys.push_back(make_shared<HeritageSystem>());
@@ -546,22 +603,12 @@ namespace Utlop
 		}
 	}
 
-	void Core::ExecSystems2()
-	{
-		for (unsigned int h = 0; h < data->entities.size(); h++) {
-			int out = data->entities[h]->componentsID_ & data->sys[kRenderCompPos]->id_;
-			if (out == data->sys[kRenderCompPos]->id_)
-				data->sys[kRenderCompPos]->exec(*data->entities[h], data, displayList);
-		}
-	}
-
 	void Core::ChangeShader(GLuint shader_idx)
 	{
 		for (unsigned int h = 0; h < data->rendercmp.size(); h++) {
 			data->rendercmp[h].shader_idx = shader_idx;
 		}
 	}
-
 
   Core* Core::Instance()
   {
@@ -597,7 +644,7 @@ namespace Utlop
       mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
     if (ImGui::IsKeyPressed(ImGuiKey_R))
       mCurrentGizmoOperation = ImGuizmo::ROTATE;
-    if (ImGui::IsKeyPressed(ImGuiKey_Y)) // r Key
+    if (ImGui::IsKeyPressed(ImGuiKey_Y)) 
       mCurrentGizmoOperation = ImGuizmo::SCALE;
     slidername = "Translate " + std::to_string(n);
     if (ImGui::RadioButton(slidername.c_str(), mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
@@ -616,7 +663,7 @@ namespace Utlop
 
 
     ImGuiIO& io = ImGui::GetIO();
-    ImGuizmo::SetRect(0, 0, io.DisplaySize.x , io.DisplaySize.y);
+    ImGuizmo::SetRect(0, 0, io.DisplaySize.x - 300.0f, io.DisplaySize.y);
     ImGuizmo::Manipulate(value_ptr(camera.view_), value_ptr(camera.projection_),
       mCurrentGizmoOperation, mCurrentGizmoMode, value_ptr(modelMat),
       NULL, nullptr);
@@ -647,16 +694,30 @@ namespace Utlop
         selectedType.push_back(vector<int>(0));
       }
     }
+    static vector<std::vector<int>> selectedMaterial;
+    for (int i = 0; i < data->entities.size(); i++) {
+      if (i == selectedMaterial.size()) {
+        selectedMaterial.push_back(vector<int>(0));
+      }
+    }
 		if (ImGui::Begin("Utlop Engine")) {
 
-			ImGui::ColorEdit4("Color", &bg_color_[0]);
+      ImGui::TextColored(ImVec4(1, 0, 0, 1), "Postprocess");
+      ImGui::RadioButton("Without", &data->framebuffer->type, 0); ImGui::SameLine();
+      ImGui::RadioButton("Colored Lines", &data->framebuffer->type, 1); ImGui::SameLine();
+      ImGui::RadioButton("Blurr", &data->framebuffer->type, 2);
 
-
-			if (ImGui::Button("Add Agent")) {
+			if (ImGui::Button("Add Entity")) {
 				int entityIdx = AddEntity();
 				AddComponent(*data->entities[entityIdx], kLocalTRComp);
 				AddComponent(*data->entities[entityIdx], kRenderComp);
 				AddComponent(*data->entities[entityIdx], kLightComp);
+				PreExecSystem(*data->entities[entityIdx]);
+			} ImGui::SameLine();
+			if (ImGui::Button("Entity w/o Light")) {
+				int entityIdx = AddEntity();
+				AddComponent(*data->entities[entityIdx], kLocalTRComp);
+				AddComponent(*data->entities[entityIdx], kRenderComp);
 				PreExecSystem(*data->entities[entityIdx]);
 			} ImGui::SameLine();
 
@@ -749,8 +810,23 @@ namespace Utlop
               char s[10];
               itoa(gameObjectSelected, s, 10);
               selectedType[gameObjectSelected].push_back(data->rendercmp[data->entities[gameObjectSelected]->cmp_indx_[kRenderCompPos]].mesh_idx[0]);
+              int tmpSelected = selectedType[gameObjectSelected][0];
               ImGui::ListBox(s, &selectedType[gameObjectSelected][0], &data->obj_str_type[0], data->obj_str_type.size());
-              ChangeMesh(*data->entities[gameObjectSelected], data, selectedType[gameObjectSelected][0]);
+              if(tmpSelected != selectedType[gameObjectSelected][0])
+                ChangeMesh(*data->entities[gameObjectSelected], data, selectedType[gameObjectSelected][0]);
+              
+              char m[10];
+              itoa(gameObjectSelected+100, m, 10);
+              selectedMaterial[gameObjectSelected].push_back(data->rendercmp[data->entities[gameObjectSelected]->cmp_indx_[kRenderCompPos]].material_idx[0]);
+              int tmpmatSelected = selectedMaterial[gameObjectSelected][0];
+              ImGui::ListBox(m, &selectedMaterial[gameObjectSelected][0], &data->mat_str_type[0], data->mat_str_type.size());
+              if(tmpmatSelected != selectedMaterial[gameObjectSelected][0])
+                ChangeMaterial(*data->entities[gameObjectSelected], data, selectedMaterial[gameObjectSelected][0]);
+            
+              if (ImGui::SmallButton("Delete Entity")) {
+                DeleteEntity(gameObjectSelected);
+                gameObjectSelected = -1;
+              }
             }
             else if (data->entities[gameObjectSelected]->cmp_indx_[kTypeLightCompPos] != -1) {
               static int e = 0;
@@ -760,7 +836,10 @@ namespace Utlop
               ImGui::RadioButton(radioname.c_str(), &data->typelighcmp[data->entities[gameObjectSelected]->cmp_indx_[kTypeLightCompPos]].type, 1); ImGui::SameLine();
               radioname = "SpotLight " + std::to_string(gameObjectSelected);
               ImGui::RadioButton(radioname.c_str(), &data->typelighcmp[data->entities[gameObjectSelected]->cmp_indx_[kTypeLightCompPos]].type, 2);
-              //data->typelighcmp[data->entities[n]->cmp_indx_[kTypeLightCompPos]].type = (float)e;
+              if (ImGui::SmallButton("Delete Entity")) {
+                DeleteEntity(gameObjectSelected);
+                gameObjectSelected = -1;
+              }
             }
 
             if (ImGui::SmallButton("Add Children")) {
@@ -770,6 +849,7 @@ namespace Utlop
         ImGui::End();
       }
       ImGui::End();
+
       ImGui::Render();
       ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		}

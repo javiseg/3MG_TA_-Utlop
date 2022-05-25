@@ -3,6 +3,9 @@
 #include <string>
 
 namespace Utlop {
+
+  struct RenderCtx;
+
 	const float skyboxVertices[] =
 	{
 		//   Coordinates
@@ -48,7 +51,7 @@ namespace Utlop {
 
 
 		void createBuffers();
-		void loadTextures(std::string faces[6]);
+		void loadTextures(std::string faces[6], RenderCtx* data);
 	};
 
 

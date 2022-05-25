@@ -18,7 +18,8 @@ int getSavedSceneCallback(void* database, int number_cols, char** values, char**
     kLocation_Y = 3,
     kLocation_Z = 4,
     kMesh = 5,
-    kParentIdx = 6
+    kMaterial = 6,
+    kParentIdx = 7
   };
 
   Utlop::RenderCtx* data = Utlop::Core::Instance()->getData();
@@ -33,6 +34,7 @@ int getSavedSceneCallback(void* database, int number_cols, char** values, char**
   
   data->localtrcmp[data->entities[newEntity]->cmp_indx_[Utlop::kLocalTRCompPos]].position = transform;
   data->rendercmp[data->entities[newEntity]->cmp_indx_[Utlop::kRenderCompPos]].mesh_idx.push_back(strtol(values[kMesh], NULL, 10));
+  data->rendercmp[data->entities[newEntity]->cmp_indx_[Utlop::kRenderCompPos]].material_idx.push_back(strtol(values[kMaterial], NULL, 10));
   
   int parent = strtol(values[kParentIdx], NULL, 10);
   if (parent != -1) {

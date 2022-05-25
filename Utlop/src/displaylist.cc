@@ -57,7 +57,7 @@ Utlop::DisplayList& Utlop::addDrawCmd(Utlop::DisplayList* dl, GLuint shaderId, G
 	return *dl;
 }
 
-Utlop::DisplayList& Utlop::addDrawMeshCmd(DisplayList* dl, Utlop::Mesh m, GLuint shader, Utlop::CameraComponent cameracmp, Utlop::LocalTRComponent localcmp, int hasLightComponent)
+Utlop::DisplayList& Utlop::addDrawMeshCmd(DisplayList* dl, Utlop::Mesh m, GLuint shader, Utlop::CameraComponent cameracmp, Utlop::LocalTRComponent localcmp, int hasLightComponent, Material mat)
 {
 	shared_ptr<DrawMeshCmd> drawMeshCmd;
 	drawMeshCmd = make_shared<DrawMeshCmd>();
@@ -66,6 +66,7 @@ Utlop::DisplayList& Utlop::addDrawMeshCmd(DisplayList* dl, Utlop::Mesh m, GLuint
 	drawMeshCmd->shader = shader;
 	drawMeshCmd->cameracmp = cameracmp;
   drawMeshCmd->hasLightComponent = hasLightComponent;
+  drawMeshCmd->mat = mat;
 
 	dl->cmdList.push_back(move(drawMeshCmd));
 
@@ -147,7 +148,7 @@ Utlop::DisplayList& Utlop::addClearDepthBufferCmd(DisplayList* dl)
   return *dl;
 }
 
-Utlop::DisplayList& Utlop::addDoFramebuffer(DisplayList* dl, GLuint shaderID, GLuint rectVAO, GLuint texture, GLuint fbo)
+Utlop::DisplayList& Utlop::addDoFramebuffer(DisplayList* dl, GLuint shaderID, GLuint rectVAO, GLuint texture, GLuint fbo, GLuint indicessize, GLint fb_type)
 {
 	std::unique_ptr<Utlop::DoFrameBufferCmd> fbcmd;
 	fbcmd = std::make_unique<Utlop::DoFrameBufferCmd>();
@@ -156,6 +157,8 @@ Utlop::DisplayList& Utlop::addDoFramebuffer(DisplayList* dl, GLuint shaderID, GL
 	fbcmd->rectVAO = rectVAO;
 	fbcmd->fbTexture = texture;
 	fbcmd->fbo = fbo;
+  fbcmd->indicessize = indicessize;
+  fbcmd->type = fb_type;
 
 	dl->cmdList.push_back(move(fbcmd));
 
