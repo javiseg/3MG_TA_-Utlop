@@ -96,12 +96,13 @@ void Utlop::RenderSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 	}
 	//entity.cmp_indx_[kRenderCompPos] = 0;
 	if (entity.cmp_indx_[kTypeLightCompPos] == -1) {
-		initialMesh(entity, data, "../UtlopTests/src/obj/cube/cube.obj");
+		initialMesh(entity, data, "../UtlopTests/src/obj/helmet/helmet.obj");
+    data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx.push_back(1);
 	}
 	else {
 		initialMesh(entity, data, "../UtlopTests/src/obj/lightcube.obj");
-	}
   data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx.push_back(0);
+	}
 }
 
 void Utlop::RenderSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
@@ -185,7 +186,7 @@ void Utlop::LightSystem::exec(Entity& entity, RenderCtx* data, DisplayList* dl)
 
 void Utlop::TypeLightSystem::preExec(Entity& entity, Utlop::RenderCtx* data)
 {
-  data->typelighcmp[entity.cmp_indx_[kTypeLightCompPos]].color = vec3(1.0f, 1.0f, 1.0f);
+  data->typelighcmp[entity.cmp_indx_[kTypeLightCompPos]].color = vec3(1.0f, 0.0f, 0.0f);
   data->typelighcmp[entity.cmp_indx_[kTypeLightCompPos]].direction = vec3(0.0f, -1.0f, 0.0f);
   data->typelighcmp[entity.cmp_indx_[kTypeLightCompPos]].intensity = 2.0f;
 	if (entity.cmp_indx_[kLocalTRCompPos] != -1) {
@@ -218,8 +219,19 @@ void Utlop::SilhoutteSystem::exec(Entity& entity, RenderCtx* data, DisplayList* 
 
   if (entity.cmp_indx_[kLocalTRCompPos] != -1 && entity.cmp_indx_[kRenderCompPos] != -1) {
     if (!data->rendercmp[entity.cmp_indx_[kRenderCompPos]].mesh_idx.empty()) {
+      data->meshes[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].mesh_idx[0]].Draw(data->shaders[data->silhoutteframebuffer->shader_idx].id,
+        data->cameracmp[0], -1, data->materials[data->rendercmp[entity.cmp_indx_[kRenderCompPos]].material_idx[0]]);
 
-     
+      data->shaders[data->silhoutteframebuffer->shader_idx].Activate();
+      glUniformMatrix4fv(glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "ModelMatrix"),
+        1, GL_FALSE, glm::value_ptr(data->localtrcmp[entity.cmp_indx_[kLocalTRCompPos]].model));
+      glUniformMatrix4fv(glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "ViewMatrix"),
+        1, GL_FALSE, glm::value_ptr(data->cameracmp[0].view_));
+      glUniformMatrix4fv(glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "ProjectionMatrix"),
+        1, GL_FALSE, glm::value_ptr(data->cameracmp[0].projection_));
+      glUniform3fv(glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "color"),
+        1, glm::value_ptr(data->silhouttecmp[entity.cmp_indx_[kSilhoutteCompPos]].color));
+      glUseProgram(0);
 
     }
   }

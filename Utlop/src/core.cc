@@ -295,33 +295,24 @@ namespace Utlop
         glViewport(0, 0, kWidth - 300.0f, kHeight);
         glEnable(GL_DEPTH_TEST);
         glBindFramebuffer(GL_FRAMEBUFFER, data->silhoutteframebuffer->FBOid);
-        glClearColor(bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glBindTextureUnit(0, data->silhoutteframebuffer->FBtexture);
 
-        ExecSystems();
+        glUniform1i(glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "silhoutteTexture"), 0);
+
+        //ExecSystems();
         for (int i = 0; i < data->entities.size(); i++) {
           if ((data->entities[i]->componentsID_ & kSilhoutteComp) == kSilhoutteComp) {
-            data->shaders[data->silhoutteframebuffer->shader_idx].Activate();
-            glUniformMatrix4fv(glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "ModelMatrix"),
-              1, GL_FALSE, glm::value_ptr(data->localtrcmp[data->entities[i]->cmp_indx_[kLocalTRCompPos]].model));
-            glUniformMatrix4fv(glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "ViewMatrix"),
-              1, GL_FALSE, glm::value_ptr(data->cameracmp[0].view_));
-            glUniformMatrix4fv(glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "ProjectionMatrix"),
-              1, GL_FALSE, glm::value_ptr(data->cameracmp[0].projection_));
-            glUniform3fv(glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "color"),
-              1, glm::value_ptr(data->silhouttecmp[data->entities[i]->cmp_indx_[kSilhoutteCompPos]].color));
-
+            if ((data->entities[i]->componentsID_ & kRenderComp) == kRenderComp) {
+              SilhoutteSystem silsys;
+              silsys.exec(*data->entities[i], data, displayList);
+            }
           }
         }
-        displayList->executeOnGPU();
 
         data->shaders[data->silhoutteframebuffer->shader_idx].Activate();
 
-        glEnable(GL_DEPTH_TEST);
-        glUseProgram(data->shaders[data->silhoutteframebuffer->shader_idx].id);
-        glBindTextureUnit(0, data->silhoutteframebuffer->FBtexture);
-        
-        glUniform1i(glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "silhoutteTexture"), 0);
         //glUniform3fv(glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "color"), 1, value_ptr(vec3(1.0f, 1.0f, 1.0f)));
         int tex = glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "silhoutteTexture");
         int color = glGetUniformLocation(data->shaders[data->silhoutteframebuffer->shader_idx].id, "color");
@@ -334,15 +325,7 @@ namespace Utlop
         glClearColor(bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUseProgram(data->shaders[data->silhoutteframebuffer->shader_idx].id);
-        glBindVertexArray(data->silhoutteframebuffer->rectVAO);
-        glDrawElements(GL_TRIANGLES, data->silhoutteframebuffer->indices, GL_UNSIGNED_INT, 0);
-        glUseProgram(0);
         
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClearColor(bg_color_.x, bg_color_.y, bg_color_.z, bg_color_.w);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
         //////////////////////////////////////////////////////
 
@@ -801,7 +784,7 @@ namespace Utlop
 
       ImGui::TextColored(ImVec4(1, 0, 0, 1), "Postprocess");
       ImGui::RadioButton("Without", &data->framebuffer->type, 0); ImGui::SameLine();
-      ImGui::RadioButton("Colored Lines", &data->framebuffer->type, 1); ImGui::SameLine();
+      ImGui::RadioButton("Silhoutte", &data->framebuffer->type, 1); ImGui::SameLine();
       ImGui::RadioButton("Blurr", &data->framebuffer->type, 2);
 
 			if (ImGui::Button("Add Entity")) {
@@ -811,10 +794,11 @@ namespace Utlop
 				AddComponent(*data->entities[entityIdx], kLightComp);
 				PreExecSystem(*data->entities[entityIdx]);
 			} ImGui::SameLine();
-			if (ImGui::Button("Entity w/o Light")) {
+			if (ImGui::Button("Entity Silhoutte")) {
 				int entityIdx = AddEntity();
 				AddComponent(*data->entities[entityIdx], kLocalTRComp);
 				AddComponent(*data->entities[entityIdx], kRenderComp);
+        AddComponent(*data->entities[entityIdx], kLightComp);
 				AddComponent(*data->entities[entityIdx], kSilhoutteComp);
 				PreExecSystem(*data->entities[entityIdx]);
 			} ImGui::SameLine();
